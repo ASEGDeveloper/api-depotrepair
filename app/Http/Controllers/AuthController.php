@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\RefreshToken;
  use App\Traits\ApiResponse;
+ use Illuminate\Support\Facades\Cache;
 
 
 class AuthController extends Controller
@@ -32,7 +33,7 @@ class AuthController extends Controller
         // Delete old tokens (optional)
         $employee->tokens()->delete();
 
-        $accessToken = $employee->createToken('API Token', ['*'], now()->addMinutes(15));
+        $accessToken = $employee->createToken('API Token', ['*'], now()->addMinutes(60));
 
         // Create refresh token (long-lived, 7 days)
         $refreshToken = Str::random(64);
@@ -88,9 +89,54 @@ class AuthController extends Controller
         return response()->json(['message' => 'Logged out successfully']);
     }
 
-    public function getEmployees(Request $request)
-    {
-       return Employee::select('*')->first(); // this is for testing purpose
+    // public function getEmployees(Request $request)
+    // {
+    //    return Employee::select('*')->limit(5)->get(); // this is for testing purpose
        
-    }
+    // }
+
+ 
+
+public function getEmployees(Request $request)
+{
+    $page   = $request->input('page', 1);
+    $limit  = $request->input('limit', 10);
+    $search = $request->input('search', '');
+    $status = $request->input('status', '');
+
+    // create unique cache key based on filters
+    $cacheKey = "employees_page_{$page}_limit_{$limit}_search_{$search}_status_{$status}";
+
+    // cache for 10 minutes (600 seconds)
+    return Cache::remember($cacheKey, 600, function () use ($page, $limit, $search, $status) {
+        $query = Employee::query();
+
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('EmployeeName', 'like', "%{$search}%")
+                  ->orWhere('EmployeeEmail', 'like', "%{$search}%");
+            });
+        }
+
+        if (!empty($status)) {
+            $query->where('status', $status);
+        }
+
+        $total = $query->count();
+
+        $employees = $query->offset(($page - 1) * $limit)
+                           ->limit($limit)
+                           ->get();
+
+        return [
+            'data'     => $employees,
+            'total'    => $total,
+            'page'     => $page,
+            'per_page' => $limit
+        ];
+    });
+}
+
+
+
 }
