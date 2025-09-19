@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Laravel\Socialite\Facades\Socialite;
-use App\Models\User;
+use App\Models\Employee;
 
 class MicrosoftController extends Controller
 {
@@ -18,10 +18,10 @@ class MicrosoftController extends Controller
         $microsoftUser = Socialite::driver('microsoft')->user();
 
         // Example: find or create user in your DB
-        $user = User::updateOrCreate(
-            ['email' => $microsoftUser->getEmail()],
+        $user = Employee::updateOrCreate(
+            ['EmployeeEmail' => $microsoftUser->getEmail()],
             [
-                'name' => $microsoftUser->getName(),
+                'EmployeeName' => $microsoftUser->getName(),
                 'microsoft_id' => $microsoftUser->getId(),
             ]
         );
