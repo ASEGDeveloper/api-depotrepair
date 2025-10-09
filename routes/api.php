@@ -12,11 +12,8 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('refresh', [AuthController::class, 'refresh']);
 
 
-Route::get('/tna-entries', [TnaEntryController::class, 'index']);
-Route::get('/tna-entries/{id}', [TnaEntryController::class, 'show']);
-Route::post('/tna-entries', [TnaEntryController::class, 'store']);
-Route::put('/tna-entries/{id}', [TnaEntryController::class, 'update']);
-Route::delete('/tna-entries/{id}', [TnaEntryController::class, 'destroy']);
+Route::post('/tna-entries', [TnaEntryController::class, 'createUpdate']);
+ 
 
 
 
