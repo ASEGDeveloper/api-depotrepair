@@ -22,18 +22,20 @@ class TnaRequest extends FormRequest
     public function rules(): array
     {
           return [ 
-            'emp_code' => 'required',
-            'job_code' => 'required',
+            'employeecode' => 'required',
+            'jobcode' => 'required',
             'tas_data_from' => 'required',
+            'source'=>'required'
           ];
     }
 
     public function messages(): array
     {
         return [
-            'emp_code.required' => 'Employee Code is required.', 
-            'job_code.required'      => 'Job Code is required.',
+            'employeecode.required' => 'Employee Code is required.', 
+            'jobcode.required'      => 'Job Code is required.',
             'tas_data_from.required'=> 'Time In is required.',
+            'source.required'=> 'Source is  required.',
         ];
     }
 

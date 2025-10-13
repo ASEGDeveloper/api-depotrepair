@@ -56,4 +56,14 @@ trait ApiResponse
             'errors' => $errors
         ], $status);
     }
+
+
+    public function response(string $message = 'Success', int $status = 200): JsonResponse
+    {
+        return response()->json([
+            'status' => 'success',
+            'message' => $message, 
+        ], $status);
+    }
+
 }
