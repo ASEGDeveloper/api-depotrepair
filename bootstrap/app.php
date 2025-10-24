@@ -14,8 +14,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
        $middleware->alias([
-        'api.token' => PublicApiTokenMiddleware::class,
-    ]);
+         'api.token' => PublicApiTokenMiddleware::class,
+         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

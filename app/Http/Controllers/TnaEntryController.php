@@ -45,7 +45,7 @@ class TnaEntryController extends Controller
         $handlers = [
             'APP' => AppTaskHandler::class,
             'Highmessage' => HighmessageTaskHandler::class,
-            'SMS' => SMSTaskHandler::class,
+            'SMS' => SMSTaskHandler::class 
         ];
 
         // Validate source

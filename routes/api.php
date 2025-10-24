@@ -1,18 +1,21 @@
 <?php
- 
- 
+  
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\TnaEntryController;
-
+use Tests\Feature\TnaControllerTest;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('refresh', [AuthController::class, 'refresh']);
 
 
 Route::middleware('api.token')->post('/tna-entries', [TnaEntryController::class, 'createOrUpdateTNAEntry']); 
+
+Route::post('/test-tna', [TnaControllerTest::class, 'createOrUpdateTNAEntry']);
+
+
 
 Route::middleware('auth:sanctum')->group(function () {
     
