@@ -38,13 +38,13 @@ class CustomerModel extends Model
         parent::boot();
 
         static::creating(function ($model) {
-            $username = Auth::check() ? Auth::user()->name : 'system';
+            $username = Auth::check() ? Auth::user()->EmployeeID : 'system';
             $model->CreatedBy = $username;
             $model->UpdatedBy = $username;
         });
 
         static::updating(function ($model) {
-            $username = Auth::check() ? Auth::user()->name : 'system';
+            $username = Auth::check() ? Auth::user()->EmployeeID : 'system';
             $model->UpdatedBy = $username;
         });
     }
