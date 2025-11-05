@@ -1,10 +1,10 @@
 <?php
- 
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Auth;
 
 class CustomerModel extends Model
 {
@@ -18,22 +18,34 @@ class CustomerModel extends Model
     const UPDATED_AT = 'UpdatedAt';
 
     protected $fillable = [
+        'OrganizationID',
         'CustomerName',
         'CustomerNumber',
         'AccountID',
+        'PaymentTermID',
         'TRN',
+        'PaymentTerms',
         'LocationNumber',
-        'AccountNumber',
+        'CreatedBy',
+        'UpdatedBy',
     ];
 
-    // Relationships
-    public function sites()
+    /**
+     * Automatically set CreatedBy and UpdatedBy fields
+     */
+    protected static function boot()
     {
-        return $this->hasMany(CustomerSiteModel::class, 'CustomerID', 'ID');
-    }
+        parent::boot();
 
-    public function items()
-    {
-        return $this->hasMany(ItemModel::class, 'CustomerID', 'ID');
+        static::creating(function ($model) {
+            $username = Auth::check() ? Auth::user()->name : 'system';
+            $model->CreatedBy = $username;
+            $model->UpdatedBy = $username;
+        });
+
+        static::updating(function ($model) {
+            $username = Auth::check() ? Auth::user()->name : 'system';
+            $model->UpdatedBy = $username;
+        });
     }
 }
