@@ -17,6 +17,30 @@ class CustomerController extends Controller
         $this->customerService = $customerService;
     }
 
+    public function searchCustomer(Request $request){ 
+        
+      return $searchResult = $this->customerService->searchCustomerService($request); 
+    }
+
+    public function getSingleCustomer($id)
+    {
+        
+    $customer = CustomerModel::select([
+        'ID',
+        'OrganizationID',
+        'CustomerName',
+        'CustomerNumber',
+        'AccountID',
+        'PaymentTermID',
+        'TRN',
+        'PaymentTerms',
+        'LocationNumber' 
+    ])->find($id);
+
+    return response()->json($customer);
+    }
+
+
     public function store(StoreCustomerRequest $request)
     {
        // return $request;

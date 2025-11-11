@@ -33,7 +33,7 @@ class AuthController extends Controller
         // Delete old tokens (optional)
         $employee->tokens()->delete();
 
-        $accessToken = $employee->createToken('API Token', ['*'], now()->addMinutes(60));
+        $accessToken = $employee->createToken('API Token', ['*'], now()->addMinutes(120));
 
         // Create refresh token (long-lived, 7 days)
         $refreshToken = Str::random(64);

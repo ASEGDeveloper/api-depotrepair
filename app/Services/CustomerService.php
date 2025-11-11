@@ -9,6 +9,32 @@ use Illuminate\Support\Facades\DB;
 
 class CustomerService
 {
+
+
+    public function searchCustomerService($request)
+    {
+    $query = CustomerModel::query();
+
+    if (!empty($request->CustomerName)) {
+        $query->where('CustomerName', 'LIKE', '%' . $request->CustomerName . '%');
+    }
+
+    if (!empty($request->CustomerNumber)) {
+        $query->orWhere('CustomerNumber', 'LIKE', '%' . $request->CustomerNumber . '%');
+    }
+
+    if (!empty($request->AccountID)) {
+        $query->orWhere('AccountID', 'LIKE', '%' . $request->AccountID . '%');
+    }
+
+    if (!empty($request->TRN)) {
+        $query->orWhere('TRN', 'LIKE', '%' . $request->TRN . '%');
+    }
+
+    return $query->get();
+}
+
+
     public function createCustomer(array $data)
     {
         DB::beginTransaction();

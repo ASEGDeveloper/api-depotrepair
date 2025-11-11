@@ -22,12 +22,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/employees', [AuthController::class, 'getEmployees']);     
     Route::post('/customers', [CustomerController::class, 'store']);
-    Route::get('/cusotomers-list', [CustomerController::class, 'getCustomersList']);     
+    Route::get('/cusotomers-list', [CustomerController::class, 'getCustomersList']);   
+    Route::post('/search-cusotomers', [CustomerController::class, 'searchCustomer']); 
+   Route::post('/getsingle-customer/{id}', [CustomerController::class, 'getsingleCustomer']);
 
-
-});
-
-
+}); 
 
 
 Route::get('/user', function (Request $request) {

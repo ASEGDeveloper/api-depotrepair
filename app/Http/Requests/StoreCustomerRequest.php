@@ -16,11 +16,11 @@ class StoreCustomerRequest extends FormRequest
         return [
             // Customer fields
             'CustomerName' => 'required|string|max:255',
-            'CustomerNumber' => 'required',
-            'AccountID' => 'nullable|string|max:100',
-            'TRN' => 'nullable|string|max:100',
+            'CustomerNumber' => 'required|string|max:100|unique:customers_dpr,CustomerNumber',
+            'AccountID' => 'nullable|string|max:100|unique:customers_dpr,AccountID',
+            'TRN' => 'nullable|string|max:100|unique:customers_dpr,TRN',
             'LocationNumber' => 'nullable|string|max:100',
-            'AccountNumber' => 'nullable|string|max:100',
+          //  'AccountNumber' => 'nullable|string|max:100',
 
             // Sites array
             // 'Sites' => 'nullable|array',
