@@ -30,17 +30,12 @@ Route::middleware('auth:sanctum')->group(function () {
    Route::prefix('items')->group(function () {
 
      Route::post('/', [ItemMasterController::class, 'save']); // Create item
-    Route::post('/search-items', [ItemMasterController::class, 'searchItems']); 
+     Route::put('/{itemID}', [ItemMasterController::class, 'update']);
+     Route::post('/search-items', [ItemMasterController::class, 'searchItems']); 
+     Route::get('{id}', [ItemMasterController::class, 'show']); // Get single item
+     Route::get('/', [ItemMasterController::class, 'getItemsList']);  
 
-
-    Route::get('/', [ItemMasterController::class, 'index']); // List all items
-    Route::get('{id}', [ItemMasterController::class, 'show']); // Get single item
-   
-
-    Route::put('{id}', [ItemMasterController::class, 'save']); // Update item
-
-    
-});
+    });
 
 
 }); 

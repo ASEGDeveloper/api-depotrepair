@@ -7,7 +7,7 @@ use App\Models\CustomerModel;
 use App\Models\CustomerSiteModel;
 use App\Services\CustomerService;
 use Illuminate\Http\Request;
- use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Cache;
 
 class CustomerController extends Controller
 {
@@ -18,51 +18,52 @@ class CustomerController extends Controller
         $this->customerService = $customerService;
     }
 
-    public function searchCustomer(Request $request){ 
-        
-      return $searchResult = $this->customerService->searchCustomerService($request); 
+    public function searchCustomer(Request $request)
+    {
+
+        return $searchResult = $this->customerService->searchCustomerService($request);
     }
 
     public function getSingleCustomer($id)
     {
-        
-  $customer = CustomerModel::select([
-        'ID',
-        'OrganizationID',
-        'CustomerName',
-        'CustomerNumber',
-        'AccountID',
-        'PaymentTermID',
-        'TRN',
-        'PaymentTerms',
-        'LocationNumber'
-    ])
-    ->find($id);
 
-if ($customer) {
-    $customer->sites = CustomerSiteModel::where('Customer_ID', $id)
-        ->select([
+        $customer = CustomerModel::select([
             'ID',
-            'Customer_ID',
-            'CustomerSite',
-            'SiteAddress',
-            'BillTo',
-            'ShipTo',
-            'EnabledFlag',
+            'OrganizationID',
+            'CustomerName',
+            'CustomerNumber',
+            'AccountID',
+            'PaymentTermID',
+            'TRN',
+            'PaymentTerms',
+            'LocationNumber'
         ])
-        ->get();
+            ->find($id);
+
+        if ($customer) {
+            $customer->sites = CustomerSiteModel::where('Customer_ID', $id)
+                ->select([
+                    'ID',
+                    'Customer_ID',
+                    'CustomerSite',
+                    'SiteAddress',
+                    'BillTo',
+                    'ShipTo',
+                    'EnabledFlag',
+                ])
+                ->get();
+        }
+
+
+        return response()->json($customer);
     }
 
-
-    return response()->json($customer);
-    }
-
-// StoreCustomerRequest $request
+    // StoreCustomerRequest $request
     public function store(Request $request)
     {
-    
-       // $request->validated()
-      // return response()->json($request->customerId);
+
+        // $request->validated()
+        // return response()->json($request->customerId);
         try {
             $customer = $this->customerService->createCustomer($request);
 
@@ -71,7 +72,6 @@ if ($customer) {
                 'message' => 'Customer, Sites, and Items created successfully',
                 'CustomerID' => $customer->ID
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -80,56 +80,54 @@ if ($customer) {
         }
     }
 
-public function getCustomersList(Request $request)
-{
-    $page   = $request->input('page', 1);
-    $limit  = $request->input('limit', 10);
-    $search = $request->input('search', '');
-    $status = $request->input('status', '');
+    public function getCustomersList(Request $request)
+    {
+        $page   = $request->input('page', 1);
+        $limit  = $request->input('limit', 10);
+        $search = $request->input('search', '');
+        $status = $request->input('status', '');
 
-  $query = CustomerModel::query()
-    ->select([
-        'ID',
-        'OrganizationID',
-        'CustomerName',
-        'CustomerNumber',
-        'AccountID',
-        'PaymentTermID',
-        'TRN',
-        'PaymentTerms',
-        'LocationNumber'
-    ])
-    ->orderBy('ID', 'desc');
+        $query = CustomerModel::query()
+            ->select([
+                'ID',
+                'OrganizationID',
+                'CustomerName',
+                'CustomerNumber',
+                'AccountID',
+                'PaymentTermID',
+                'TRN',
+                'PaymentTerms',
+                'LocationNumber'
+            ])
+            ->orderBy('ID', 'desc');
 
-if (!empty($search)) {
-    $query->where(function ($q) use ($search) {
-        $q->where('CustomerName', 'like', "%{$search}%")
-          ->orWhere('CustomerNumber', 'like', "%{$search}%")
-          ->orWhere('AccountID', 'like', "%{$search}%")
-          ->orWhere('PaymentTermID', 'like', "%{$search}%")
-          ->orWhere('TRN', 'like', "%{$search}%")
-          ->orWhere('PaymentTerms', 'like', "%{$search}%")
-          ->orWhere('LocationNumber', 'like', "%{$search}%");
-    });
-}
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('CustomerName', 'like', "%{$search}%")
+                    ->orWhere('CustomerNumber', 'like', "%{$search}%")
+                    ->orWhere('AccountID', 'like', "%{$search}%")
+                    ->orWhere('PaymentTermID', 'like', "%{$search}%")
+                    ->orWhere('TRN', 'like', "%{$search}%")
+                    ->orWhere('PaymentTerms', 'like', "%{$search}%")
+                    ->orWhere('LocationNumber', 'like', "%{$search}%");
+            });
+        }
 
-    // if (!empty($status)) {
-    //     $query->where('status', $status);
-    // }
+        // if (!empty($status)) {
+        //     $query->where('status', $status);
+        // }
 
-    $total = $query->count();
+        $total = $query->count();
 
-    $employees = $query->offset(($page - 1) * $limit)
-                       ->limit($limit)
-                       ->get();
+        $employees = $query->offset(($page - 1) * $limit)
+            ->limit($limit)
+            ->get();
 
-    return [
-        'data'     => $employees,
-        'total'    => $total,
-        'page'     => $page,
-        'per_page' => $limit
-    ];
-}
-
-
+        return [
+            'data'     => $employees,
+            'total'    => $total,
+            'page'     => $page,
+            'per_page' => $limit
+        ];
+    }
 }
