@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCustomerRequest;
 use App\Models\CustomerModel;
+use App\Models\CustomerSiteModel;
 use App\Services\CustomerService;
 use Illuminate\Http\Request;
  use Illuminate\Support\Facades\Cache;
@@ -25,7 +26,7 @@ class CustomerController extends Controller
     public function getSingleCustomer($id)
     {
         
-    $customer = CustomerModel::select([
+  $customer = CustomerModel::select([
         'ID',
         'OrganizationID',
         'CustomerName',
@@ -34,18 +35,36 @@ class CustomerController extends Controller
         'PaymentTermID',
         'TRN',
         'PaymentTerms',
-        'LocationNumber' 
-    ])->find($id);
+        'LocationNumber'
+    ])
+    ->find($id);
+
+if ($customer) {
+    $customer->sites = CustomerSiteModel::where('Customer_ID', $id)
+        ->select([
+            'ID',
+            'Customer_ID',
+            'CustomerSite',
+            'SiteAddress',
+            'BillTo',
+            'ShipTo',
+            'EnabledFlag',
+        ])
+        ->get();
+    }
+
 
     return response()->json($customer);
     }
 
-
-    public function store(StoreCustomerRequest $request)
+// StoreCustomerRequest $request
+    public function store(Request $request)
     {
-       // return $request;
+    
+       // $request->validated()
+      // return response()->json($request->customerId);
         try {
-            $customer = $this->customerService->createCustomer($request->validated());
+            $customer = $this->customerService->createCustomer($request);
 
             return response()->json([
                 'success' => true,

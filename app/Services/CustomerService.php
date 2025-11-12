@@ -13,77 +13,74 @@ class CustomerService
 
     public function searchCustomerService($request)
     {
-    $query = CustomerModel::query();
+        $query = CustomerModel::query();
 
-    if (!empty($request->CustomerName)) {
-        $query->where('CustomerName', 'LIKE', '%' . $request->CustomerName . '%');
+        if (!empty($request->CustomerName)) {
+            $query->where('CustomerName', 'LIKE', '%' . $request->CustomerName . '%');
+        }
+
+        if (!empty($request->CustomerNumber)) {
+            $query->orWhere('CustomerNumber', 'LIKE', '%' . $request->CustomerNumber . '%');
+        }
+
+        if (!empty($request->AccountID)) {
+            $query->orWhere('AccountID', 'LIKE', '%' . $request->AccountID . '%');
+        }
+
+        if (!empty($request->TRN)) {
+            $query->orWhere('TRN', 'LIKE', '%' . $request->TRN . '%');
+        }
+
+        return $query->get();
     }
 
-    if (!empty($request->CustomerNumber)) {
-        $query->orWhere('CustomerNumber', 'LIKE', '%' . $request->CustomerNumber . '%');
-    }
 
-    if (!empty($request->AccountID)) {
-        $query->orWhere('AccountID', 'LIKE', '%' . $request->AccountID . '%');
-    }
-
-    if (!empty($request->TRN)) {
-        $query->orWhere('TRN', 'LIKE', '%' . $request->TRN . '%');
-    }
-
-    return $query->get();
-}
-
-
-    public function createCustomer(array $data)
+    public function createCustomer($data)
     {
         DB::beginTransaction();
 
         try {
-            // 1️⃣ Create Customer
-            // $customer = CustomerModel::create([
-            //     'CustomerName' => $data['CustomerName'],
-            //     'CustomerNumber' => $data['CustomerNumber'] ?? null,
-            //     'AccountID' => $data['AccountID'] ?? null,
-            //     'TRN' => $data['TRN'] ?? null,
-            //     'LocationNumber' => $data['LocationNumber'] ?? null,
-            //     'AccountNumber' => $data['AccountNumber'] ?? null,
-            // ]);
 
-            $customer = CustomerModel::create([
-                'OrganizationID' => '9608',
-                'CustomerName'   => $data['CustomerName'],
-                'CustomerNumber' => $data['CustomerNumber'] ?? null,
-                'AccountID'      => $data['AccountID'] ?? null,
-                'PaymentTermID'  => $data['PaymentTermID'] ?? null,
-                'TRN'            => $data['TRN'] ?? null,
-                'PaymentTerms'   => $data['PaymentTerms'] ?? null,
-                'LocationNumber' => $data['LocationNumber'] ?? null,
-            ]);
+            $customer = CustomerModel::updateOrCreate(
+                ['ID' => $data->CustomerId ?? 0], // Condition to check if customer exists
+                [
+                    'OrganizationID' => '9608',
+                    'CustomerName'   => $data->CustomerName ?? null,
+                    'CustomerNumber' => $data->CustomerNumber ?? null,
+                    'AccountID'      => $data->CustomerAccountID ?? null,
+                    'PaymentTermID'  => $data->PaymentTermID ?? null,
+                    'TRN'            => $data->TRN ?? null,
+                    'PaymentTerms'   => $data->PaymentTerms ?? null,
+                    'LocationNumber' => $data->LocationNumber ?? null,
+                ]
+            );
 
 
+            $sites = $data->Sites ?? [];
 
-            // 2️⃣ Create Sites
-            // if (!empty($data['Sites'])) {
-            //     foreach ($data['Sites'] as $siteData) {
-            //         CustomerSiteModel::create(array_merge($siteData, [
-            //             'CustomerID' => $customer->ID
-            //         ]));
-            //     }
-            // }
+            if (is_array($sites)) {
+                foreach ($sites as $site) {
+                    // If $site is an array, cast to object
+                    $siteObj = is_array($site) ? (object) $site : $site;
 
-            // 3️⃣ Create Items
-            // if (!empty($data['Items'])) {
-            //     foreach ($data['Items'] as $itemData) {
-            //         ItemModel::create(array_merge($itemData, [
-            //             'CustomerID' => $customer->ID
-            //         ]));
-            //     }
-            // }
+                    CustomerSiteModel::updateOrCreate(
+                        ['ID' => $siteObj->id ?? 0],
+                        [
+                            'Customer_ID' => $customer->ID,
+                            'CustomerSite' => $siteObj->CustomerSite ?? null,
+                            'SiteAddress' => $siteObj->SiteAddress ?? null,
+                            'BillTo' => $siteObj->BillTo ?? 0,
+                            'ShipTo' => $siteObj->ShipTo ?? 0,
+                        ]
+                    );
+                }
+            }
+
+
+
 
             DB::commit();
             return $customer;
-
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
