@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ItemMasterController;
 use App\Http\Controllers\TnaEntryController;
 use Tests\Feature\TnaControllerTest;
 
@@ -25,6 +26,22 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/cusotomers-list', [CustomerController::class, 'getCustomersList']);   
     Route::post('/search-cusotomers', [CustomerController::class, 'searchCustomer']); 
    Route::post('/getsingle-customer/{id}', [CustomerController::class, 'getsingleCustomer']);
+
+   Route::prefix('items')->group(function () {
+
+     Route::post('/', [ItemMasterController::class, 'save']); // Create item
+    Route::post('/search-items', [ItemMasterController::class, 'searchItems']); 
+
+
+    Route::get('/', [ItemMasterController::class, 'index']); // List all items
+    Route::get('{id}', [ItemMasterController::class, 'show']); // Get single item
+   
+
+    Route::put('{id}', [ItemMasterController::class, 'save']); // Update item
+
+    
+});
+
 
 }); 
 

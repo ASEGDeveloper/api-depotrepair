@@ -47,11 +47,11 @@ class CustomerService
                     'OrganizationID' => '9608',
                     'CustomerName'   => $data->CustomerName ?? null,
                     'CustomerNumber' => $data->CustomerNumber ?? null,
-                    'AccountID'      => $data->CustomerAccountID ?? null,
-                    'PaymentTermID'  => $data->PaymentTermID ?? null,
+                    'AccountID'      => mt_rand(100000, 999999), 
                     'TRN'            => $data->TRN ?? null,
                     'PaymentTerms'   => $data->PaymentTerms ?? null,
-                    'LocationNumber' => $data->LocationNumber ?? null,
+                    // 'PaymentTermID'  => $data->PaymentTermID ?? null,
+                    //'LocationNumber' => $data->LocationNumber ?? null,
                 ]
             );
 
