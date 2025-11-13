@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\InstallBaseController;
 use App\Http\Controllers\ItemMasterController;
 use App\Http\Controllers\TnaEntryController;
 use Tests\Feature\TnaControllerTest;
@@ -36,6 +37,19 @@ Route::middleware('auth:sanctum')->group(function () {
      Route::get('/', [ItemMasterController::class, 'getItemsList']);  
 
     });
+
+
+     Route::prefix('installbase')->group(function () {
+
+     Route::get('/', [InstallBaseController::class, 'getInstallBase']);  
+     Route::post('/', [InstallBaseController::class, 'save']); // Create item
+     Route::put('/{id}', [InstallBaseController::class, 'update']); // update the records
+     Route::post('/search', [InstallBaseController::class, 'searchInstallBase']); 
+     Route::get('{id}', [InstallBaseController::class, 'show']); // Get single item
+     
+
+    });
+
 
 
 }); 
