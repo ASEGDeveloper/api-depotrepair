@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\InstallBaseModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Models\CustomerModel;
 
 class InstallBaseController extends Controller
 {
@@ -205,6 +207,22 @@ public function show($id)
         }
         return response()->json($item);
     }
+ 
+     public function searchCustomers(Request $request)
+    {
+         
+        $search = $request->input('search', '');
 
+        $customers = CustomerModel::query()
+            ->select('ID','CustomerName')
+            ->when($search, function ($query, $search) {
+                $query->where('CustomerName', 'LIKE', "%{$search}%");
+            })
+            ->distinct()
+            ->limit(10)
+            ->get();
+
+        return response()->json($customers);
+    }
 
 }

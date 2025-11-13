@@ -36,10 +36,14 @@ Route::middleware('auth:sanctum')->group(function () {
      Route::get('{id}', [ItemMasterController::class, 'show']); // Get single item
      Route::get('/', [ItemMasterController::class, 'getItemsList']);  
 
+     
+
+
     });
 
 
      Route::prefix('installbase')->group(function () {
+     Route::get('customers_search', [InstallBaseController::class, 'searchCustomers']);
 
      Route::get('/', [InstallBaseController::class, 'getInstallBase']);  
      Route::post('/', [InstallBaseController::class, 'save']); // Create item
@@ -47,7 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
      Route::post('/search', [InstallBaseController::class, 'searchInstallBase']); 
      Route::get('{id}', [InstallBaseController::class, 'show']); // Get single item
      
-
+   
     });
 
 
