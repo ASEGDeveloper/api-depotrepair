@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\InspectionReportController;
 use App\Http\Controllers\InstallBaseController;
 use App\Http\Controllers\ItemMasterController;
 use App\Http\Controllers\TnaEntryController;
@@ -23,10 +24,20 @@ Route::middleware('auth:sanctum')->group(function () {
     
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/employees', [AuthController::class, 'getEmployees']);     
-    Route::post('/customers', [CustomerController::class, 'store']);
-    Route::get('/cusotomers-list', [CustomerController::class, 'getCustomersList']);   
-    Route::post('/search-cusotomers', [CustomerController::class, 'searchCustomer']); 
-   Route::post('/getsingle-customer/{id}', [CustomerController::class, 'getsingleCustomer']);
+    // Route::post('/customers', [CustomerController::class, 'store']);
+    // Route::get('/customer-list-list', [CustomerController::class, 'getCustomersList']);   
+    // Route::post('/search-customer-list', [CustomerController::class, 'searchCustomer']); 
+    // Route::post('/getsingle-customer/{id}', [CustomerController::class, 'getsingleCustomer']); 
+ 
+
+    Route::prefix('customers')->group(function () {
+        Route::post('/', [CustomerController::class, 'store']);
+        Route::get('/list', [CustomerController::class, 'getCustomersList']);
+        Route::post('/search', [CustomerController::class, 'searchCustomer']);
+        Route::post('/{id}', [CustomerController::class, 'getsingleCustomer']);
+    });
+
+
 
    Route::prefix('items')->group(function () {
 
@@ -34,25 +45,30 @@ Route::middleware('auth:sanctum')->group(function () {
      Route::put('/{itemID}', [ItemMasterController::class, 'update']);
      Route::post('/search-items', [ItemMasterController::class, 'searchItems']); 
      Route::get('{id}', [ItemMasterController::class, 'show']); // Get single item
-     Route::get('/', [ItemMasterController::class, 'getItemsList']);  
-
-     
-
-
+     Route::get('/', [ItemMasterController::class, 'getItemsList']);   
     });
 
 
      Route::prefix('installbase')->group(function () {
-     Route::get('customers_search', [InstallBaseController::class, 'searchCustomers']);
-
+     Route::get('customers_search', [InstallBaseController::class, 'searchCustomers']); 
+     Route::post('get-items', [InstallBaseController::class, 'searchItems']);
      Route::get('/', [InstallBaseController::class, 'getInstallBase']);  
      Route::post('/', [InstallBaseController::class, 'save']); // Create item
      Route::put('/{id}', [InstallBaseController::class, 'update']); // update the records
      Route::post('/search', [InstallBaseController::class, 'searchInstallBase']); 
-     Route::get('{id}', [InstallBaseController::class, 'show']); // Get single item
-     
-   
+     Route::get('{id}', [InstallBaseController::class, 'show']); // Get single item  
     });
+
+    Route::prefix('inspection-report')->group(function () {
+    // Route::post('search', [InspectionReportController::class, 'searchInstallbase']);
+     Route::post('search', [InspectionReportController::class, 'searchInspection']);
+     Route::get('{id}', [InspectionReportController::class, 'showInspectionFetch']);  
+
+     Route::post('/', [InspectionReportController::class, 'save']); // Create Isnpection Report
+     Route::put('/{id}', [InspectionReportController::class, 'update']); // update Inspection Report
+
+    });
+
 
 
 

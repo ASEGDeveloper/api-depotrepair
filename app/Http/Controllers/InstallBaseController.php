@@ -7,17 +7,18 @@ use App\Models\InstallBaseModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\CustomerModel;
+use App\Models\ItemMasterModel;
 
 class InstallBaseController extends Controller
 {
-   public function save(Request $request, $id = null)
+public function save(Request $request, $id = null)
 {
    // return $request->SerialNumbers;
     try {
         // ✅ Validate required fields
         $validated = $request->validate([
             'ITEM'           => 'required|string|max:100',
-            'SerialNumbers'  => 'required|string|max:100',
+            'SerialNumbers' => 'required|string|max:100|unique:installbase_dpr,Serial_Numbers',
             'CustomerName'   => 'required|string|max:150',
         ]);
 
@@ -224,5 +225,24 @@ public function show($id)
 
         return response()->json($customers);
     }
+
+
+    public function searchItems(Request $request)
+    {
+         
+        $search = $request->input('search', '');
+
+        $customers = ItemMasterModel::query()
+            ->select('ID','ItemNumber')
+            ->when($search, function ($query, $search) {
+                $query->where('ItemNumber', 'LIKE', "%{$search}%");
+            })
+            ->distinct()
+            ->limit(10)
+            ->get();
+
+        return response()->json($customers);
+    }
+
 
 }
