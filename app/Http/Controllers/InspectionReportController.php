@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\InspectionReportModel;
 use App\Models\InstallBaseModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Mockery\Matcher\Any;
 
 class InspectionReportController extends Controller
 {
@@ -33,34 +36,6 @@ public function searchInstallbase_Test(Request $request)
 }
 
 
- 
-
-// public function searchInstallbase(Request $request)
-// {
-//     $query = InstallBaseModel::query();
-
-//     // Filter by ITEM
-//     if ($request->filled('ITEM')) {
-//         $query->where('ITEM', 'LIKE', '%' . $request->ITEM . '%');
-//     }
-
-//     // Filter by Customer Name
-//     if ($request->filled('Customer_Name')) {
-//         $query->where('Customer_Name', 'LIKE', '%' . $request->Customer_Name . '%');
-//     }
-
-//     // Filter by Serial Numbers
-//     if ($request->filled('Serial_Numbers')) {
-//         $query->where('Serial_Numbers', 'LIKE', '%' . $request->Serial_Numbers . '%');
-//     }
-
-//     // Select fields explicitly and order by latest first
-//     $results = $query->select('ID', 'ITEM', 'Serial_Numbers', 'Customer_Name')
-//                      ->orderByDesc('ID')
-//                      ->get();
-
-//     return response()->json($results);
-// }
 
 
 public function searchInspection(Request $request)
@@ -323,5 +298,113 @@ public function generateCode()
 }
 
 
+public function saveInspection(Request $request) 
+{
+    // ... (Initial validation and data collection remains the same)
+    $validated = $request->all();
+    $images = collect($request->file('images'));
+    $descriptions = $validated['descriptions'] ?? [];
+    $inspectionID = $validated['inspectionID'] ?? null;
 
+    if (empty($descriptions) && $images->isEmpty()) {
+        return response()->json([
+            'message' => 'No descriptions or images provided.',
+        ], 400);
+    }
+
+    $savedRecords = [];
+
+    try {
+        DB::beginTransaction();
+
+        foreach ($descriptions as $index => $description) {
+
+            $imageFile = $images->get($index);
+
+            // Base data
+            $data = [
+                'inspection_id' => $inspectionID,
+                'description'   => $description ?? '',
+                'image_data'    => null, // Initialize
+                'original_filename' => null, // Initialize
+                'created_at'    => now(),
+                'updated_at'    => now(),
+                'is_deleted'    => 0,
+            ];
+
+            // Add image data if uploaded
+            if ($imageFile && $imageFile->isValid()) {
+                
+                // 1. Read raw binary content safely
+                $binary = file_get_contents($imageFile->getRealPath());
+                
+                // 2. Get the MIME type (e.g., 'image/jpeg')
+                $mimeType = $imageFile->getClientMimeType();
+
+                // 3. CORRECTLY construct the Base64 Data URI string.
+                // This ensures only the Base64 encoded string is used in the text field.
+                $base64Data = base64_encode($binary);
+                $dataURI = "data:{$mimeType};base64,{$base64Data}";
+
+                // Store the Base64 Data URI in the data array
+                $data['image_data'] = $dataURI; 
+                $data['original_filename'] = $imageFile->getClientOriginalName();
+            }
+
+            // Insert into the database
+            $newId = DB::table('inspection_images')->insertGetId($data);
+
+            // IMPORTANT: Never return the full Base64 string in the JSON response
+            // The JSON encoder might still struggle with very large data strings,
+            // even if they are valid UTF-8, and it severely bloats the response.
+            // If you need the image in the response, fetch it separately or send the ID.
+
+            // Only include safe fields in the response
+            $savedRecords[] = [
+                'id'     => $newId,
+                'action' => 'created',
+            ];
+        }
+
+        DB::commit();
+
+        return response()->json([
+            'message'       => 'Inspection data inserted successfully.',
+            'inspection_id' => $inspectionID,
+            'records'       => $savedRecords,
+        ], 200);
+
+    } catch (\Exception $e) {
+        // ... (Error handling remains the same)
+        DB::rollBack();
+        Log::error('Inspection save error: ' . $e->getMessage(), ['exception' => $e]);
+
+        return response()->json([
+            'message' => 'An error occurred during inspection save.',
+            'error'   => $e->getMessage(),
+        ], 500);
+    }
 }
+
+
+   
+
+public function showInspectionImages($id)
+    {
+        
+        $images = DB::table('inspection_images')
+                    ->where('inspection_id', $id)
+                    ->where('is_deleted', 0)
+                    ->select('id', 'inspection_id', 'description', 'image_data')
+                    ->orderBy('id', 'DESC')
+                    ->get();
+        if (!$images) {
+            return response()->json(['message' => 'Inspection not found.'], 404);
+        }
+        return response()->json($images);
+    }
+
+
+
+
+    }

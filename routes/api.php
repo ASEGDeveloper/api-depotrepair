@@ -65,7 +65,9 @@ Route::middleware('auth:sanctum')->group(function () {
      Route::get('{id}', [InspectionReportController::class, 'showInspectionFetch']);  
 
      Route::post('/', [InspectionReportController::class, 'save']); // Create Isnpection Report
-     Route::put('/{id}', [InspectionReportController::class, 'update']); // update Inspection Report
+     Route::put('/{id}', [InspectionReportController::class, 'update']); // update Inspection Report 
+     Route::post('/save_inspection', [InspectionReportController::class, 'saveInspection']); // Create Isnpection Report 
+     Route::post('/inspection-images/{id}', [InspectionReportController::class, 'showInspectionImages']); // Get the inspection images 
 
     });
 
