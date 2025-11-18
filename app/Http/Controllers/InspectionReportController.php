@@ -148,10 +148,7 @@ public function save(Request $request, $id = null)
                 'Status'               => $request->status,
                 'DATALOAD_TIME'        => now(),
             ]
-        );
-
- 
-
+        ); 
 
         return response()->json([
             'status'  => 'success',
@@ -403,6 +400,33 @@ public function showInspectionImages($id)
         }
         return response()->json($images);
     }
+
+
+
+
+public function delete(Request $request, $id)
+{
+    try {
+        DB::table('inspection_images')
+            ->where('id', $id)
+            ->update([
+                'is_deleted' => 1
+            ]);
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Image deleted successfully.',
+        ], 200);
+
+    } catch (\Exception $e) {
+
+        return response()->json([
+            'status'  => 'error',
+            'message' => 'Delete failed.',
+            'error'   => $e->getMessage(),
+        ], 500);
+    }
+}
 
 
 

@@ -68,6 +68,8 @@ Route::middleware('auth:sanctum')->group(function () {
      Route::put('/{id}', [InspectionReportController::class, 'update']); // update Inspection Report 
      Route::post('/save_inspection', [InspectionReportController::class, 'saveInspection']); // Create Isnpection Report 
      Route::post('/inspection-images/{id}', [InspectionReportController::class, 'showInspectionImages']); // Get the inspection images 
+     Route::post('/{id}', [InspectionReportController::class, 'delete']);
+
 
     });
 
