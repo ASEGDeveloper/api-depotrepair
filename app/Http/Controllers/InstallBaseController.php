@@ -265,6 +265,36 @@ public function show($id)
         return response()->json($item);
     }
  
+
+public function getItems($id)
+{
+    // First check if record exists
+    $item = InstallBaseModel::find($id);
+
+    if (!$item) {
+        return response()->json(['message' => 'Item not found.'], 404);
+    }
+
+    // Now get full joined data
+    $data = DB::table('installbase_dpr')
+        ->join('item_master_dpr', 'installbase_dpr.ITEM', '=', 'item_master_dpr.ItemNumber')
+        ->where('installbase_dpr.ID', $id)
+        ->select(
+            'installbase_dpr.ITEM',
+            'installbase_dpr.Serial_Numbers',
+            'installbase_dpr.Customer_Name',
+            'item_master_dpr.TankType',
+            'item_master_dpr.Manufacturer',
+            'item_master_dpr.UnPortableTankType',
+            'item_master_dpr.Capacity',
+            'item_master_dpr.PrimaryUOM'
+        )
+        ->first();
+
+    return response()->json($data);
+}
+
+
      public function searchCustomers(Request $request)
     {
          

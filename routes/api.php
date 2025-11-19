@@ -59,6 +59,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{id}', [InstallBaseController::class, 'update']); // update the records
         Route::post('/search', [InstallBaseController::class, 'searchInstallBase']); 
         Route::get('{id}', [InstallBaseController::class, 'show']); // Get single item  
+
+         Route::get('item/{id}', [InstallBaseController::class, 'getItems']); //  
     });
 
     Route::prefix('inspection-report')->group(function () {
@@ -66,7 +68,7 @@ Route::middleware('auth:sanctum')->group(function () {
      Route::post('search', [InspectionReportController::class, 'searchInspection']);
      Route::get('{id}', [InspectionReportController::class, 'showInspectionFetch']);  
 
-     Route::post('/', [InspectionReportController::class, 'save']); // Create Isnpection Report
+     Route::post('/save/{id}', [InspectionReportController::class, 'save']); // Create Inspetion Report
      Route::put('/{id}', [InspectionReportController::class, 'update']); // update Inspection Report 
      Route::post('/save_inspection', [InspectionReportController::class, 'saveInspection']); // Create Isnpection Report 
      Route::post('/inspection-images/{id}', [InspectionReportController::class, 'showInspectionImages']); // Get the inspection images 

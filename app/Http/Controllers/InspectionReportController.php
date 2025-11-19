@@ -101,35 +101,9 @@ public function showInstallbaseFetch($id)
 public function save(Request $request, $id = null)
 {
  
-    try {
-
-        // Validate fields
-        // $validated = $request->validate([             
-        //     'Unit_Number'           => 'required|string|max:100',
-        //     'Customer_Name'         => 'required|string|max:150',
-        //     'Capacity'              => 'nullable|string|max:255',
-        //     'Initialtest'           => 'nullable|string|max:255',
-        //     'InnertankMaterial'     => 'nullable|string|max:255',
-        //     'Last2_to_5yrTest'      => 'nullable|string|max:255',
-        //     'Last5yrTest'           => 'nullable|string|max:255',
-        //     'LocationOfInspection'  => 'nullable|string|max:255',
-        //     'Manufacturer'          => 'nullable|string|max:255',
-        //     'MaxGrossWeight'        => 'nullable|string|max:255',
-        //     'NextCSCDue'            => 'nullable|string|max:255',
-        //     'NexttestDue'           => 'nullable|string|max:255',
-        //     'Outertankmaterial'     => 'nullable|string|max:255',
-        //     'Results'               => 'nullable|string|max:255',
-        //     'SurveyDate'            => 'nullable|date',
-        //     'Survey_Type'            => 'nullable|string|max:50',
-        //     'Surveyor'              => 'nullable|string|max:255',
-        //     'TareWeight'            => 'nullable|string|max:255',
-        //     'UnPortableTankType'    => 'nullable|string|max:255',
-        //     'Vacuum_reading'        => 'nullable|string|max:255',
-        //     'comments'              => 'nullable|string|max:500',
-        // ]);
-
-       // dd( $validated);
-        // Create/update record
+    try { 
+       
+        
         $query = InspectionReportModel::updateOrCreate(
             ['ID' => $id ?? 0],
             [
@@ -146,7 +120,7 @@ public function save(Request $request, $id = null)
                 'Manufacturer'         => $request->Manufacturer,
                 'Max_Gross_Weight_kg'       => $request->MaxGrossWeight,
                 'Next_CSC_Due'           => $request->NextCSCDue,
-                'Next_Test_Due_MMM_YY'          => $request->NexttestDue,
+                'Next_Test_Due_MMM_YY'          => $request->Next_Test_Due_MMM_YY,
                 'Outer_Tank_Material'    => $request->OuterTankMaterial,
                 'Results'              => $request->Results,
                 'Survey_Date'           => $request->SurveyDate,
@@ -163,6 +137,7 @@ public function save(Request $request, $id = null)
 
         return response()->json([
             'status'  => 'success',
+             'last_inserted_id'  =>  $id ?? $query->ID,
             'message' => $id 
                 ? 'Inspection report record updated successfully.' 
                 : 'Inspection report record created successfully.',
