@@ -157,30 +157,37 @@ public function update(Request $request, $id)
 }
 
 
-
 public function searchInstallBase(Request $request)
 {
     try {
         $query = InstallBaseModel::query();
 
-        // ✅ Check if any search filters are provided
-        $hasFilter = $request->filled(['ITEM', 'SerialNumbers', 'CustomerName']);
+        // Apply grouped search filters
+        $query->when(
+            $request->filled(['ITEM', 'SerialNumbers', 'CustomerName']),
+            function ($q) use ($request) {
+                $q->where(function ($sub) use ($request) {
+                    if ($request->filled('ITEM')) {
+                        $sub->where('ITEM', 'LIKE', '%' . $request->ITEM . '%');
+                    }
 
-        if ($hasFilter) {
-            if ($request->filled('ITEM')) {
-                $query->where('ITEM', 'LIKE', '%' . $request->ITEM . '%');
-            }
+                    if ($request->filled('SerialNumbers')) {
+                        $sub->orWhere('Serial_Numbers', 'LIKE', '%' . $request->SerialNumbers . '%');
+                    }
 
-            if ($request->filled('SerialNumbers')) {
-                $query->orWhere('Serial_Numbers', 'LIKE', '%' . $request->SerialNumbers . '%');
+                    if ($request->filled('CustomerName')) {
+                        $sub->orWhere('Customer_Name', 'LIKE', '%' . $request->CustomerName . '%');
+                    }
+                });
             }
+        );
 
-            if ($request->filled('CustomerName')) {
-                $query->orWhere('Customer_Name', 'LIKE', '%' . $request->CustomerName . '%');
-            }
+        // Apply date filter separately (AND condition)
+        if ($request->filled('Creation_Date')) {
+            $query->whereDate('Creation_Date', $request->Creation_Date);
         }
 
-        // ✅ Select the fields you want to return (include ID)
+        // Select specific fields
         $results = $query->select('ID', 'ITEM', 'Serial_Numbers', 'Customer_Name')
                          ->orderBy('ID', 'desc')
                          ->get();
@@ -189,7 +196,7 @@ public function searchInstallBase(Request $request)
             'status'  => 'success',
             'message' => $results->isEmpty() ? 'No matching records found.' : 'Install base records fetched successfully.',
             'data'    => $results
-        ], 200);
+        ]);
 
     } catch (\Exception $e) {
         return response()->json([
@@ -199,6 +206,55 @@ public function searchInstallBase(Request $request)
         ], 500);
     }
 }
+
+
+
+// public function searchInstallBase(Request $request)
+// {
+//     try {
+//         $query = InstallBaseModel::query();
+
+//         // ✅ Check if any search filters are provided
+//         $hasFilter = $request->filled(['ITEM', 'SerialNumbers', 'CustomerName','Creation_Date']);
+
+//         if ($hasFilter) {
+//             if ($request->filled('ITEM')) {
+//                 $query->where('ITEM', 'LIKE', '%' . $request->ITEM . '%');
+//             }
+
+//             if ($request->filled('SerialNumbers')) {
+//                 $query->orWhere('Serial_Numbers', 'LIKE', '%' . $request->SerialNumbers . '%');
+//             }
+
+//             if ($request->filled('CustomerName')) {
+//                 $query->orWhere('Customer_Name', 'LIKE', '%' . $request->CustomerName . '%');
+//             }
+
+//           if ($request->filled('Creation_Date')) {
+//             $query->whereDate('Creation_Date', $request->Creation_Date);
+//         }
+
+//                 }
+
+//         // ✅ Select the fields you want to return (include ID)
+//         $results = $query->select('ID', 'ITEM', 'Serial_Numbers', 'Customer_Name')
+//                          ->orderBy('ID', 'desc')
+//                          ->get();
+
+//         return response()->json([
+//             'status'  => 'success',
+//             'message' => $results->isEmpty() ? 'No matching records found.' : 'Install base records fetched successfully.',
+//             'data'    => $results
+//         ], 200);
+
+//     } catch (\Exception $e) {
+//         return response()->json([
+//             'status'  => 'error',
+//             'message' => 'Failed to search install base records.',
+//             'error'   => $e->getMessage(),
+//         ], 500);
+//     }
+// }
 
 public function show($id)
     {
@@ -232,16 +288,15 @@ public function show($id)
          
         $search = $request->input('search', '');
 
-        $customers = ItemMasterModel::query()
+        $items = ItemMasterModel::query()
             ->select('ID','ItemNumber')
             ->when($search, function ($query, $search) {
                 $query->where('ItemNumber', 'LIKE', "%{$search}%");
             })
-            ->distinct()
             ->limit(10)
             ->get();
 
-        return response()->json($customers);
+        return response()->json($items);
     }
 
 

@@ -31,6 +31,7 @@ Route::middleware('auth:sanctum')->group(function () {
  
 
     Route::prefix('customers')->group(function () {
+        Route::post('/getsingle-customer/{id}', [CustomerController::class, 'getsingleCustomer']); 
         Route::post('/', [CustomerController::class, 'store']);
         Route::get('/list', [CustomerController::class, 'getCustomersList']);
         Route::post('/search', [CustomerController::class, 'searchCustomer']);
@@ -50,13 +51,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
      Route::prefix('installbase')->group(function () {
-     Route::get('customers_search', [InstallBaseController::class, 'searchCustomers']); 
-     Route::post('get-items', [InstallBaseController::class, 'searchItems']);
-     Route::get('/', [InstallBaseController::class, 'getInstallBase']);  
-     Route::post('/', [InstallBaseController::class, 'save']); // Create item
-     Route::put('/{id}', [InstallBaseController::class, 'update']); // update the records
-     Route::post('/search', [InstallBaseController::class, 'searchInstallBase']); 
-     Route::get('{id}', [InstallBaseController::class, 'show']); // Get single item  
+        Route::get('customers_search', [InstallBaseController::class, 'searchCustomers']); 
+      ///  Route::post('get-items', [InstallBaseController::class, 'searchItems']);
+         Route::post('items/search', [InstallBaseController::class, 'searchItems']);
+        Route::get('/', [InstallBaseController::class, 'getInstallBase']);  
+        Route::post('/', [InstallBaseController::class, 'save']); // Create item
+        Route::put('/{id}', [InstallBaseController::class, 'update']); // update the records
+        Route::post('/search', [InstallBaseController::class, 'searchInstallBase']); 
+        Route::get('{id}', [InstallBaseController::class, 'show']); // Get single item  
     });
 
     Route::prefix('inspection-report')->group(function () {

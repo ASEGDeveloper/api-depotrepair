@@ -67,11 +67,22 @@ public function searchInspection(Request $request)
 
 public function showInspectionFetch($id)
     {
-        $item = InspectionReportModel::find($id);
-        if (!$item) {
+        $inspection = InspectionReportModel::find($id);
+        $images =  $this->getInspectionImages($id);
+        $inspection->images = $images;
+        if (!$inspection) {
             return response()->json(['message' => 'Inspection not found.'], 404);
         }
-        return response()->json($item);
+        return response()->json($inspection);
+    }
+
+
+    private function getInspectionImages($inspectionID) 
+    {
+        
+        return DB::table('inspection_images')->where('inspection_id', $inspectionID)
+            ->where('is_deleted', 0)->select('image_data','description')->orderBy('id','desc')->get();
+        
     }
 
 
@@ -241,15 +252,14 @@ public function update(Request $request, $id = null)
             ]
         );
 
- 
-
+  
 
         return response()->json([
             'status'  => 'success',
             'message' => $id 
                 ? 'Inspection report record updated successfully.' 
                 : 'Inspection report record created successfully.',
-            'data'    => $query
+            'data'    => $query->Status
         ], 200);
 
     } catch (\Illuminate\Validation\ValidationException $e) {
