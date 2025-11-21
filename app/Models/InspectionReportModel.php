@@ -21,6 +21,7 @@ class InspectionReportModel extends Model
     'Inspection_ID',
     'Unit_Number',
     'Customer_Name', 
+    'Tank_Type',
     'Capacity_L',
     'Initial_Test_MMM_YY',
     'Last_Cargo',

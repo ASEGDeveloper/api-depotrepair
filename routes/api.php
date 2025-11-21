@@ -64,16 +64,19 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::prefix('inspection-report')->group(function () {
-    // Route::post('search', [InspectionReportController::class, 'searchInstallbase']);
-     Route::post('search', [InspectionReportController::class, 'searchInspection']);
-     Route::get('{id}', [InspectionReportController::class, 'showInspectionFetch']);  
+        // Route::post('search', [InspectionReportController::class, 'searchInstallbase']);
+        Route::post('search', [InspectionReportController::class, 'searchInspection']);
+        Route::get('{id}', [InspectionReportController::class, 'showInspectionFetch']);  
 
-     Route::post('/save/{id}', [InspectionReportController::class, 'save']); // Create Inspetion Report
-     Route::put('/{id}', [InspectionReportController::class, 'update']); // update Inspection Report 
-     Route::post('/save_inspection', [InspectionReportController::class, 'saveInspection']); // Create Isnpection Report 
-     Route::post('/inspection-images/{id}', [InspectionReportController::class, 'showInspectionImages']); // Get the inspection images 
-     Route::post('/{id}', [InspectionReportController::class, 'delete']);
+        Route::post('/save', [InspectionReportController::class, 'save']); // Create Inspetion Report
+        Route::put('/{id}', [InspectionReportController::class, 'update']); // update Inspection Report 
 
+      //  Route::prefix('inspection-report')->group(function () {
+            Route::post('/save_inspection', [InspectionReportController::class, 'saveInspection']); // Create Isnpection Report 
+            Route::post('/inspection-images/{id}', [InspectionReportController::class, 'showInspectionImages']); // Get the inspection images 
+            Route::post('/{id}', [InspectionReportController::class, 'delete']); // delete Inspection Report
+      //  });
+        
 
     });
 

@@ -14,12 +14,28 @@ class ItemMasterController extends Controller
     // ItemMasterRequest
     public function save(ItemMasterRequest $request, $itemID = null)
     {
+
+        $uniqueItemNumber = $request->ItemNumber;
+
+            if ($uniqueItemNumber) {
+                $count = ItemMasterModel::where('ItemNumber', $uniqueItemNumber)
+                            ->when($request->itemID, fn($q) => $q->where('ID', '!=', $request->itemID))
+                            ->count();
+
+                if ($count > 0) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Item Number already exists.'
+                    ], 422);
+                }
+            }
+
        
         $item = ItemMasterModel::updateOrCreate(
             ['ID' => $request->itemID ?? 0],
             [
                 'InventoryItemID'    =>  mt_rand(100000, 999999),
-                'ItemNumber'         => $request->ItemNumber ?? null,
+                'ItemNumber'         => $uniqueItemNumber,
                 'TankType'           => $request->TankType ?? null,
                 'Manufacturer'       => $request->Manufacturer ?? null,
                 'UnPortableTankType' => $request->UnPortableTankType ?? null,
@@ -128,6 +144,7 @@ class ItemMasterController extends Controller
 
     $query = ItemMasterModel::query()
         ->select([
+            'id',
             'InventoryItemID',
             'ItemNumber',
             'TankType',

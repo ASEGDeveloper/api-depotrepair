@@ -98,9 +98,10 @@ public function showInstallbaseFetch($id)
 
 
 
-public function save(Request $request, $id = null)
+public function save(Request $request )
 {
- 
+  
+     
     try { 
        
         
@@ -111,6 +112,7 @@ public function save(Request $request, $id = null)
                 'Unit_Number'          => $request->Unit_Number,
                 'Customer_Name'        => $request->Customer_Name,
                 'Capacity_L'             => $request->Capacity,
+                'Tank_Type'             => $request->TankType,
                 'Initial_Test_MMM_YY'          => $request->Initialtest,
                 'Last_Cargo '             => $request->LastCargo,
                 'Inner_Tank_Material'    => $request->InnertankMaterial,
@@ -133,12 +135,12 @@ public function save(Request $request, $id = null)
                 'Status'               => $request->status,
                 'DATALOAD_TIME'        => now(),
             ]
-        ); 
+        );  
 
         return response()->json([
             'status'  => 'success',
-             'last_inserted_id'  =>  $id ?? $query->ID,
-            'message' => $id 
+             'last_inserted_id'  => $query->ID,
+            'message' =>$query->ID 
                 ? 'Inspection report record updated successfully.' 
                 : 'Inspection report record created successfully.',
             'data'    => $query
@@ -204,6 +206,7 @@ public function update(Request $request, $id = null)
                 'Customer_Name'        => $request->Customer_Name,
                 'Capacity_L'             => $request->Capacity,
                 'Initial_Test_MMM_YY'          => $request->Initialtest,
+                'Tank_Type'             => $request->TankType,
                 'Last_Cargo '             => $request->LastCargo,
                 'Inner_Tank_Material'    => $request->InnertankMaterial,
                 'Last_2_5yr_Test_MMM_YY'     => $request->Last_2_5yr_Test_MMM_YY,
