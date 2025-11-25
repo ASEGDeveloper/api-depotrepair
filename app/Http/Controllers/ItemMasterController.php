@@ -42,6 +42,7 @@ class ItemMasterController extends Controller
                 'Capacity'           => $request->Capacity ?? null,
                 'Description'        => $request->Description ?? null,
                 'PrimaryUOM'         => $request->PrimaryUOM ?? null,
+                'MAWP'         => $request->MAWP ?? null,
                 'PurchasingFLAG'     => $request->PurchasingFLAG ?? 0,
                 'OrganizationID'     => '9608',
                 'DATALOAD_TIME'      => $request->DATALOAD_TIME ?? now(),
@@ -65,7 +66,8 @@ class ItemMasterController extends Controller
                 'UnPortableTankType' => 'nullable|string|max:255',
                 'Capacity'           => 'nullable|numeric',
                 'Description'        => 'nullable|string',
-                'PrimaryUOM'         => 'nullable|string|max:255',
+                'PrimaryUOM'         => 'nullable|string|max:255', 
+                 'MAWP'         => 'nullable|string|max:255', 
                 'PurchasingFLAG'     => 'nullable|boolean',
             ]);
 
@@ -81,6 +83,7 @@ class ItemMasterController extends Controller
                 'Capacity'           => $validated['Capacity'] ?? $item->Capacity,
                 'Description'        => $validated['Description'] ?? $item->Description,
                 'PrimaryUOM'         => $validated['PrimaryUOM'] ?? $item->PrimaryUOM,
+                 'MAWP'              => $validated['MAWP'] ??  $item->MAWP,
                 'PurchasingFLAG'     => $validated['PurchasingFLAG'] ?? $item->PurchasingFLAG,
                 'DATALOAD_TIME'      => now(),
             ]);

@@ -43,10 +43,14 @@ class CustomerController extends Controller
         if ($customer) {
             $customer->sites = CustomerSiteModel::where('Customer_ID', $id)
                 ->select([
-                    'ID',
+                    'ID as siteID',
                     'Customer_ID',
                     'CustomerSite',
                     'SiteAddress',
+                    'Contact_Person',
+                    'Mobile_Number',
+                    'Email',
+                    'Position',
                     'BillTo',
                     'ShipTo',
                     'EnabledFlag',

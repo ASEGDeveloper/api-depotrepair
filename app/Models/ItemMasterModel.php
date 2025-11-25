@@ -26,6 +26,7 @@ class ItemMasterModel extends Model
         'Capacity',
         'Description',
         'PrimaryUOM',
+        'MAWP',
         'PurchasingFLAG',
         'OrganizationID',
         'Created_by',

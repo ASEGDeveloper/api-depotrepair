@@ -6,6 +6,7 @@ use App\Models\CustomerModel;
 use App\Models\CustomerSiteModel;
 use App\Models\ItemModel;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log as FacadesLog;
 
 class CustomerService
 {
@@ -47,7 +48,7 @@ class CustomerService
                     'OrganizationID' => '9608',
                     'CustomerName'   => $data->CustomerName ?? null,
                     'CustomerNumber' => $data->CustomerNumber ?? null,
-                    'AccountID'      => mt_rand(100000, 999999), 
+                    'AccountID'      => mt_rand(100000, 999999),
                     'TRN'            => $data->TRN ?? null,
                     'PaymentTerms'   => $data->PaymentTerms ?? null,
                     // 'PaymentTermID'  => $data->PaymentTermID ?? null,
@@ -60,23 +61,35 @@ class CustomerService
 
             if (is_array($sites)) {
                 foreach ($sites as $site) {
-                    // If $site is an array, cast to object
+
+                    // Convert array to object
                     $siteObj = is_array($site) ? (object) $site : $site;
 
-                    CustomerSiteModel::updateOrCreate(
-                        ['ID' => $siteObj->id ?? 0],
-                        [
-                            'Customer_ID' => $customer->ID,
-                            'CustomerSite' => $siteObj->CustomerSite ?? null,
-                            'SiteAddress' => $siteObj->SiteAddress ?? null,
-                            'BillTo' => $siteObj->BillTo ?? 0,
-                            'ShipTo' => $siteObj->ShipTo ?? 0,
-                        ]
-                    );
+                    // Check if ID exists
+                    $lookupId = isset($siteObj->id) && $siteObj->id > 0 ? $siteObj->id : null;
+
+                    // Prepare data
+                    $data = [
+                        'Customer_ID'   => $customer->ID,
+                        'CustomerSite'  => $siteObj->CustomerSite  ?? $siteObj->customerSite ?? null,
+                        'SiteAddress'   => $siteObj->SiteAddress   ?? $siteObj->siteAddress ?? null,
+                        'Contact_Person' => $siteObj->Contact_Person ?? $siteObj->contactPerson ?? null,
+                        'Email'         => $siteObj->Email         ?? $siteObj->email ?? null,
+                        'Mobile_Number' => $siteObj->Mobile_Number ?? $siteObj->mobile ?? null,
+                        'Position'      => $siteObj->Position      ?? $siteObj->position ?? null,
+                        'BillTo'        => $siteObj->BillTo        ?? $siteObj->billTo ?? 0,
+                        'ShipTo'        => $siteObj->ShipTo        ?? $siteObj->shipTo ?? 0,
+                    ];
+
+                    if ($lookupId) {
+                        // ✅ Update existing record
+                        CustomerSiteModel::where('ID', $lookupId)->update($data);
+                    } else {
+                        // ✅ Insert new record
+                        CustomerSiteModel::create($data);
+                    }
                 }
-            }
-
-
+            } 
 
 
             DB::commit();

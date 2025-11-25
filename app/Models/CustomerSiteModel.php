@@ -20,7 +20,11 @@ class CustomerSiteModel extends Model
     protected $fillable = [
         'Customer_ID',       // foreign key to customers table
         'CustomerSite',
-        'SiteAddress',       // nvarchar(MAX)
+        'SiteAddress',  
+        'Contact_Person',     // nvarchar(MAX)
+        'Mobile_Number',
+        'Email',          // nvarchar(255)
+        'Position',  
         'BillTo',            // BIT (true/false)
         'ShipTo',            // BIT (true/false)
         'EnabledFlag',
