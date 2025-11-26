@@ -7,57 +7,94 @@ use App\Models\InstallBaseModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\CustomerModel;
+use App\Models\InstallBaseItemModel;
 use App\Models\ItemMasterModel;
+use Illuminate\Support\Facades\Auth;
 
 class InstallBaseController extends Controller
 {
-public function save(Request $request, $id = null)
-{
-   // return $request->SerialNumbers;
-    try {
-        // ✅ Validate required fields
-        $validated = $request->validate([
-            'ITEM'           => 'required|string|max:100',
-            'SerialNumbers' => 'required|string|max:100|unique:installbase_dpr,Serial_Numbers',
-            'CustomerName'   => 'required|string|max:150',
-        ]);
+ 
+    public function save(Request $request, $id = null)
+    {
+        DB::beginTransaction(); // ✅ Start Transaction
 
-        // ✅ Create or update record
-        $installbase = InstallBaseModel::updateOrCreate(
-            ['ID' => $id ?? 0],
-            [
-                'ITEM'           => $request->ITEM,
-                'Serial_Numbers' => $request->SerialNumbers,
-                'Customer_Name'  => $request->CustomerName,
-                'DATALOAD_TIME'  => now(),
-            ]
-        );
+        try {
+            // Validate required fields
+            $validated = $request->validate([
+                'CustomerName' => 'required|string|max:150',
+            ]);
 
-        return response()->json([
-            'status'  => 'success',
-            'message' => $id ? 'Install base record updated successfully.' : 'Install base record created successfully.',
-            'data'    => $installbase
-        ], 200);
+            // Create or update install base record
+            $installbase = InstallBaseModel::updateOrCreate(
+                ['ID' => $id ?? 0],
+                [
+                    'Customer_Name' => $request->CustomerName,
+                    'DATALOAD_TIME' => now(),
+                ]
+            );
 
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        // ❌ Handle validation errors
-        return response()->json([
-            'status'  => 'error',
-            'message' => 'Validation failed.',
-            'errors'  => $e->errors(),
-        ], 422);
+            $items = $request->Items ?? [];
 
-    } catch (\Exception $e) {
-        // ❌ Handle unexpected errors
-        return response()->json([
-            'status'  => 'error',
-            'message' => 'An unexpected error occurred while saving the install base record.',
-            'error'   => $e->getMessage(),
-        ], 500);
+            if (is_array($items)) {
+                foreach ($items as $item) {
+
+                    // Convert array to object
+                    $itemObject = is_array($item) ? (object)$item : $item;
+
+                    // Check if updating existing item
+                    $lookupId = (!empty($itemObject->id) && $itemObject->id > 0) ? $itemObject->id : null;
+
+                    // Common data for both insert & update
+                    $data = [
+                        'installbase_id' => $installbase->ID,
+                        'Item_Numbers'   => $itemObject->ItemNumber ?? null,
+                        'Serial_Numbers' => $itemObject->SerialNumber ?? null, 
+                    ];
+
+                    if ($lookupId) {
+                        // Update existing item
+                        InstallBaseItemModel::where('ID', $lookupId)->update($data);
+                    } else {
+                        // Insert new item → add creation fields
+                        $data['created_by']   = 88888;
+                        $data['created_date'] = now();
+
+                        InstallBaseItemModel::create($data);
+                    }
+                }
+            }
+
+            DB::commit(); // ✅ Commit Transaction
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => $id ? 'Install base record updated successfully.' : 'Install base record created successfully.',
+                'data'    => $installbase
+            ], 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+
+            DB::rollBack(); // ❌ Rollback on validation error
+
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Validation failed.',
+                'errors'  => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+
+            DB::rollBack(); // ❌ Rollback on system error
+
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'An unexpected error occurred while saving the install base record.',
+                'error'   => $e->getMessage(),
+                'line'    => $e->getLine(),   // 👈 Helpful for debugging
+                'file'    => $e->getFile(),   // 👈 Helpful for debugging
+            ], 500);
+        }
     }
-}
 
-
+   
 public function getInstallBase(Request $request)
 {
     try {
@@ -65,34 +102,56 @@ public function getInstallBase(Request $request)
         $limit  = (int) $request->input('limit', 10);
         $search = trim($request->input('search', ''));
 
-        $query = InstallBaseModel::query()
-            ->select(['ID', 'ITEM', 'Serial_Numbers', 'Customer_Name'])
-            ->orderBy('ID', 'desc');
+        // Base query with join
+        $query = DB::table('installbase_dpr as ib')
+            ->join('installbase_items_dpr as ibi', 'ib.ID', '=', 'ibi.installbase_id')
+            
+            ->select(
+                'ib.ID',
+                'ib.Customer_Name',
+                'ibi.Item_Numbers',
+                'ibi.Serial_Numbers'
+            );
 
-        // ✅ Apply search filter
+        // Apply search filter
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
-                $q->where('ITEM', 'like', "%{$search}%")
-                  ->orWhere('Serial_Numbers', 'like', "%{$search}%")
-                  ->orWhere('Customer_Name', 'like', "%{$search}%");
+                $q->where('ib.Customer_Name', 'like', "%{$search}%")
+                  ->orWhere('ibi.Item_Numbers', 'like', "%{$search}%")
+                  ->orWhere('ibi.Serial_Numbers', 'like', "%{$search}%");
             });
         }
 
-        // ✅ Get total before pagination
-        $total = $query->count();
+        // Get total count (distinct users)
+        $total = $query->distinct('ib.ID')->count('ib.ID');
 
-        // ✅ Apply pagination
-        $records = $query->skip(($page - 1) * $limit)
+        // Apply pagination
+        $records = $query->orderBy('ib.ID', 'desc')
+            ->skip(($page - 1) * $limit)
             ->take($limit)
             ->get();
 
+        // Group items per user
+        $grouped = $records->groupBy('ID')->map(function ($items, $key) {
+            return [
+                'ID'           => $key,
+                'Customer_Name'=> $items->first()->Customer_Name,
+                'Items'        => $items->map(function ($i) {
+                    return [
+                        'Item_Number'   => $i->Item_Numbers,
+                        'Serial_Number' => $i->Serial_Numbers
+                    ];
+                })->values()
+            ];
+        })->values();
+
         return response()->json([
-            'status'     => 'success',
-            'data'       => $records,
-            'total'      => $total,
-            'page'       => $page,
-            'per_page'   => $limit,
-            'total_pages'=> ceil($total / $limit)
+            'status'      => 'success',
+            'data'        => $grouped,
+            'total'       => $total,
+            'page'        => $page,
+            'per_page'    => $limit,
+            'total_pages' => ceil($total / $limit)
         ], 200);
 
     } catch (\Exception $e) {
@@ -106,98 +165,92 @@ public function getInstallBase(Request $request)
 
 
 
-public function update(Request $request, $id)
-{
-    try {
-        // ✅ Validate incoming data (fields based on installbase_dpr)
-        $validated = $request->validate([
-            'ITEM'           => 'nullable|string|max:255',
-            'SerialNumbers' => 'nullable|string|max:255',
-            'CustomerName'   => 'nullable|string|max:255',
-        ]);
 
-        // ✅ Find the record or throw 404 if not found
-        $installbase = InstallBaseModel::findOrFail($id);
+    public function update(Request $request, $id)
+    {
+        try {
+            // ✅ Validate incoming data (fields based on installbase_dpr)
+            $validated = $request->validate([
+                'ITEM'           => 'nullable|string|max:255',
+                'SerialNumbers' => 'nullable|string|max:255',
+                'CustomerName'   => 'nullable|string|max:255',
+            ]);
 
-        // ✅ Update existing record
-        $installbase->update([
-            'ITEM'           => $validated['ITEM'] ?? $installbase->ITEM,
-            'Serial_Numbers' => $validated['SerialNumbers'] ?? $installbase->Serial_Numbers,
-            'Customer_Name'   => $validated['CustomerName'] ?? $installbase->Customer_Name,
-            
-            'DATALOAD_TIME'  => now(),
-        ]);
+            // ✅ Find the record or throw 404 if not found
+            $installbase = InstallBaseModel::findOrFail($id);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Install base record updated successfully.',
-            'data'    => $installbase,
-        ], 200);
+            // ✅ Update existing record
+            $installbase->update([
+                'ITEM'           => $validated['ITEM'] ?? $installbase->ITEM,
+                'Serial_Numbers' => $validated['SerialNumbers'] ?? $installbase->Serial_Numbers,
+                'Customer_Name'   => $validated['CustomerName'] ?? $installbase->Customer_Name,
 
-    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Install base record not found.',
-        ], 404);
+                'DATALOAD_TIME'  => now(),
+            ]);
 
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Validation failed.',
-            'errors'  => $e->errors(),
-        ], 422);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Something went wrong while updating the install base record.',
-            'error'   => $e->getMessage(),
-        ], 500);
+            return response()->json([
+                'success' => true,
+                'message' => 'Install base record updated successfully.',
+                'data'    => $installbase,
+            ], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Install base record not found.',
+            ], 404);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed.',
+                'errors'  => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong while updating the install base record.',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
     }
-}
 
 
-public function searchInstallBase(Request $request)
-{
+   public function searchInstallBase(Request $request)
+{  
     try {
-        $query = InstallBaseModel::query();
+        $query = DB::table('installbase_dpr as ib')
+            ->join('installbase_items_dpr as ibi', 'ib.ID', '=', 'ibi.installbase_id')
+            ->select(
+                'ib.ID',
+                'ib.Customer_Name',
+                'ibi.Item_Numbers',
+                'ibi.Serial_Numbers'
+            );
 
-        // Apply grouped search filters
-        $query->when(
-            $request->filled(['ITEM', 'SerialNumbers', 'CustomerName']),
-            function ($q) use ($request) {
-                $q->where(function ($sub) use ($request) {
-                    if ($request->filled('ITEM')) {
-                        $sub->where('ITEM', 'LIKE', '%' . $request->ITEM . '%');
-                    }
-
-                    if ($request->filled('SerialNumbers')) {
-                        $sub->orWhere('Serial_Numbers', 'LIKE', '%' . $request->SerialNumbers . '%');
-                    }
-
-                    if ($request->filled('CustomerName')) {
-                        $sub->orWhere('Customer_Name', 'LIKE', '%' . $request->CustomerName . '%');
-                    }
-                });
-            }
-        );
-
-        // Apply date filter separately (AND condition)
-        if ($request->filled('Creation_Date')) {
-            $query->whereDate('Creation_Date', $request->Creation_Date);
+        
+         if (!empty($request->Customer_Name)) {
+            $query->where('ib.Customer_Name', 'LIKE', '%' . $request->Customer_Name . '%');
         }
 
-        // Select specific fields
-        $results = $query->select('ID', 'ITEM', 'Serial_Numbers', 'Customer_Name')
-                         ->orderBy('ID', 'desc')
-                         ->get();
+
+
+        // Specific filters applied individually
+        if (!empty($request->Item_Numbers)) {
+            $query->where('ibi.Item_Numbers', 'LIKE', '%' . $request->Item_Numbers . '%');
+        }
+
+        if (!empty($request->Serial_Numbers)) {
+            $query->where('ibi.Serial_Numbers', 'LIKE', '%' . $request->Serial_Numbers . '%');
+        }
+       
+
+        
+        $results = $query->orderBy('ib.ID', 'desc')->get();
 
         return response()->json([
             'status'  => 'success',
             'message' => $results->isEmpty() ? 'No matching records found.' : 'Install base records fetched successfully.',
             'data'    => $results
         ]);
-
     } catch (\Exception $e) {
         return response()->json([
             'status'  => 'error',
@@ -209,54 +262,57 @@ public function searchInstallBase(Request $request)
 
 
 
-// public function searchInstallBase(Request $request)
-// {
-//     try {
-//         $query = InstallBaseModel::query();
 
-//         // ✅ Check if any search filters are provided
-//         $hasFilter = $request->filled(['ITEM', 'SerialNumbers', 'CustomerName','Creation_Date']);
 
-//         if ($hasFilter) {
-//             if ($request->filled('ITEM')) {
-//                 $query->where('ITEM', 'LIKE', '%' . $request->ITEM . '%');
-//             }
 
-//             if ($request->filled('SerialNumbers')) {
-//                 $query->orWhere('Serial_Numbers', 'LIKE', '%' . $request->SerialNumbers . '%');
-//             }
+    // public function searchInstallBase(Request $request)
+    // {
+    //     try {
+    //         $query = InstallBaseModel::query();
 
-//             if ($request->filled('CustomerName')) {
-//                 $query->orWhere('Customer_Name', 'LIKE', '%' . $request->CustomerName . '%');
-//             }
+    //         // ✅ Check if any search filters are provided
+    //         $hasFilter = $request->filled(['ITEM', 'SerialNumbers', 'CustomerName','Creation_Date']);
 
-//           if ($request->filled('Creation_Date')) {
-//             $query->whereDate('Creation_Date', $request->Creation_Date);
-//         }
+    //         if ($hasFilter) {
+    //             if ($request->filled('ITEM')) {
+    //                 $query->where('ITEM', 'LIKE', '%' . $request->ITEM . '%');
+    //             }
 
-//                 }
+    //             if ($request->filled('SerialNumbers')) {
+    //                 $query->orWhere('Serial_Numbers', 'LIKE', '%' . $request->SerialNumbers . '%');
+    //             }
 
-//         // ✅ Select the fields you want to return (include ID)
-//         $results = $query->select('ID', 'ITEM', 'Serial_Numbers', 'Customer_Name')
-//                          ->orderBy('ID', 'desc')
-//                          ->get();
+    //             if ($request->filled('CustomerName')) {
+    //                 $query->orWhere('Customer_Name', 'LIKE', '%' . $request->CustomerName . '%');
+    //             }
 
-//         return response()->json([
-//             'status'  => 'success',
-//             'message' => $results->isEmpty() ? 'No matching records found.' : 'Install base records fetched successfully.',
-//             'data'    => $results
-//         ], 200);
+    //           if ($request->filled('Creation_Date')) {
+    //             $query->whereDate('Creation_Date', $request->Creation_Date);
+    //         }
 
-//     } catch (\Exception $e) {
-//         return response()->json([
-//             'status'  => 'error',
-//             'message' => 'Failed to search install base records.',
-//             'error'   => $e->getMessage(),
-//         ], 500);
-//     }
-// }
+    //                 }
 
-public function show($id)
+    //         // ✅ Select the fields you want to return (include ID)
+    //         $results = $query->select('ID', 'ITEM', 'Serial_Numbers', 'Customer_Name')
+    //                          ->orderBy('ID', 'desc')
+    //                          ->get();
+
+    //         return response()->json([
+    //             'status'  => 'success',
+    //             'message' => $results->isEmpty() ? 'No matching records found.' : 'Install base records fetched successfully.',
+    //             'data'    => $results
+    //         ], 200);
+
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'status'  => 'error',
+    //             'message' => 'Failed to search install base records.',
+    //             'error'   => $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
+
+    public function show($id)
     {
         $item = InstallBaseModel::find($id);
         if (!$item) {
@@ -264,44 +320,53 @@ public function show($id)
         }
         return response()->json($item);
     }
- 
+
 
 public function getItems($id)
 {
-    // First check if record exists
-    $item = InstallBaseModel::find($id);
+    // Check if the record exists in installbase_dpr
+    $installBase = DB::table('installbase_dpr')->find($id);
 
-    if (!$item) {
+    if (!$installBase) {
         return response()->json(['message' => 'Item not found.'], 404);
     }
 
-    // Now get full joined data
-    $data = DB::table('installbase_dpr')
-        ->join('item_master_dpr', 'installbase_dpr.ITEM', '=', 'item_master_dpr.ItemNumber')
-        ->where('installbase_dpr.ID', $id)
+    // Fetch full joined data from related tables
+    $data = DB::table('installbase_items_dpr as ibi')
+        ->join('item_master_dpr as im', 'ibi.Item_Numbers', '=', 'im.ItemNumber')
+        ->join('installbase_dpr as ib', 'ib.ID', '=', 'ibi.installbase_id')
+        ->where('ib.ID', $id)
         ->select(
-            'installbase_dpr.ITEM',
-            'installbase_dpr.Serial_Numbers',
-            'installbase_dpr.Customer_Name',
-            'item_master_dpr.TankType',
-            'item_master_dpr.Manufacturer',
-            'item_master_dpr.UnPortableTankType',
-            'item_master_dpr.Capacity',
-            'item_master_dpr.PrimaryUOM'
+            'ibi.Item_Numbers',
+            'ibi.Serial_Numbers',
+            'ib.Customer_Name',
+            'im.TankType',
+            'im.Manufacturer',
+            'im.UnPortableTankType',
+            'im.Capacity',
+            'im.PrimaryUOM'
         )
         ->first();
 
-    return response()->json($data);
+    if (!$data) {
+        return response()->json(['message' => 'No details found for this item.'], 404);
+    }
+
+    return response()->json([
+        'status' => 'success',
+        'data' => $data
+    ]);
 }
 
 
-     public function searchCustomers(Request $request)
+
+    public function searchCustomers(Request $request)
     {
-         
+
         $search = $request->input('search', '');
 
         $customers = CustomerModel::query()
-            ->select('ID','CustomerName')
+            ->select('ID', 'CustomerName')
             ->when($search, function ($query, $search) {
                 $query->where('CustomerName', 'LIKE', "%{$search}%");
             })
@@ -315,11 +380,11 @@ public function getItems($id)
 
     public function searchItems(Request $request)
     {
-         
+
         $search = $request->input('search', '');
 
         $items = ItemMasterModel::query()
-            ->select('ID','ItemNumber')
+            ->select('ID', 'ItemNumber')
             ->when($search, function ($query, $search) {
                 $query->where('ItemNumber', 'LIKE', "%{$search}%");
             })
@@ -328,6 +393,4 @@ public function getItems($id)
 
         return response()->json($items);
     }
-
-
 }

@@ -16,9 +16,7 @@ class InstallBaseModel extends Model
     const CREATED_AT = 'Creation_date';
     const UPDATED_AT = 'Updated_date';
 
-    protected $fillable = [
-        'ITEM',
-        'Serial_Numbers',
+    protected $fillable = [ 
         'Customer_Name',
         'Created_by',
         'Creation_date',
