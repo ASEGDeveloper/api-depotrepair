@@ -325,7 +325,9 @@ public function getInstallBase(Request $request)
 public function getItems($id)
 {
     // Check if the record exists in installbase_dpr
-    $installBase = DB::table('installbase_dpr')->find($id);
+   // $installBase = DB::table('installbase_dpr')->find($id);
+
+   $installBase=DB::table('installbase_items_dpr')->where('Serial_Numbers',$id)->first();
 
     if (!$installBase) {
         return response()->json(['message' => 'Item not found.'], 404);
@@ -335,7 +337,8 @@ public function getItems($id)
     $data = DB::table('installbase_items_dpr as ibi')
         ->join('item_master_dpr as im', 'ibi.Item_Numbers', '=', 'im.ItemNumber')
         ->join('installbase_dpr as ib', 'ib.ID', '=', 'ibi.installbase_id')
-        ->where('ib.ID', $id)
+       // ->where('ib.ID', $id)
+        ->where('ibi.Serial_Numbers', $id)
         ->select(
             'ibi.Item_Numbers',
             'ibi.Serial_Numbers',
