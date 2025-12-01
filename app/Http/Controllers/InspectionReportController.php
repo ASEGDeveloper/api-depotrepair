@@ -109,6 +109,7 @@ public function save(Request $request )
             ['ID' => $id ?? 0],
             [
                 'Inspection_ID'        => $this->generateCode(),
+                'serialNumber'          => $request->serialNumber,
                 'Unit_Number'          => $request->Unit_Number,
                 'Customer_Name'        => $request->Customer_Name,
                 'Capacity_L'             => $request->Capacity,

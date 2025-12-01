@@ -61,6 +61,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('{id}', [InstallBaseController::class, 'show']); // Get single item  
 
         Route::get('item/{id}', [InstallBaseController::class, 'getItems']); //  
+
+        Route::get('customer/{id}', [InstallBaseController::class, 'getCustomerName']); //  
+
     });
 
     Route::prefix('inspection-report')->group(function () {

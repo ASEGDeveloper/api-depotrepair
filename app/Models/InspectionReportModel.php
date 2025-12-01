@@ -20,6 +20,7 @@ class InspectionReportModel extends Model
     protected $fillable = [
     'Inspection_ID',
     'Unit_Number',
+    'serialNumber',
     'Customer_Name', 
     'Tank_Type',
     'Capacity_L',

@@ -94,6 +94,72 @@ class InstallBaseController extends Controller
         }
     }
 
+
+
+public function update(Request $request, $id = null)
+{
+    DB::beginTransaction();
+
+    try {
+        $items = $request->Items ?? [];
+
+        foreach ($items as $item) {
+
+            $itemObj = (object) $item; // normalize array/object
+
+            // Prepare fields
+            $data = [
+                'Item_Numbers'   => $itemObj->ItemNumber ?? null,
+                'Serial_Numbers' => $itemObj->SerialNumber ?? null,
+                'installbase_id' => $id,  // parent ID
+            ];
+
+            if (!empty($itemObj->id) && $itemObj->id > 0) {
+
+                // 🔄 UPDATE
+                InstallBaseItemModel::where('ID', $itemObj->id)->update($data);
+
+            } else {
+
+                // ➕ INSERT (no id found)
+                // $data['created_by']   = auth()->id() ?? 1;
+                // $data['created_date'] = now();
+
+                InstallBaseItemModel::create($data);
+            }
+        }
+
+        DB::commit();
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Install base items saved successfully.',
+        ], 200);
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+
+        DB::rollBack();
+
+        return response()->json([
+            'status'  => 'error',
+            'message' => 'Validation failed.',
+            'errors'  => $e->errors(),
+        ], 422);
+
+    } catch (\Exception $e) {
+
+        DB::rollBack();
+
+        return response()->json([
+            'status'  => 'error',
+            'message' => 'An unexpected error occurred.',
+            'error'   => $e->getMessage(),
+            'line'    => $e->getLine(),
+        ], 500);
+    }
+}
+ 
+
    
 public function getInstallBase(Request $request)
 {
@@ -166,64 +232,66 @@ public function getInstallBase(Request $request)
 
 
 
-    public function update(Request $request, $id)
-    {
-        try {
-            // ✅ Validate incoming data (fields based on installbase_dpr)
-            $validated = $request->validate([
-                'ITEM'           => 'nullable|string|max:255',
-                'SerialNumbers' => 'nullable|string|max:255',
-                'CustomerName'   => 'nullable|string|max:255',
-            ]);
+    // public function update(Request $request, $id)
+    // {
+    //     try {
+    //         // ✅ Validate incoming data (fields based on installbase_dpr)
+    //         $validated = $request->validate([
+    //             'ITEM'           => 'nullable|string|max:255',
+    //             'SerialNumbers' => 'nullable|string|max:255',
+    //             'CustomerName'   => 'nullable|string|max:255',
+    //         ]);
 
-            // ✅ Find the record or throw 404 if not found
-            $installbase = InstallBaseModel::findOrFail($id);
+    //         // ✅ Find the record or throw 404 if not found
+    //         $installbase = InstallBaseModel::findOrFail($id);
 
-            // ✅ Update existing record
-            $installbase->update([
-                'ITEM'           => $validated['ITEM'] ?? $installbase->ITEM,
-                'Serial_Numbers' => $validated['SerialNumbers'] ?? $installbase->Serial_Numbers,
-                'Customer_Name'   => $validated['CustomerName'] ?? $installbase->Customer_Name,
+    //         // ✅ Update existing record
+    //         $installbase->update([
+    //             'ITEM'           => $validated['ITEM'] ?? $installbase->ITEM,
+    //             'Serial_Numbers' => $validated['SerialNumbers'] ?? $installbase->Serial_Numbers,
+    //             'Customer_Name'   => $validated['CustomerName'] ?? $installbase->Customer_Name,
 
-                'DATALOAD_TIME'  => now(),
-            ]);
+    //             'DATALOAD_TIME'  => now(),
+    //         ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Install base record updated successfully.',
-                'data'    => $installbase,
-            ], 200);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Install base record not found.',
-            ], 404);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed.',
-                'errors'  => $e->errors(),
-            ], 422);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Something went wrong while updating the install base record.',
-                'error'   => $e->getMessage(),
-            ], 500);
-        }
-    }
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Install base record updated successfully.',
+    //             'data'    => $installbase,
+    //         ], 200);
+    //     } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Install base record not found.',
+    //         ], 404);
+    //     } catch (\Illuminate\Validation\ValidationException $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Validation failed.',
+    //             'errors'  => $e->errors(),
+    //         ], 422);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Something went wrong while updating the install base record.',
+    //             'error'   => $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
 
 
-   public function searchInstallBase(Request $request)
+public function searchInstallBase(Request $request)
 {  
     try {
         $query = DB::table('installbase_dpr as ib')
             ->join('installbase_items_dpr as ibi', 'ib.ID', '=', 'ibi.installbase_id')
+            ->leftJoin('inspection_report_dpr as ird', 'ird.serialNumber', '=', 'ibi.Serial_Numbers')
             ->select(
                 'ib.ID',
                 'ib.Customer_Name',
                 'ibi.Item_Numbers',
-                'ibi.Serial_Numbers'
+                'ibi.Serial_Numbers',
+                'ird.id as InspectionReportID',
             );
 
         
@@ -322,12 +390,12 @@ public function getInstallBase(Request $request)
     }
 
 
-public function getItems($id)
+public function getItems($serialNumber)
 {
     // Check if the record exists in installbase_dpr
    // $installBase = DB::table('installbase_dpr')->find($id);
 
-   $installBase=DB::table('installbase_items_dpr')->where('Serial_Numbers',$id)->first();
+   $installBase=DB::table('installbase_items_dpr')->where('Serial_Numbers',$serialNumber)->first();
 
     if (!$installBase) {
         return response()->json(['message' => 'Item not found.'], 404);
@@ -338,10 +406,11 @@ public function getItems($id)
         ->join('item_master_dpr as im', 'ibi.Item_Numbers', '=', 'im.ItemNumber')
         ->join('installbase_dpr as ib', 'ib.ID', '=', 'ibi.installbase_id')
        // ->where('ib.ID', $id)
-        ->where('ibi.Serial_Numbers', $id)
+        ->where('ibi.Serial_Numbers', $serialNumber)
         ->select(
             'ibi.Item_Numbers',
             'ibi.Serial_Numbers',
+            'im.MAWP',
             'ib.Customer_Name',
             'im.TankType',
             'im.Manufacturer',
@@ -360,6 +429,39 @@ public function getItems($id)
         'data' => $data
     ]);
 }
+
+
+
+public function getCustomerName($id)
+{
+    // Fetch main install base (single row)
+    $installBase = DB::table('installbase_dpr')
+        ->where('ID', $id)
+        ->select('Customer_Name')
+        ->first();
+
+    if (!$installBase) {
+        return response()->json(['message' => 'Install base not found.'], 404);
+    }
+
+    // Fetch all related installbase_items_dpr rows
+    $items = DB::table('installbase_items_dpr')
+        ->where('installbase_id', $id)
+        ->select(
+            'ID as InstallBaseDetailsID',
+            'Item_Numbers',
+            'Serial_Numbers'
+        )
+        ->get();
+
+    return response()->json([
+        'status' => 'success',
+        'CustomerName' => $installBase->Customer_Name,
+        'items' => $items
+    ]);
+}
+
+
 
 
 
