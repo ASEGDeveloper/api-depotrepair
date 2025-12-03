@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    'paths' => ['api/*', 'sanctum/csrf-cookie','generate-pdf'],
     'allowed_methods' => ['*'],
     'allowed_origins' => ['http://localhost:3000'], // your frontend
     'allowed_origins_patterns' => [],

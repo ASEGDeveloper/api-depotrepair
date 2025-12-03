@@ -5,13 +5,24 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\InspectionReportModel;
 use App\Models\InstallBaseModel;
+use App\Services\InspectionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Mockery\Matcher\Any;
+use Barryvdh\DomPDF\Facade\Pdf;
+
 
 class InspectionReportController extends Controller
 {
+
+
+     protected $inspectionService;
+
+    public function __construct(InspectionService $inspectionService)
+    {
+        $this->inspectionService = $inspectionService;
+    }
 
 
 public function searchInstallbase_Test(Request $request)
@@ -68,23 +79,14 @@ public function searchInspection(Request $request)
 public function showInspectionFetch($id)
     {
         $inspection = InspectionReportModel::find($id);
-        $images =  $this->getInspectionImages($id);
+        $images =  $this->inspectionService->getInspectionImages($id);
         $inspection->images = $images;
         if (!$inspection) {
             return response()->json(['message' => 'Inspection not found.'], 404);
         }
         return response()->json($inspection);
     }
-
-
-    private function getInspectionImages($inspectionID) 
-    {
-        
-        return DB::table('inspection_images')->where('inspection_id', $inspectionID)
-            ->where('is_deleted', 0)->select('image_data','description')->orderBy('id','desc')->get();
-        
-    }
-
+ 
 
 
 public function showInstallbaseFetch($id)
@@ -267,15 +269,7 @@ public function generateCode()
     $prefix = "CRYOTECH";
 
     // Current date in YYYYMMDD
-    $date = now()->format('Ymd');
-
-    // Auto-increment sequence (fetch last sequence from DB)
-    // $lastRecord = InspectionReportModel::orderBy('ID', 'DESC')->first();
-    // $lastSequence = $lastRecord ? intval($lastRecord->sequence ?? 0) : 0;
-    // $newSequence = str_pad($lastSequence + 1, 4, '0', STR_PAD_LEFT);
-
-    // // Final Code
-    // $finalCode = "{$prefix}|{$date}|{$customerNumber}|{$newSequence}";
+    $date = now()->format('Ymd'); 
 
     $unique = random_int(10000000, 99999999);
     $finalCode = "{$prefix}{$date}{$unique}";
@@ -372,6 +366,84 @@ public function saveInspection(Request $request)
     }
 }
 
+
+
+public function saveSignature(Request $request)
+{
+    try {
+        $base64Image = $request->signature;
+
+        // If signature is coming as: data:image/png;base64,xxxxxx
+        // remove the "data:image/*;base64," part
+        if (strpos($base64Image, 'base64,') !== false) {
+            $base64Image = explode('base64,', $base64Image)[1];
+        }
+
+        if (!empty($request->signature)) { 
+
+            DB::table('inspection_signatures')->insert([
+                'inspection_id'     => $request->inspectionID,
+                'custSignatureName' => $request->custSignatureName,
+                'signature_data'    => $base64Image,  // PURE base64 image
+                'date'              => date('Y-m-d'),
+            ]);
+        }
+ 
+      
+        return response()->json([
+            'status'  => true,
+            'message' => 'Signature saved successfully.',
+        ], 200);
+
+    } catch (\Exception $e) {
+
+        Log::error('Signature save error: ' . $e->getMessage(), ['exception' => $e]);
+
+        return response()->json([
+            'status'  => false,
+            'message' => 'An error occurred while saving signature.',
+            'error'   => $e->getMessage(),
+        ], 500);
+    }
+}
+
+
+public function downloadReport(Request $request,$inspectionID){ 
+
+      $data =  $this->inspectionService->getInspectionDetails($inspectionID);  
+
+      
+    $data = $data->getData(true); // 'true' makes it an associative array
+
+   // return $data;
+
+// Now you can access values like an array
+            // $inspectionID = $data['Inspection_ID'];
+            // $customerName = $data['Customer_Name'];
+
+            // return  $inspectionID ;
+     
+      $pdf = Pdf::loadView('pdf_template', compact('data'))
+        ->setPaper('a4', 'portrait')
+        ->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => true,
+            'defaultFont' => 'DejaVu Sans',
+            'isFontSubsettingEnabled' => true,
+        ]);
+
+    return $pdf->download('inspection_report.pdf');
+
+    
+
+      
+      
+         // Generate the PDF
+  //  $pdf = Pdf::loadView('pdf_template', compact('data'));
+
+    // Download the PDF
+   // return $pdf->download('inspection_report.pdf');
+}
 
    
 

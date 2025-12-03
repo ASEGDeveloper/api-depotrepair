@@ -80,6 +80,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/{id}', [InspectionReportController::class, 'delete']); // delete Inspection Report
         //  });
 
+         Route::prefix('signature-pdf')->group(function () {
+
+          Route::post('/save-signature', [InspectionReportController::class, 'saveSignature']); // Save Signature
+
+           Route::get('/download-pdf/{id}', [InspectionReportController::class, 'downloadReport']);
+         });
+
 
     });
 });

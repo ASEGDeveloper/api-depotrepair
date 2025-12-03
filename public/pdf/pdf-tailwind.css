@@ -1,0 +1,37 @@
+/* Typography */
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.text-xl { font-size: 20px; font-weight: 600; }
+.text-lg { font-size: 18px; font-weight: 600; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: bold; }
+
+/* Layout */
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-4 { gap: 16px; }
+
+/* Padding */
+.p-2 { padding: 8px; }
+.p-4 { padding: 16px; }
+.p-6 { padding: 24px; }
+
+/* Margin */
+.mb-2 { margin-bottom: 8px; }
+.mt-4 { margin-top: 16px; }
+
+/* Border */
+.border { border: 1px solid #ccc; }
+.border-2 { border: 2px solid #000; }
+.rounded { border-radius: 6px; }
+.rounded-full { border-radius: 9999px; }
+
+/* Background */
+.bg-white { background: #fff; }
+.bg-blue { background: #4a98d8; color: white; }
+
+/* Table */
+.table { width: 100%; border-collapse: collapse; }
+.table th { background: #4a98d8; color: #fff; padding: 8px; font-size: 14px; }
+.table td { padding: 8px; background: #f8f8f8; border: 1px solid #ccc; }
