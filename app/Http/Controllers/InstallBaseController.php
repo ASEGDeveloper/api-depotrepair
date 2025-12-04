@@ -20,15 +20,15 @@ class InstallBaseController extends Controller
 
         try {
             // Validate required fields
-            $validated = $request->validate([
-                'CustomerName' => 'required|string|max:150',
-            ]);
+            // $validated = $request->validate([
+            //     'CustomerName' => 'required|string|max:150',
+            // ]);
 
             // Create or update install base record
             $installbase = InstallBaseModel::updateOrCreate(
                 ['ID' => $id ?? 0],
                 [
-                    'Customer_Name' => $request->CustomerName,
+                    'CustomerID' => $request->CustomerID,
                     'DATALOAD_TIME' => now(),
                 ]
             );
@@ -171,10 +171,10 @@ public function getInstallBase(Request $request)
         // Base query with join
         $query = DB::table('installbase_dpr as ib')
             ->join('installbase_items_dpr as ibi', 'ib.ID', '=', 'ibi.installbase_id')
-            
+            ->join('customers_dpr as cd','cd.ID','=','ib.CustomerID')
             ->select(
                 'ib.ID',
-                'ib.Customer_Name',
+                'cd.CustomerName as Customer_Name',
                 'ibi.Item_Numbers',
                 'ibi.Serial_Numbers'
             );
@@ -285,10 +285,11 @@ public function searchInstallBase(Request $request)
     try {
         $query = DB::table('installbase_dpr as ib')
             ->join('installbase_items_dpr as ibi', 'ib.ID', '=', 'ibi.installbase_id')
+            ->join('customers_dpr as cd', 'cd.ID', '=', 'ib.customerID')
             ->leftJoin('inspection_report_dpr as ird', 'ird.serialNumber', '=', 'ibi.Serial_Numbers')
             ->select(
                 'ib.ID',
-                'ib.Customer_Name',
+                'cd.CustomerName as Customer_Name',
                 'ibi.Item_Numbers',
                 'ibi.Serial_Numbers',
                 'ird.id as InspectionReportID',
@@ -403,22 +404,23 @@ public function getItems($serialNumber)
 
     // Fetch full joined data from related tables
     $data = DB::table('installbase_items_dpr as ibi')
-        ->join('item_master_dpr as im', 'ibi.Item_Numbers', '=', 'im.ItemNumber')
-        ->join('installbase_dpr as ib', 'ib.ID', '=', 'ibi.installbase_id')
-       // ->where('ib.ID', $id)
-        ->where('ibi.Serial_Numbers', $serialNumber)
-        ->select(
-            'ibi.Item_Numbers',
-            'ibi.Serial_Numbers',
-            'im.MAWP',
-            'ib.Customer_Name',
-            'im.TankType',
-            'im.Manufacturer',
-            'im.UnPortableTankType',
-            'im.Capacity',
-            'im.PrimaryUOM'
-        )
-        ->first();
+    ->join('item_master_dpr as im', 'ibi.Item_Numbers', '=', 'im.ItemNumber')
+    ->join('installbase_dpr as ib', 'ib.ID', '=', 'ibi.installbase_id')
+    ->join('customers_dpr as cd', 'cd.ID', '=', 'ib.CustomerID')
+    ->where('ibi.Serial_Numbers', $serialNumber)
+    ->select(
+        'ibi.Item_Numbers',
+        'ibi.Serial_Numbers',
+        'im.MAWP',
+        'cd.CustomerName as Customer_Name',
+        'im.TankType',
+        'im.Manufacturer',
+        'im.UnPortableTankType',
+        'im.Capacity',
+        'im.PrimaryUOM'
+    )
+    ->first();
+
 
     if (!$data) {
         return response()->json(['message' => 'No details found for this item.'], 404);
@@ -435,10 +437,12 @@ public function getItems($serialNumber)
 public function getCustomerName($id)
 {
     // Fetch main install base (single row)
-    $installBase = DB::table('installbase_dpr')
-        ->where('ID', $id)
-        ->select('Customer_Name')
-        ->first();
+    $installBase = DB::table('installbase_dpr as ib') // alias should match
+    ->join('customers_dpr as cd', 'cd.ID', '=', 'ib.CustomerID')
+    ->where('ib.ID', $id)
+    ->select('cd.CustomerName as Customer_Name')
+    ->first();
+
 
     if (!$installBase) {
         return response()->json(['message' => 'Install base not found.'], 404);

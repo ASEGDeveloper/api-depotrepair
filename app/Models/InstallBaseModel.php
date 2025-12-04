@@ -18,6 +18,7 @@ class InstallBaseModel extends Model
 
     protected $fillable = [ 
         'Customer_Name',
+        'CustomerID',
         'Created_by',
         'Creation_date',
         'Updated_by',
