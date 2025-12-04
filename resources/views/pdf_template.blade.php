@@ -289,21 +289,21 @@
 <div style="font-weight: bold; margin-top: 20px; margin-bottom: 5px; font-size: 14px;">
     Customer Signature   
 </div>
+ 
 
-
-
-<table style="width:100%; border-collapse:collapse; margin-bottom:20px;">
+<table style="width:100%;  margin-bottom:20px;">
     <tbody>
-        <tr><td style="padding:12px; border:1px solid #000; min-height:40px; text-align: left;">Customer Name: {{ $data['signature']['custSignatureName'] }}</td></tr>
+        <tr><td style="padding:12px;  min-height:40px; text-align: left;">Customer Name: {{ $data['signature']['custSignatureName'] }}</td></tr>
         <tr>
-            <td style="padding:12px; border:1px solid #000; min-height:40px; text-align: left;">
-              <img src="data:image/png;base64,[PASTE THE FULL BASE64 STRING HERE]" 
-     alt="Encoded Image"
-     style="max-width: 100%; height: auto;">
+            <td style="padding:12px;  min-height:40px; text-align: left;">
+             <img src="data:image/png;base64,{!! $data['signature']['signature_data'] !!}" 
+             alt="Signature"
+             style="max-width:100%; height:auto;">
+
             </td>
         </tr>
 
-         <tr><td style="padding:12px; border:1px solid #000; min-height:40px; text-align: left;">Date: {{ $data['signature']['date'] }}</td></tr>
+         <tr><td style="padding:12px;   min-height:40px; text-align: left;">Date: {{ $data['signature']['date'] }}</td></tr>
 
     </tbody>
 </table>

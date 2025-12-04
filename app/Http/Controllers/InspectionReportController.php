@@ -80,7 +80,10 @@ public function showInspectionFetch($id)
     {
         $inspection = InspectionReportModel::find($id);
         $images =  $this->inspectionService->getInspectionImages($id);
-        $inspection->images = $images;
+         $inspection->images = $images;
+        $signature =  $this->inspectionService->getSignature($id);
+        $inspection->signature = $signature;
+       
         if (!$inspection) {
             return response()->json(['message' => 'Inspection not found.'], 404);
         }
