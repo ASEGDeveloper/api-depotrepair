@@ -59,11 +59,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{id}', [InstallBaseController::class, 'update']); // update the records
         Route::post('/search', [InstallBaseController::class, 'searchInstallBase']);
         Route::get('{id}', [InstallBaseController::class, 'show']); // Get single item  
-
         Route::get('item/{id}', [InstallBaseController::class, 'getItems']); //  
-
         Route::get('customer/{id}', [InstallBaseController::class, 'getCustomerName']); //  
-
     });
 
     Route::prefix('inspection-report')->group(function () {
@@ -81,10 +78,13 @@ Route::middleware('auth:sanctum')->group(function () {
         //  });
 
          Route::prefix('signature-pdf')->group(function () {
-
           Route::post('/save-signature', [InspectionReportController::class, 'saveSignature']); // Save Signature
+          Route::get('/download-pdf/{id}', [InspectionReportController::class, 'downloadReport']);
+          Route::get('/get-emails/{id}', [InspectionReportController::class, 'getEmails']);
 
-           Route::get('/download-pdf/{id}', [InspectionReportController::class, 'downloadReport']);
+          Route::post('/sent-email/{any}', [InspectionReportController::class, 'sendEmail']);
+
+
          });
 
 

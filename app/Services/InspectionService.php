@@ -48,5 +48,29 @@ class InspectionService
         
     }
 
+    public function getCustomerID($inspectionID) 
+    {
+        
+    return $result = DB::table('inspection_report_dpr as ird')
+                ->join('installbase_items_dpr as iid', 'iid.Serial_Numbers', '=', 'ird.SerialNumber')
+                ->join('installbase_dpr as insid', 'insid.ID', '=', 'iid.installbase_id')
+                ->where('ird.id', $inspectionID)   // replace $inspectionID with your variable
+                ->select('insid.CustomerID')
+                ->first();
+        
+    }
+
+
+    public function getCustomerEmail($customerID)
+    {
+
+        
+    return DB::table('sites_dpr')
+        ->select('Contact_Person', 'Email', 'Position','BillTo','ShipTo')
+        ->where('Customer_ID', $customerID)
+        ->get();
+    }
+
+
     
 }
