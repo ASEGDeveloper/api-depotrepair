@@ -167,147 +167,159 @@
         </table>
     </div>
 
-    <!-- Details Table -->
-    <table class="content-table">
-        <tr>
-            <th>Tank Type:</th>
-            <th>Unit Number:</th>
-            <th>Customer:</th>
-            <th>Survey Type:</th>
-        </tr>
-        <tr>
-            <td>{{ $data['Tank_Type'] ?? 'N/A' }}</td>
-            <td>{{ $data['Unit_Number'] ?? 'N/A' }}</td>
-            <td>{{ $data['Customer_Name'] ?? 'N/A' }}</td>
-            <td>{{ $data['Survey_Type'] ?? 'N/A' }}</td>
-        </tr>
+  <!-- Details Table -->
+<table class="content-table">
+    <tr>
+        <th>Tank Type:</th>
+        <th>Unit Number:</th>
+        <th>Customer:</th>
+        <th>Survey Type:</th>
+    </tr>
+    <tr>
+        <td>{{ $data['Tank_Type'] ?? 'N/A' }}</td>
+        <td>{{ $data['Unit_Number'] ?? 'N/A' }}</td>
+        <td>{{ $data['Customer_Name'] ?? 'N/A' }}</td>
+        <td>{{ $data['Survey_Type'] ?? 'N/A' }}</td>
+    </tr>
 
-     <!-- row 2 --> 
-        <tr>
-            <th>Manufacturer</th>
-            <th>Un Portable Tank Type</th>
-            <th>Survey Date (MM/DD/YYYY)</th>
-            <th>Location of Inspection</th>
-        </tr>
-        <tr>
-            <td>{{ $data['Manufacturer'] ?? 'N/A' }}</td>
-            <td>{{ $data['Un_Portable_Tank_Type'] ?? 'N/A' }}</td>
-            <td>{{ $data['Survey_Date'] ?? 'N/A' }}</td>
-            <td>{{ $data['Location_of_Inspection'] ?? 'N/A' }}</td>
-        </tr>
+    <!-- row 2 -->
+    <tr>
+        <th>Manufacturer</th>
+        <th>Un Portable Tank Type</th>
+        <th>Survey Date (MM/DD/YYYY)</th>
+        <th>Location of Inspection</th>
+    </tr>
+    <tr>
+        <td>{{ $data['Manufacturer'] ?? 'N/A' }}</td>
+        <td>{{ $data['Un_Portable_Tank_Type'] ?? 'N/A' }}</td>
+        <td>{{ $data['Survey_Date'] ?? 'N/A' }}</td>
+        <td>{{ $data['Location_of_Inspection'] ?? 'N/A' }}</td>
+    </tr>
 
-         <!-- row 3 --> 
-        <tr>
-            <th>Manufacturer Serial No</th>
-            <th>MAWP</th>
-            <th>Inner tank Material</th>
-            <th>Outer tank material</th>
-        </tr>
-        <tr>
-            <td>{{ $data['manufacturerSerialNo'] ?? 'N/A' }}</td>
-            <td>{{ $data['mawp'] ?? 'N/A' }}</td>
-            <td>{{ $data['Inner_Tank_Material'] ?? 'N/A' }}</td>
-            <td>{{ $data['Outer_Tank_Material'] ?? 'N/A' }}</td>
-        </tr>
+    <!-- row 3 -->
+    <tr>
+        <th>Manufacturer Serial No</th>
+        <th>MAWP</th>
+        <th>Inner tank Material</th>
+        <th>Outer tank material</th>
+    </tr>
+    <tr>
+        <td>{{ $data['manufacturerSerialNo'] ?? 'N/A' }}</td>
+        <td>{{ $data['mawp'] ?? 'N/A' }}</td>
+        <td>{{ $data['Inner_Tank_Material'] ?? 'N/A' }}</td>
+        <td>{{ $data['Outer_Tank_Material'] ?? 'N/A' }}</td>
+    </tr>
+
+    <!-- row 4 -->
+    <tr>
+        <th>Gross Weight(kg)</th>
+        <th>Tare Weight(kg)</th>
+        <th>Capacity(L)</th>
+        <th>Next CSC Due</th>
+    </tr>
+    <tr>
+        <td>{{ $data['Max_Gross_Weight_kg'] ?? 'N/A' }}</td>
+        <td>{{ $data['Tare_Weight_kg'] ?? 'N/A' }}</td>
+        <td>{{ $data['Capacity_L'] ?? 'N/A' }}</td>
+        <td>{{ $data['Next_CSC_Due'] ?? 'N/A' }}</td>
+    </tr>
+
+    <!-- row 5 -->
+    <tr>
+        <th>Initial test (MM-YY)</th>
+        <th>Last 2.5yr Test (MM-YY)</th>
+        <th>Last 5 yr. test (MM-YY)</th>
+        <th>Next test Due (MM-YY)</th>
+    </tr>
+    <tr>
+        <td>{{ $data['Initial_Test_MMM_YY'] ?? 'N/A' }}</td>
+        <td>{{ $data['Last_2_5yr_Test_MMM_YY'] ?? 'N/A' }}</td>
+        <td>{{ $data['Last_5yr_Test_MMM_YY'] ?? 'N/A' }}</td>
+        <td>{{ $data['Next_Test_Due_MMM_YY'] ?? 'N/A' }}</td>
+    </tr>
+
+    <!-- row 6 -->
+    <tr>
+        <th>Last Cargo</th>
+        <th>Vacuum reading</th>
+        <th>Results : Accepted</th>
+        <th>Surveyor</th>
+    </tr>
+    <tr>
+        <td>{{ $data['Last_Cargo'] ?? 'N/A' }}</td>
+        <td>{{ $data['Vacuum_Reading'] ?? 'N/A' }}</td>
+        <td>{{ $data['Results'] ?? 'N/A' }}</td>
+        <td>{{ $data['Surveyor'] ?? 'N/A' }}</td>
+    </tr>
+</table>
+
+<!-- Comments Section -->
 
 
-        <!-- row 4 --> 
-        <tr>
-            <th>Gross Weight(kg)</th>
-            <th>Tare Weight(kg)</th>
-            <th>Capacity(L)</th>
-            <th>Next CSC Due</th>
-        </tr>
-        <tr>
-            <td>{{ $data['Max_Gross_Weight_kg'] ?? 'N/A' }}</td>
-            <td>{{ $data['Tare_Weight_kg'] ?? 'N/A' }}</td>
-            <td>{{ $data['Capacity_L'] ?? 'N/A' }}</td>
-            <td>{{ $data['Next_CSC_Due'] ?? 'N/A' }}</td>
-        </tr>
+<div style="page-break-inside: avoid;">
 
+    <!-- Comments Heading -->
+    <div style="font-weight: bold; margin-top: 20px; margin-bottom: 5px; font-size: 14px;">
+        Comments
+    </div>
 
-        <!-- row 4 --> 
-        <tr>
-            <th>Initial test (MM-YY)</th>
-            <th>Last 2.5yr Test (MM-YY)</th>
-            <th>Last 5 yr. test (MM-YY)</th>
-            <th>Next test Due (MM-YY)</th>
-        </tr>
-        <tr>
-            <td>{{ $data['Initial_Test_MMM_YY'] ?? 'N/A' }}</td>
-            <td>{{ $data['Last_2_5yr_Test_MMM_YY'] ?? 'N/A' }}</td>
-            <td>{{ $data['Last_5yr_Test_MMM_YY'] ?? 'N/A' }}</td>
-            <td>{{ $data['Next_Test_Due_MMM_YY'] ?? 'N/A' }}</td>
-        </tr>
-
-
-         <!-- row 5 --> 
-        <tr>
-            <th>Last Cargo</th>
-            <th>Vacuum reading</th>
-            <th>Results : Accepted</th>
-            <th>Surveyor</th>
-        </tr>
-        <tr>
-            <td>{{ $data['Last_Cargo'] ?? 'N/A' }}</td>
-            <td>{{ $data['Vacuum_Reading'] ?? 'N/A' }}</td>
-            <td>{{ $data['Results'] ?? 'N/A' }}</td>
-            <td>{{ $data['Surveyor'] ?? 'N/A' }}</td>
-        </tr> 
+    <!-- Comments Table -->
+    <table style="width:100%; border-collapse:collapse; margin-bottom:20px;">
+        <tbody>
+            <tr>
+                <td style="padding:12px; border:1px solid #000; white-space: pre-wrap;">
+                    {{ $data['Comments'] ?? 'N/A' }}
+                </td>
+            </tr>
+        </tbody>
     </table>
 
- 
-    
-    <!-- Comments Section -->
-<!-- Comments Heading -->
-<div style="font-weight: bold; margin-top: 20px; margin-bottom: 5px; font-size: 14px;">
-    Comments
 </div>
 
-<!-- Comments Table -->
-<table style="width:100%; border-collapse:collapse; margin-bottom:20px;">
-    <tbody>
-        <tr>
-            <td style="padding:12px; border:1px solid #000; min-height:40px; white-space: pre-wrap; text-align: left;">
-                {{ $data['Comments'] ?? 'N/A' }}
-            </td>
-        </tr>
-    </tbody>
-</table> 
- 
-   <div class="image-gallery">
+<!-- Images -->
+@if(!empty($data['images']) && is_array($data['images']))
+<div class="image-gallery">
     @foreach($data['images'] as $img)
-        <div class="image-card"> <img src="{{ $img['image_data'] }}" 
+        <div class="image-card">
+            <img src="{{ $img['image_data'] ?? '' }}"
                  alt="Inspection Image"
                  style="width: 45%; max-height: 200px; object-fit: cover;">
             <p>{{ $img['description'] ?? 'No description' }}</p>
         </div>
     @endforeach
 </div>
- 
+@endif
 
+
+
+@if(!empty($data['signature']))
+
+<!-- Customer Signature -->
 <div style="font-weight: bold; margin-top: 20px; margin-bottom: 5px; font-size: 14px;">
-    Customer Signature   
+    Customer Signature
 </div>
- 
-
-<table style="width:100%;  margin-bottom:20px;">
+<table style="width:100%; margin-bottom:20px;">
     <tbody>
-        <tr><td style="padding:12px;  min-height:40px; text-align: left;">Customer Name: {{ $data['signature']['custSignatureName'] }}</td></tr>
         <tr>
-            <td style="padding:12px;  min-height:40px; text-align: left;">
-             <img src="data:image/png;base64,{!! $data['signature']['signature_data'] !!}" 
-             alt="Signature"
-             style="max-width:100%; height:auto;">
-
+            <td style="padding:12px;">Customer Name: {{ $data['signature']['custSignatureName'] ?? 'N/A' }}</td>
+        </tr>
+        <tr>
+            <td style="padding:12px;">
+                @if(!empty($data['signature']['signature_data']))
+                <img src="data:image/png;base64,{{ $data['signature']['signature_data'] }}"
+                     alt="Signature"
+                     style="max-width:100%; height:auto;">
+                @else
+                    No Signature Available
+                @endif
             </td>
         </tr>
-
-         <tr><td style="padding:12px;   min-height:40px; text-align: left;">Date: {{ $data['signature']['date'] }}</td></tr>
-
+        <tr>
+            <td style="padding:12px;">Date: {{ $data['signature']['date'] ?? 'N/A' }}</td>
+        </tr>
     </tbody>
 </table>
-
+@endif
 
 
 </body>
