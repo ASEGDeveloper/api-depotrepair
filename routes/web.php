@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\InspectionReportController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TestMail;
@@ -20,3 +21,6 @@ Route::get('/send-test-mail', function () {
         return "Mail sending failed: " . $e->getMessage();
     }
 });
+
+
+Route::get('/test-download-pdf/{id}', [InspectionReportController::class, 'WebdownloadReport']);

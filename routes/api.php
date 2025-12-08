@@ -79,6 +79,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
          Route::prefix('signature-pdf')->group(function () {
           Route::post('/save-signature', [InspectionReportController::class, 'saveSignature']); // Save Signature
+
+           Route::post('/surveyor-save-signature', [InspectionReportController::class, 'saveSurveyorSignature']); // Save Signature
+
           Route::get('/download-pdf/{id}', [InspectionReportController::class, 'downloadReport']);
           Route::get('/get-emails/{id}', [InspectionReportController::class, 'getEmails']);
 

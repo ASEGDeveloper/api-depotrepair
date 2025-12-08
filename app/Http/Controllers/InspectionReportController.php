@@ -52,6 +52,9 @@ class InspectionReportController extends Controller
 
     public function searchInspection(Request $request)
     {
+
+       
+
         $query = InspectionReportModel::query();
 
         // Filter by ITEM
@@ -64,11 +67,10 @@ class InspectionReportController extends Controller
             $query->where('Customer_Name', 'LIKE', '%' . $request->Customer_Name . '%');
         }
 
-        // Filter by Serial Numbers
-        if ($request->filled('Creation_Date')) {
-            $query->where('Creation_Date', 'LIKE', '%' . $request->Creation_Date . '%');
+    
+       if ($request->filled('Creation_Date')) {
+            $query->whereDate('Creation_Date', $request->Creation_Date);
         }
-
         // Select fields explicitly and order by latest first
         $results = $query->select('ID', 'Inspection_ID', 'Creation_Date', 'Customer_Name', 'Status')
             ->orderByDesc('ID')
@@ -403,6 +405,56 @@ class InspectionReportController extends Controller
                 'error'   => $e->getMessage(),
             ], 500);
         }
+    }
+
+
+     public function saveSurveyorSignature(Request $request)
+    {
+        try {
+            $base64Image = $request->surveyorSignature;
+
+            // If signature is coming as: data:image/png;base64,xxxxxx
+            // remove the "data:image/*;base64," part
+            if (strpos($base64Image, 'base64,') !== false) {
+                $base64Image = explode('base64,', $base64Image)[1];
+            }
+
+            if (!empty($request->signature)) {
+
+                DB::table('inspection_signatures')->insert([
+                    'inspection_id'     => $request->inspectionID,
+                    'custSignatureName' => $request->surveyorSignatureName,
+                    'signature_data'    => $base64Image,  // PURE base64 image
+                    'date'              => date('Y-m-d'),
+                ]);
+            }
+
+
+            return response()->json([
+                'status'  => true,
+                'message' => 'Signature saved successfully.',
+            ], 200);
+        } catch (\Exception $e) {
+
+            Log::error('Signature save error: ' . $e->getMessage(), ['exception' => $e]);
+
+            return response()->json([
+                'status'  => false,
+                'message' => 'An error occurred while saving signature.',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
+
+    public function WebdownloadReport(Request $request, $inspectionID)
+    {
+    $data = $this->inspectionService->getInspectionDetails($inspectionID);
+    $data = $data->getData(true);
+
+    // 🔍 Return the HTML view for testing
+    return view('pdf_template', compact('data'));
     }
 
 
