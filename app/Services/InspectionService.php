@@ -44,7 +44,7 @@ class InspectionService
     {
         
         return DB::table('inspection_signatures')->where('inspection_id', $inspectionID)
-        ->select('custSignatureName','signature_data','date')->orderBy('ID', 'desc')->first();
+        ->select('custSignatureName','Type','signature_data','date')->where('Type','Customer')->orderBy('ID', 'desc')->first();
         
     }
 
@@ -69,6 +69,15 @@ class InspectionService
         ->select('Contact_Person', 'Email', 'Position','BillTo','ShipTo')
         ->where('Customer_ID', $customerID)
         ->get();
+    }
+
+
+     public function getSurSignature($inspectionID) 
+    {
+        
+        return DB::table('inspection_signatures')->where('inspection_id', $inspectionID)
+        ->select('Surveyor_Name','Type','signature_data','date')->where('Type','Surveyor')->first();
+        
     }
 
 

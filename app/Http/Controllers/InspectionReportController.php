@@ -51,9 +51,7 @@ class InspectionReportController extends Controller
 
 
     public function searchInspection(Request $request)
-    {
-
-       
+    { 
 
         $query = InspectionReportModel::query();
 
@@ -386,6 +384,7 @@ class InspectionReportController extends Controller
                     'inspection_id'     => $request->inspectionID,
                     'custSignatureName' => $request->custSignatureName,
                     'signature_data'    => $base64Image,  // PURE base64 image
+                    'Type' => 'Customer',
                     'date'              => date('Y-m-d'),
                 ]);
             }
@@ -409,9 +408,9 @@ class InspectionReportController extends Controller
 
 
      public function saveSurveyorSignature(Request $request)
-    {
+    { 
         try {
-            $base64Image = $request->surveyorSignature;
+         $base64Image = $request->surveyorSignature;
 
             // If signature is coming as: data:image/png;base64,xxxxxx
             // remove the "data:image/*;base64," part
@@ -419,16 +418,26 @@ class InspectionReportController extends Controller
                 $base64Image = explode('base64,', $base64Image)[1];
             }
 
-            if (!empty($request->signature)) {
+            if (!empty($request->surveyorSignature)) {
 
                 DB::table('inspection_signatures')->insert([
                     'inspection_id'     => $request->inspectionID,
-                    'custSignatureName' => $request->surveyorSignatureName,
+                    'Surveyor_Name' => $request->surveyorSignatureName,
                     'signature_data'    => $base64Image,  // PURE base64 image
+                    'Type' => 'Surveyor',
                     'date'              => date('Y-m-d'),
-                ]);
+                ]); 
             }
 
+  InspectionReportModel::where('id', $request->inspectionID)
+    ->update(['Status' => $request->Status]);
+
+Log::info("UPDATED TO:", [
+  'id' => $request->inspectionID,
+  'new_status' => InspectionReportModel::find($request->inspectionID)->Status
+]);
+
+ 
 
             return response()->json([
                 'status'  => true,
@@ -444,6 +453,15 @@ class InspectionReportController extends Controller
                 'error'   => $e->getMessage(),
             ], 500);
         }
+    }
+
+    private function reportStatusUpdate($inspectionID){
+        DB::table('inspection_report_dpr')
+        ->where('id', $inspectionID)
+        ->update([
+            'Status' => 'Report Generated', // set the new status 
+        ]);
+
     }
 
 
@@ -581,6 +599,10 @@ public function sendEmail(Request $request)
 }
 
 
+public function getSurvorSignature($inspectionID){
+
+      return  $this->inspectionService->getSurSignature($inspectionID);
+}
 
 
 }
