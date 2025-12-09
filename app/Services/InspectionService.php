@@ -21,7 +21,11 @@ class InspectionService
         $images =  $this->getInspectionImages($inspectionID);
         $inspection->images = $images;
         $signature =  $this->getSignature($inspectionID); 
-        $inspection->signature = $signature;
+         $inspection->signature = $signature;
+         $surSignature =  $this->getSurSignature($inspectionID);
+          $inspection->surveyor = $surSignature;
+         $inspection->logo =  $this->getLogo();
+       
 
         if (!$inspection) {
             return response()->json(['message' => 'Inspection not found.'], 404);
@@ -30,6 +34,9 @@ class InspectionService
 
     }
 
+    public function getLogo(){
+      return  DB::table('cryotech_logo')->select('logo')->first();
+    }
 
     public function getInspectionImages($inspectionID) 
     {

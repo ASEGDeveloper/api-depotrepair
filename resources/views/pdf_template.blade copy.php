@@ -282,20 +282,41 @@
 <body>
 
     <table class="pdf-header">
-    <tr>
-        <td style="width: 50%; text-align: left;">
-            <img src="{{ $data['logo']['logo'] }}"
-                alt="Logo"
-                style="max-width: 200px; height: auto;"> </td>
-        <td class="company-info" style="text-align: right;">
-            <div class="company-title">CRYOTECH MIDDLE EAST L.L.C.</div>
-            <div>Dubai Investment Park 2, P.O.Box 7427, Dubai, UAE</div>
-            <div>Tel : +971-4-8855169</div>
-            <div>Website : <a href="https://www.cryotechme.com">www.cryotechme.com</a></div>
-            <div>Email: <a href="mailto:service@cryotechme.com">service@cryotechme.com</a></div>
-        </td>
-    </tr>
-</table>
+        <tr>
+            <td style="width: 50%; ">
+                <table width="100%" style="border-collapse: collapse;">
+                    <tr>
+                        <td style="width:60px; text-align:center;">
+                            <div style="
+                    width:50px; 
+                    height:50px;
+                    border-radius:100%;
+                    background:#4a98d8;
+                    color:white;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    font-size:20px;">
+                                O
+                            </div>
+                        </td>
+
+                        <td style="padding-left:10px;">
+                            <h2 style="margin:0; font-size:12px; font-weight:600;">CRYOTECH MIDDLE EAST</h2>
+                            <p style="margin:0; font-size:10px;">cryo-gas tank depot and services</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td class="company-info">
+                <div class="company-title">CRYOTECH MIDDLE EAST L.L.C.</div>
+                <div>Dubai Investment Park 2, P.O.Box 7427, Dubai, UAE</div>
+                <div>Tel : +971-4-8855169</div>
+                <div>Website : <a href="https://www.cryotechme.com">www.cryotechme.com</a></div>
+                <div>Email: <a href="mailto:service@cryotechme.com">service@cryotechme.com</a></div>
+            </td>
+        </tr>
+    </table>
 
 
 

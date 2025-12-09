@@ -51,7 +51,7 @@ class InspectionReportController extends Controller
 
 
     public function searchInspection(Request $request)
-    { 
+    {
 
         $query = InspectionReportModel::query();
 
@@ -65,8 +65,8 @@ class InspectionReportController extends Controller
             $query->where('Customer_Name', 'LIKE', '%' . $request->Customer_Name . '%');
         }
 
-    
-       if ($request->filled('Creation_Date')) {
+
+        if ($request->filled('Creation_Date')) {
             $query->whereDate('Creation_Date', $request->Creation_Date);
         }
         // Select fields explicitly and order by latest first
@@ -266,13 +266,14 @@ class InspectionReportController extends Controller
     public function generateCode()
     {
         // Prefix
-        $prefix = "CRYOTECH";
+        //$prefix = "CRYOTECH";
 
         // Current date in YYYYMMDD
         $date = now()->format('Ymd');
 
         $unique = random_int(10000000, 99999999);
-        $finalCode = "{$prefix}{$date}{$unique}";
+       // $finalCode = "{$prefix}{$date}{$unique}";
+       $finalCode = "{$date}{$unique}";
 
         return $finalCode;
     }
@@ -407,10 +408,10 @@ class InspectionReportController extends Controller
     }
 
 
-     public function saveSurveyorSignature(Request $request)
-    { 
+    public function saveSurveyorSignature(Request $request)
+    {
         try {
-         $base64Image = $request->surveyorSignature;
+            $base64Image = $request->surveyorSignature;
 
             // If signature is coming as: data:image/png;base64,xxxxxx
             // remove the "data:image/*;base64," part
@@ -426,18 +427,18 @@ class InspectionReportController extends Controller
                     'signature_data'    => $base64Image,  // PURE base64 image
                     'Type' => 'Surveyor',
                     'date'              => date('Y-m-d'),
-                ]); 
+                ]);
             }
 
-  InspectionReportModel::where('id', $request->inspectionID)
-    ->update(['Status' => $request->Status]);
+            InspectionReportModel::where('id', $request->inspectionID)
+                ->update(['Status' => $request->Status]);
 
-Log::info("UPDATED TO:", [
-  'id' => $request->inspectionID,
-  'new_status' => InspectionReportModel::find($request->inspectionID)->Status
-]);
+            Log::info("UPDATED TO:", [
+                'id' => $request->inspectionID,
+                'new_status' => InspectionReportModel::find($request->inspectionID)->Status
+            ]);
 
- 
+
 
             return response()->json([
                 'status'  => true,
@@ -455,24 +456,26 @@ Log::info("UPDATED TO:", [
         }
     }
 
-    private function reportStatusUpdate($inspectionID){
+    private function reportStatusUpdate($inspectionID)
+    {
         DB::table('inspection_report_dpr')
-        ->where('id', $inspectionID)
-        ->update([
-            'Status' => 'Report Generated', // set the new status 
-        ]);
-
+            ->where('id', $inspectionID)
+            ->update([
+                'Status' => 'Report Generated', // set the new status 
+            ]);
     }
 
 
 
     public function WebdownloadReport(Request $request, $inspectionID)
     {
-    $data = $this->inspectionService->getInspectionDetails($inspectionID);
-    $data = $data->getData(true);
+        $data = $this->inspectionService->getInspectionDetails($inspectionID);
+        $data = $data->getData(true);
 
-    // 🔍 Return the HTML view for testing
-    return view('pdf_template', compact('data'));
+      //  return  $data['logo']['logo'];
+
+        // 🔍 Return the HTML view for testing
+        return view('pdf_template', compact('data'));
     }
 
 
@@ -480,6 +483,10 @@ Log::info("UPDATED TO:", [
     {
 
         $data =  $this->inspectionService->getInspectionDetails($inspectionID);
+
+        
+
+
         $data = $data->getData(true); // 'true' makes it an associative array      
 
         $pdf = Pdf::loadView('pdf_template', compact('data'))
@@ -491,7 +498,7 @@ Log::info("UPDATED TO:", [
                 'isFontSubsettingEnabled' => true,
             ]);
 
-        return $pdf->download('inspection_report.pdf');
+        return $pdf->download("inspection_report.pdf");
     }
 
 
@@ -562,47 +569,46 @@ Log::info("UPDATED TO:", [
     // }
 
 
-public function sendEmail(Request $request)
-{
-    $contacts = $request->input('contacts'); 
+    public function sendEmail(Request $request)
+    {
+        $contacts = $request->input('contacts');
 
-    // Get inspection ID from first contact
-    $inspectionID = $contacts[0]['inspectionID'];
+        // Get inspection ID from first contact
+        $inspectionID = $contacts[0]['inspectionID'];
 
-    // Fetch inspection details
-    $data = $this->inspectionService->getInspectionDetails($inspectionID);
-    $data = $data->getData(true); // convert to array
+        // Fetch inspection details
+        $data = $this->inspectionService->getInspectionDetails($inspectionID);
+        $data = $data->getData(true); // convert to array
 
-    // Generate PDF
-    $pdf = Pdf::loadView('pdf_template', compact('data'))
-        ->setPaper('a4', 'portrait')
-        ->setOptions([
-            'isHtml5ParserEnabled' => true,
-            'isRemoteEnabled' => true,
-            'defaultFont' => 'DejaVu Sans',
-            'isFontSubsettingEnabled' => true,
-        ]);
+        // Generate PDF
+        $pdf = Pdf::loadView('pdf_template', compact('data'))
+            ->setPaper('a4', 'portrait')
+            ->setOptions([
+                'isHtml5ParserEnabled' => true,
+                'isRemoteEnabled' => true,
+                'defaultFont' => 'DejaVu Sans',
+                'isFontSubsettingEnabled' => true,
+            ]);
 
-    // PDF binary data
-    $pdfContent = $pdf->output();
+        // PDF binary data
+        $pdfContent = $pdf->output();
 
-    // Send email to each contact
-    foreach ($contacts as $c) {
+        // Send email to each contact
+        foreach ($contacts as $c) {
 
-        $email = $c['email'];
-        $name  = $c['name'];
+            $email = $c['email'];
+            $name  = $c['name'];
 
-        Mail::to($email)->send(new InspectionReportMail($name, $pdfContent));
+            Mail::to($email)->send(new InspectionReportMail($name, $pdfContent));
+        }
+
+        return response()->json(['status' => 'Emails sent successfully']);
     }
 
-    return response()->json(['status' => 'Emails sent successfully']);
-}
 
+    public function getSurvorSignature($inspectionID)
+    {
 
-public function getSurvorSignature($inspectionID){
-
-      return  $this->inspectionService->getSurSignature($inspectionID);
-}
-
-
+        return  $this->inspectionService->getSurSignature($inspectionID);
+    }
 }
