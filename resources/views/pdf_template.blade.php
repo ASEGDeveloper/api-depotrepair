@@ -282,20 +282,21 @@
 <body>
 
     <table class="pdf-header">
-    <tr>
-        <td style="width: 50%; text-align: left;">
-            <img src="{{ $data['logo']['logo'] }}"
-                alt="Logo"
-                style="max-width: 200px; height: auto;"> </td>
-        <td class="company-info" style="text-align: right;">
-            <div class="company-title">CRYOTECH MIDDLE EAST L.L.C.</div>
-            <div>Dubai Investment Park 2, P.O.Box 7427, Dubai, UAE</div>
-            <div>Tel : +971-4-8855169</div>
-            <div>Website : <a href="https://www.cryotechme.com">www.cryotechme.com</a></div>
-            <div>Email: <a href="mailto:service@cryotechme.com">service@cryotechme.com</a></div>
-        </td>
-    </tr>
-</table>
+        <tr>
+            <td style="width: 50%; text-align: left;">
+                <img src="{{ $data['logo']['logo'] }}"
+                    alt="Logo"
+                    style="max-width: 200px; height: auto;">
+            </td>
+            <td class="company-info" style="text-align: right;">
+                <div class="company-title">CRYOTECH MIDDLE EAST L.L.C.</div>
+                <div>Dubai Investment Park 2, P.O.Box 7427, Dubai, UAE</div>
+                <div>Tel : +971-4-8855169</div>
+                <div>Website : <a href="https://www.cryotechme.com">www.cryotechme.com</a></div>
+                <div>Email: <a href="mailto:service@cryotechme.com">service@cryotechme.com</a></div>
+            </td>
+        </tr>
+    </table>
 
 
 

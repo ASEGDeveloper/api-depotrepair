@@ -546,8 +546,10 @@ class InspectionReportController extends Controller
 
 
     public function getEmails($inspectionID)
-    {
-        $data =  $this->inspectionService->getCustomerID($inspectionID);
+    { 
+       
+        $data =  $this->inspectionService->getCustomerID($inspectionID); 
+        
         return $this->inspectionService->getCustomerEmail($data->CustomerID);
     }
 

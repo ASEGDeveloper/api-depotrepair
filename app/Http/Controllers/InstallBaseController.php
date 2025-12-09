@@ -297,7 +297,7 @@ public function searchInstallBase(Request $request)
 
         
          if (!empty($request->Customer_Name)) {
-            $query->where('ib.Customer_Name', 'LIKE', '%' . $request->Customer_Name . '%');
+            $query->where('cd.CustomerName', 'LIKE', '%' . $request->Customer_Name . '%');
         }
 
 
