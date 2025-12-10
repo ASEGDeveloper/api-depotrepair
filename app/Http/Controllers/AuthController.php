@@ -21,6 +21,9 @@ class AuthController extends Controller
             'EmployeePassword' => 'required',
         ]);
 
+        return "Sucess";
+        
+
 
         $employee = Employee::where('EmployeeEmail', $request->EmployeeEmail)->first();
 
