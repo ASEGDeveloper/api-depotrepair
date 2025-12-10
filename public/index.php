@@ -1,26 +1,20 @@
 <?php
 
 //echo phpinfo();
-$server = "192.168.5.139";
+$serverName = "tcp:192.168.5.139,1433";
 
 $connectionInfo = [
     "Database" => "deporepair",
     "UID" => "depouser",
     "PWD" => "P@33w0rd",
-
-    // Important for SQL Server without TLS
     "Encrypt" => "No",
-    "TrustServerCertificate" => 1,
-
-    // Extra options for compatibility
-    "DisableStatementPooling" => true,
-    "Mars" => false
+    "TrustServerCertificate" => 1
 ];
 
-$conn = sqlsrv_connect($server, $connectionInfo);
+$conn = sqlsrv_connect($serverName, $connectionInfo);
 
 if ($conn) {
-    echo "✔ Connected Successfully";
+    echo "✔ Connected Successfully using Driver 17";
 } else {
     echo "❌ Connection Failed<br>";
     print_r(sqlsrv_errors());
