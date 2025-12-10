@@ -98,26 +98,30 @@ return [
             'sslmode' => 'prefer',
         ],
 
-        
-     'sqlsrv' => [
-    'driver' => 'sqlsrv',
-    'url' => env('DB_URL'),
-    'host' => env('DB_HOST'),
-    'port' => env('DB_PORT', '1433'),
-    'database' => env('DB_DATABASE'),
-    'username' => env('DB_USERNAME'),
-    'password' => env('DB_PASSWORD'),
-    'charset' => 'utf8',
-    'prefix' => '',
-    'prefix_indexes' => true,
 
-    // These do nothing for SQLSRV, but kept to avoid warnings
-    'encrypt' => env('DB_ENCRYPT', 'no'),
-    'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', true),
+        'sqlsrv' => [
+            'driver' => 'sqlsrv',
 
-    // REAL DRIVER OPTIONS (this is what SQLSRV uses)
-     
-],
+            // DSN includes all working options
+            'dsn' => 'sqlsrv:Server=' . env('DB_HOST', '192.168.5.139')
+                . ',' . env('DB_PORT', '1433')
+                . ';Database=' . env('DB_DATABASE', 'deporepair')
+                . ';Encrypt=no;TrustServerCertificate=yes;LoginTimeout=30',
+
+            'host' => env('DB_HOST', '192.168.5.139'),
+            'port' => env('DB_PORT', '1433'),
+            'database' => env('DB_DATABASE', 'deporepair'),
+            'username' => env('DB_USERNAME', 'depouser'),
+            'password' => env('DB_PASSWORD', 'P@33w0rd'),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+
+            // Empty options — DSN already sets everything
+            'options' => [],
+        ],
+
+
 
 
 
@@ -172,7 +176,7 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')).'-database-'),
+            'prefix' => env('REDIS_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')) . '-database-'),
             'persistent' => env('REDIS_PERSISTENT', false),
         ],
 
