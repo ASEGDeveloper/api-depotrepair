@@ -1,6 +1,7 @@
 <?php
 
-$serverName = "192.168.5.139,1433"; // SQL Server IP and port
+// 192.168.5.139,1433
+$serverName = "192.168.5.139"; // SQL Server IP and port
 
 $connectionInfo = [
     "Database" => "deporepair",
