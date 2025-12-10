@@ -1,7 +1,7 @@
 <?php
 
 //echo phpinfo();
-$serverName = "tcp:192.168.5.139,1433";
+$serverName = "192.168.5.139";
 
 $connectionInfo = [
     "Database" => "deporepair",
