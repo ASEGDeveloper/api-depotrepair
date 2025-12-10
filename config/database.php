@@ -99,19 +99,41 @@ return [
         ],
 
         'sqlsrv' => [
-            'driver' => 'sqlsrv',
-            'url' => env('DB_URL'),
-            'host' => env('DB_HOST', 'localhost'),
-            'port' => env('DB_PORT', '1433'),
-            'database' => env('DB_DATABASE', 'laravel'),
-            'username' => env('DB_USERNAME', 'root'),
-            'password' => env('DB_PASSWORD', ''),
-            'charset' => env('DB_CHARSET', 'utf8'),
-            'prefix' => '',
-            'prefix_indexes' => true,
-            'encrypt' => env('DB_ENCRYPT', 'yes'),
-           'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', true),
-        ],
+    'driver' => 'sqlsrv',
+    'url' => env('DB_URL'),
+    'host' => env('DB_HOST', '192.168.5.139'),
+    'port' => env('DB_PORT', '1433'),
+    'database' => env('DB_DATABASE', 'deporepair'),
+    'username' => env('DB_USERNAME', 'depouser'),
+    'password' => env('DB_PASSWORD', 'P@33w0rd'),
+
+    'charset' => 'utf8',
+    'prefix' => '',
+    'prefix_indexes' => true,
+
+    // IMPORTANT FIXES FOR SQL SERVER 2014
+    'encrypt' => 'no',                      // Disable TLS because SQL 2014 cannot handshake
+    'trust_server_certificate' => true,     // Accept the server certificate
+    'options' => [
+        'TrustServerCertificate' => true,
+    ],
+],
+
+
+        // 'sqlsrv' => [
+        //     'driver' => 'sqlsrv',
+        //     'url' => env('DB_URL'),
+        //     'host' => env('DB_HOST', 'localhost'),
+        //     'port' => env('DB_PORT', '1433'),
+        //     'database' => env('DB_DATABASE', 'laravel'),
+        //     'username' => env('DB_USERNAME', 'root'),
+        //     'password' => env('DB_PASSWORD', ''),
+        //     'charset' => env('DB_CHARSET', 'utf8'),
+        //     'prefix' => '',
+        //     'prefix_indexes' => true,
+        //     'encrypt' => env('DB_ENCRYPT', 'yes'),
+        //    'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', true),
+        // ],
 
     ],
 
