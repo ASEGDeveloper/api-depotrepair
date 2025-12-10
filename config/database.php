@@ -98,26 +98,33 @@ return [
             'sslmode' => 'prefer',
         ],
 
+        
         'sqlsrv' => [
     'driver' => 'sqlsrv',
     'url' => env('DB_URL'),
-    'host' => env('DB_HOST', '192.168.5.139'),
+    'host' => env('DB_HOST', 'localhost'),
     'port' => env('DB_PORT', '1433'),
-    'database' => env('DB_DATABASE', 'deporepair'),
-    'username' => env('DB_USERNAME', 'depouser'),
-    'password' => env('DB_PASSWORD', 'P@33w0rd'),
-
+    'database' => env('DB_DATABASE', 'laravel'),
+    'username' => env('DB_USERNAME', 'root'),
+    'password' => env('DB_PASSWORD', ''),
     'charset' => 'utf8',
     'prefix' => '',
     'prefix_indexes' => true,
 
-    // IMPORTANT FIXES FOR SQL SERVER 2014
-    'encrypt' => 'no',                      // Disable TLS because SQL 2014 cannot handshake
-    'trust_server_certificate' => true,     // Accept the server certificate
+    // SSL/TLS FIX FOR SQL SERVER 2014
+    'encrypt' => env('DB_ENCRYPT', 'no'),             
+    'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', true),
+
+    // These must be inside options for SQLSRV to read them properly
     'options' => [
-        'TrustServerCertificate' => true,
+        // Disable encryption
+        "Encrypt" => env('DB_ENCRYPT', 'no'),
+
+        // Trust unverified server certificate
+        "TrustServerCertificate" => env('DB_TRUST_SERVER_CERTIFICATE', true),
     ],
 ],
+
 
 
         // 'sqlsrv' => [
