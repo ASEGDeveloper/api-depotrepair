@@ -2,15 +2,15 @@
 
 //echo phpinfo();
 
- 
+ $server = "192.168.5.139";
 
-$server = "192.168.5.139";
 $connectionInfo = [
     "Database" => "deporepair",
     "UID" => "depouser",
     "PWD" => "P@33w0rd",
-    "Encrypt" => "No",
-    "TrustServerCertificate" => true
+    "Encrypt" => "no",
+    "TrustServerCertificate" => 1,
+    "TLSVersion" => "1.0"
 ];
 
 $conn = sqlsrv_connect($server, $connectionInfo);
