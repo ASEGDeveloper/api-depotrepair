@@ -7,7 +7,7 @@ $connectionInfo = [
     "Database" => "deporepair",
     "UID" => "depouser",
     "PWD" => "P@33w0rd",
-    "Encrypt" => "no",
+    "Encrypt" => 0,
     "TrustServerCertificate" => 1
 ];
 
