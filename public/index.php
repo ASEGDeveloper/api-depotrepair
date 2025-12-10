@@ -1,16 +1,20 @@
 <?php
 
 //echo phpinfo();
-
- $server = "192.168.5.139";
+$server = "192.168.5.139";
 
 $connectionInfo = [
     "Database" => "deporepair",
     "UID" => "depouser",
     "PWD" => "P@33w0rd",
-    "Encrypt" => "no",
+
+    // Important for SQL Server without TLS
+    "Encrypt" => "No",
     "TrustServerCertificate" => 1,
-    "TLSVersion" => "1.0"
+
+    // Extra options for compatibility
+    "DisableStatementPooling" => true,
+    "Mars" => false
 ];
 
 $conn = sqlsrv_connect($server, $connectionInfo);
