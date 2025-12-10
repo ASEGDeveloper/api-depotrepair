@@ -19,10 +19,7 @@ class AuthController extends Controller
         $request->validate([
             'EmployeeEmail' => 'required|email',
             'EmployeePassword' => 'required',
-        ]);
-
-        return "Sucess";
-        
+        ]); 
 
 
         $employee = Employee::where('EmployeeEmail', $request->EmployeeEmail)->first();

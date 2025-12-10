@@ -101,23 +101,20 @@ return [
         
      'sqlsrv' => [
     'driver' => 'sqlsrv',
-    'url' => env('DB_URL'),
-    'host' => env('DB_HOST'),
+    'host' => env('DB_HOST', '192.168.5.139'),
     'port' => env('DB_PORT', '1433'),
-    'database' => env('DB_DATABASE'),
-    'username' => env('DB_USERNAME'),
-    'password' => env('DB_PASSWORD'),
+    'database' => env('DB_DATABASE', 'deporepair'),
+    'username' => env('DB_USERNAME', 'depouser'),
+    'password' => env('DB_PASSWORD', 'P@33w0rd'),
     'charset' => 'utf8',
     'prefix' => '',
     'prefix_indexes' => true,
-
-    // These do nothing for SQLSRV, but kept to avoid warnings
-    'encrypt' => env('DB_ENCRYPT', 'no'),
-    'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', true),
-
-    // REAL DRIVER OPTIONS (this is what SQLSRV uses)
-     
+    'options' => [
+        PDO::SQLSRV_ATTR_ENCRYPT => PDO::SQLSRV_ENCRYPT_DISABLE,
+        PDO::SQLSRV_ATTR_TRUST_SERVER_CERTIFICATE => true,
+    ],
 ],
+
 
 
 
