@@ -1,6 +1,6 @@
 <?php
 
-// phpinfo();
+  phpinfo();
 
 // exit; 
 $serverName = "192.168.5.139,1433";
