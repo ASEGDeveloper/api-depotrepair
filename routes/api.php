@@ -52,7 +52,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::prefix('installbase')->group(function () {
         Route::get('customers_search', [InstallBaseController::class, 'searchCustomers']);
-        ///  Route::post('get-items', [InstallBaseController::class, 'searchItems']);
+       
         Route::post('items/search', [InstallBaseController::class, 'searchItems']);
         Route::get('/', [InstallBaseController::class, 'getInstallBase']);
         Route::post('/', [InstallBaseController::class, 'save']); // Create item
@@ -70,29 +70,21 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::post('/save', [InspectionReportController::class, 'save']); // Create Inspetion Report
         Route::put('/{id}', [InspectionReportController::class, 'update']); // update Inspection Report 
-
-        //  Route::prefix('inspection-report')->group(function () {
+ 
+       
         Route::post('/save_inspection', [InspectionReportController::class, 'saveInspection']); // Create Isnpection Report 
         Route::post('/inspection-images/{id}', [InspectionReportController::class, 'showInspectionImages']); // Get the inspection images 
         Route::post('/{id}', [InspectionReportController::class, 'delete']); // delete Inspection Report
-        //  });
+        
 
-         Route::prefix('signature-pdf')->group(function () {
-          Route::post('/save-signature', [InspectionReportController::class, 'saveSignature']); // Save Signature 
-           Route::post('/surveyor-save-signature', [InspectionReportController::class, 'saveSurveyorSignature']); // Save Signature
-
-          Route::get('/suryor-signature/{id}', [InspectionReportController::class, 'getSurvorSignature']); // get survor Signature
-
-
-          Route::get('/download-pdf/{id}', [InspectionReportController::class, 'downloadReport']);
-          Route::get('/get-emails/{id}', [InspectionReportController::class, 'getEmails']);
-
-          Route::post('/sent-email/{any}', [InspectionReportController::class, 'sendEmail']);
-
-
-         });
-
-
+        Route::prefix('signature-pdf')->group(function () {
+            Route::post('/save-signature', [InspectionReportController::class, 'saveSignature']); // Save Signature 
+            Route::post('/surveyor-save-signature', [InspectionReportController::class, 'saveSurveyorSignature']); // Save Signature
+            Route::get('/suryor-signature/{id}', [InspectionReportController::class, 'getSurvorSignature']); // get survor Signature
+            Route::get('/download-pdf/{id}', [InspectionReportController::class, 'downloadReport']);
+            Route::get('/get-emails/{id}', [InspectionReportController::class, 'getEmails']);
+            Route::post('/sent-email/{any}', [InspectionReportController::class, 'sendEmail']);
+        });
     });
 });
 

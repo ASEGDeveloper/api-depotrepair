@@ -369,20 +369,26 @@
             </tr>
 
             <tr>
-                <th>Last Cargo</th>
+                <th>Manufacturer Serial Number</th>
                 <th>Vacuum reading</th>
                 <th>Results : Accepted</th>
                 <th>Surveyor</th>
             </tr>
             <tr>
-                <td>{{ $data['Last_Cargo'] ?? 'N/A' }}</td>
+                <td>{{ $data['serialNumber'] ?? 'N/A' }}</td>
                 <td>{{ $data['Vacuum_Reading'] ?? 'N/A' }}</td>
                 <td>{{ $data['Results'] ?? 'N/A' }}</td>
                 <td>{{ $data['Surveyor'] ?? 'N/A' }}</td>
             </tr>
 
 
+            
 
+
+        </table>
+
+
+        <table class="content-table">
 
             <tr>
                 <td colspan="4" style="padding: 6px; font-weight: bold; background: rgb(241, 241, 241); border: 1px solid rgb(0, 0, 0);">
@@ -392,13 +398,10 @@
 
             <tr>
                 <td colspan="4"
-                    style="padding: 8px; border: 1px solid rgb(0, 0, 0); white-space: pre-wrap; min-height: 35px;">
+                    style="padding: 8px; border: 1px solid rgb(0, 0, 0); white-space: pre-line; min-height: 35px;">
                     {{ ltrim($data['Comments'] ?? 'N/A', " \t\n\r\0\x0B") }}
                 </td>
             </tr>
-
-
-
         </table>
 
 

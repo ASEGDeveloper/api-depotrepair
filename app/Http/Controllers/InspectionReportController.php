@@ -482,11 +482,7 @@ class InspectionReportController extends Controller
     public function downloadReport(Request $request, $inspectionID)
     {
 
-        $data =  $this->inspectionService->getInspectionDetails($inspectionID);
-
-        
-
-
+        $data =  $this->inspectionService->getInspectionDetails($inspectionID); 
         $data = $data->getData(true); // 'true' makes it an associative array      
 
         $pdf = Pdf::loadView('pdf_template', compact('data'))

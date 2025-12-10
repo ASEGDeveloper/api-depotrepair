@@ -48,7 +48,7 @@ class InstallBaseController extends Controller
                     $data = [
                         'installbase_id' => $installbase->ID,
                         'Item_Numbers'   => $itemObject->ItemNumber ?? null,
-                        'Serial_Numbers' => $itemObject->SerialNumber ?? null, 
+                        'Serial_Numbers' => str_replace(' ','',$itemObject->SerialNumber) ?? null, 
                     ];
 
                     if ($lookupId) {
@@ -110,7 +110,7 @@ public function update(Request $request, $id = null)
             // Prepare fields
             $data = [
                 'Item_Numbers'   => $itemObj->ItemNumber ?? null,
-                'Serial_Numbers' => $itemObj->SerialNumber ?? null,
+                'Serial_Numbers' =>  str_replace(' ','',$itemObj->SerialNumber) ?? null, 
                 'installbase_id' => $id,  // parent ID
             ];
 
