@@ -99,31 +99,26 @@ return [
         ],
 
         
-        'sqlsrv' => [
+     'sqlsrv' => [
     'driver' => 'sqlsrv',
     'url' => env('DB_URL'),
-    'host' => env('DB_HOST', 'localhost'),
+    'host' => env('DB_HOST'),
     'port' => env('DB_PORT', '1433'),
-    'database' => env('DB_DATABASE', 'laravel'),
-    'username' => env('DB_USERNAME', 'root'),
-    'password' => env('DB_PASSWORD', ''),
+    'database' => env('DB_DATABASE'),
+    'username' => env('DB_USERNAME'),
+    'password' => env('DB_PASSWORD'),
     'charset' => 'utf8',
     'prefix' => '',
     'prefix_indexes' => true,
 
-    // SSL/TLS FIX FOR SQL SERVER 2014
-    'encrypt' => env('DB_ENCRYPT', 'no'),             
+    // These do nothing for SQLSRV, but kept to avoid warnings
+    'encrypt' => env('DB_ENCRYPT', 'no'),
     'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', true),
 
-    // These must be inside options for SQLSRV to read them properly
-    'options' => [
-        // Disable encryption
-        "Encrypt" => env('DB_ENCRYPT', 'no'),
-
-        // Trust unverified server certificate
-        "TrustServerCertificate" => env('DB_TRUST_SERVER_CERTIFICATE', true),
-    ],
+    // REAL DRIVER OPTIONS (this is what SQLSRV uses)
+     
 ],
+
 
 
 
