@@ -12,12 +12,14 @@
 // ];
 
 
-$serverName = "192.168.5.139";
+
+$serverName = "192.168.5.139"; // No need to include port if default 1433
+
 $connectionInfo = [
-    "Database" => "deporepair",
+    "Database" => "DEPOREPAIR",
     "UID" => "pdms",
     "PWD" => "PhpC@ase2608",
-    // "Encrypt" => "DISABLE",
+    "Encrypt" => "Optional",       // Use Optional for ODBC 18
     "TrustServerCertificate" => true
 ];
 
