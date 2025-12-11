@@ -16,9 +16,7 @@ Route::post('refresh', [AuthController::class, 'refresh']);
 
 Route::middleware('api.token')->post('/tna-entries', [TnaEntryController::class, 'createOrUpdateTNAEntry']);
 
-Route::post('/test-tna', [TnaControllerTest::class, 'createOrUpdateTNAEntry']);
-
-
+Route::post('/test-tna', [TnaControllerTest::class, 'createOrUpdateTNAEntry']); 
 
 Route::middleware('auth:sanctum')->group(function () {
 
