@@ -13,16 +13,29 @@
 
 
 
-$serverName = "192.168.5.139"; // No need to include port if default 1433
+// $serverName = "192.168.5.139"; // No need to include port if default 1433
+
+// $connectionInfo = [
+//     "Database" => "DEPOREPAIR",
+//     "UID" => "pdms",
+//     "PWD" => "PhpC@ase2608",
+//     "Encrypt" => "Optional",       // Use Optional for ODBC 18
+//     "TrustServerCertificate" => true
+// ];
+
+
+$serverName = "192.168.5.139";
 
 $connectionInfo = [
     "Database" => "DEPOREPAIR",
     "UID" => "pdms",
     "PWD" => "PhpC@ase2608",
-    "Encrypt" => "Optional",       // Use Optional for ODBC 18
-    "TrustServerCertificate" => true
+    "ConnectionPooling" => 0,
+    "Encrypt" => "no",
+    "TrustServerCertificate" => "yes"
 ];
 
+ 
 
 $conn = sqlsrv_connect($serverName, $connectionInfo);
 
