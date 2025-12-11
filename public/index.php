@@ -1,8 +1,8 @@
 <?php
 
- // phpinfo();
+  phpinfo();
 
-// exit; 
+ exit; 
 $serverName = "192.168.5.139,1433";
 $connectionInfo = [
     "Database" => "deporepair",
