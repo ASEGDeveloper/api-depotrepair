@@ -33,7 +33,7 @@ class TnaEntryController extends Controller
         // Check employee status
        $status = $this->tnaService->toCheckUserStatusTaskNo($request->employeecode, $request->jobcode);
 
-       return   $status;
+       
         if (!$status) {
             return $this->errorResponse('The specified employee does not exist or is currently inactive in the Depot Repair system');
         }

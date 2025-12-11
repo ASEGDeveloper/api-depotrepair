@@ -12,7 +12,7 @@ class TnaService
 
     public function toCheckUserStatusTaskNo($empId, $taskNo)
     {
-        return DB::table('employee')
+        return DB::table('deporepair.employee')
             ->where('EmployeeID', $empId)
             ->where('EmployeeStatus', 'Active')
             ->first(); 
@@ -20,7 +20,7 @@ class TnaService
 
     public function toCheckJobCard($taskNo)
     {
-        return DB::table('quotation_repair_order_jobs')
+        return DB::table('deporepair.quotation_repair_order_jobs')
             ->where('Task_No', $taskNo)
             ->first();
     }
