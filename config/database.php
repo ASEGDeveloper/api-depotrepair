@@ -110,7 +110,7 @@ return [
     'password' => env('DB_PASSWORD', ''),
     'charset' => 'utf8',
     //'prefix' => 'deporepair.',  // Add this line
-    'prefix' => env('DB_PREFIX', 'deporepair_'),
+   // 'prefix' => env('DB_PREFIX', 'deporepair_'),
     'prefix_indexes' => true,
     'options' => [
         'Encrypt' => env('DB_ENCRYPT', false),
