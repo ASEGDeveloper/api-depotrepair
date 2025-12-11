@@ -8,8 +8,8 @@ $connectionInfo = [
     "Database" => "deporepair",
     "UID" => "depouser",
     "PWD" => "P@33w0rd",
-    "Encrypt" => "optional", // This is the crucial change to fix the 'unsupported protocol' error
-    "TrustServerCertificate" => false,
+   "Encrypt" => "yes",
+"TrustServerCertificate" => true
 ];
 
 $conn = sqlsrv_connect($serverName, $connectionInfo);
