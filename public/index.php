@@ -27,10 +27,10 @@
 $serverName = "192.168.5.139";
 
 $connectionInfo = [
-    "Database" => "DEPOREPAIR",
+   "Database" => "DEPOREPAIR",
     "UID" => "pdms",
     "PWD" => "PhpC@ase2608",
-    "ConnectionPooling" => 0,
+    "Driver" => "{ODBC Driver 17 for SQL Server}",
     "Encrypt" => "no",
     "TrustServerCertificate" => "yes"
 ];
