@@ -8,8 +8,8 @@ $connectionInfo = [
     "Database" => "deporepair",
     "UID" => "depouser",
     "PWD" => "P@33w0rd",
-   "Encrypt" => "yes",
-"TrustServerCertificate" => true
+   "Encrypt" => "optional",
+    "TrustServerCertificate" => true
 ];
 
 $conn = sqlsrv_connect($serverName, $connectionInfo);
