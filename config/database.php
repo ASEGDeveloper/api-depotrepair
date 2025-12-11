@@ -109,7 +109,7 @@ return [
     'username' => env('DB_USERNAME', 'forge'),
     'password' => env('DB_PASSWORD', ''),
     'charset' => 'utf8',
-   // 'prefix' => 'deporepair.',  // Add this line
+    'prefix' => 'deporepair.',  // Add this line
     'prefix_indexes' => true,
     'options' => [
         'Encrypt' => env('DB_ENCRYPT', false),
