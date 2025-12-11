@@ -1,32 +1,20 @@
 <?php
 
+use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
 
+define('LARAVEL_START', microtime(true));
 
-// $serverName = "192.168.5.139,1433";
-// $connectionInfo = [
-//     "Database" => "deporepair",
-//     "UID" => "depouser",
-//     "PWD" => "P@33w0rd",
-//    "Encrypt" => "DISABLE",
-//     "TrustServerCertificate" => true
-// ];
-
-$serverName = "192.168.5.139,1433";
-
-$connectionInfo = [
-    "Database" => "DEPOREPAIR",
-    "UID" => "pdms",
-    "PWD" => "PhpC@ase2608",
-    "Encrypt" => false,
-    "TrustServerCertificate" => true
-];
-
-$conn = sqlsrv_connect($serverName, $connectionInfo);
-
-if (!$conn) {
-    echo "Connection failed:\n";
-    die(print_r(sqlsrv_errors(), true));
-} else {
-    echo "Connected successfully!";
-    sqlsrv_close($conn);
+// Determine if the application is in maintenance mode...
+if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
+    require $maintenance;
 }
+
+// Register the Composer autoloader...
+require __DIR__.'/../vendor/autoload.php';
+
+// Bootstrap Laravel and handle the request...
+/** @var Application $app */
+$app = require_once __DIR__.'/../bootstrap/app.php';
+
+$app->handleRequest(Request::capture());
