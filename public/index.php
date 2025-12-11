@@ -24,17 +24,17 @@
 // ];
 
 
-$serverName = "192.168.5.139";
+$serverName = "192.168.5.139,1433";  // Explicitly add port
 
 $connectionInfo = [
-   "Database" => "DEPOREPAIR",
+    "Database" => "DEPOREPAIR",
     "UID" => "pdms",
     "PWD" => "PhpC@ase2608",
-    "Driver" => "{ODBC Driver 17 for SQL Server}",
-    "Encrypt" => "no",
-    "TrustServerCertificate" => "yes"
+    "Encrypt" => false,  // Try boolean false
+    "TrustServerCertificate" => true,
+    "TransparentNetworkIPResolution" => "Disabled",
+    "MultipleActiveResultSets" => false
 ];
-
  
 
 $conn = sqlsrv_connect($serverName, $connectionInfo);
