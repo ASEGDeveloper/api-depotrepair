@@ -9,7 +9,7 @@ class TnaEntry extends Model
 {
     use HasFactory;
 
-    protected $table = 'tna_entry_duplicate'; // schema.table (SQL Server)
+    protected $table = 'deporepair.tna_entry_duplicate'; // schema.table (SQL Server)
 
     protected $primaryKey = 'ID';
     public $timestamps = false;
