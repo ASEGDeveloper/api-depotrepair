@@ -11,7 +11,7 @@ class Employee extends Authenticatable
     
     //protected $table = 'deporepair.employee';
 
-    protected $table = 'deporepair.employee';
+    protected $table = 'employee';
 
     protected $primaryKey = 'ID';   // 👈 must match DB column name
     public $incrementing = true;            // 👈 true if auto-increment
