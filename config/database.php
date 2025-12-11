@@ -99,27 +99,24 @@ return [
         ],
 
 
-        'sqlsrv' => [
-            'driver' => 'sqlsrv',
-
-            // DSN includes all working options
-            'dsn' => 'sqlsrv:Server=' . env('DB_HOST', '192.168.5.139')
-                . ',' . env('DB_PORT', '1433')
-                . ';Database=' . env('DB_DATABASE', 'deporepair')
-                . ';Encrypt=no;TrustServerCertificate=yes;LoginTimeout=30',
-
-            'host' => env('DB_HOST', '192.168.5.139'),
-            'port' => env('DB_PORT', '1433'),
-            'database' => env('DB_DATABASE', 'deporepair'),
-            'username' => env('DB_USERNAME', 'depouser'),
-            'password' => env('DB_PASSWORD', 'P@33w0rd'),
-            'charset' => 'utf8',
-            'prefix' => '',
-            'prefix_indexes' => true,
-
-            // Empty options — DSN already sets everything
-            'options' => [],
-        ],
+        
+    'sqlsrv' => [
+    'driver' => 'sqlsrv',
+    'url' => env('DATABASE_URL'),
+    'host' => env('DB_HOST', 'localhost'),
+    'port' => env('DB_PORT', '1433'),
+    'database' => env('DB_DATABASE', 'forge'),
+    'username' => env('DB_USERNAME', 'forge'),
+    'password' => env('DB_PASSWORD', ''),
+    'charset' => 'utf8',
+    'prefix' => '',
+    'prefix_indexes' => true,
+    // Add these options
+    'options' => [
+        'Encrypt' => env('DB_ENCRYPT', false),
+        'TrustServerCertificate' => env('DB_TRUST_SERVER_CERTIFICATE', true),
+    ],
+],
 
 
 
