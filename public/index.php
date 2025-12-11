@@ -8,7 +8,7 @@ $connectionInfo = [
     "Database" => "deporepair",
     "UID" => "depouser",
     "PWD" => "P@33w0rd",
-    "Encrypt" => "No", // This is the crucial change to fix the 'unsupported protocol' error
+    "Encrypt" => "optional", // This is the crucial change to fix the 'unsupported protocol' error
     "TrustServerCertificate" => false,
 ];
 
