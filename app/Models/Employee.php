@@ -9,7 +9,7 @@ class Employee extends Authenticatable
 {
     use HasApiTokens;
     
-    protected $table = 'employee';
+    protected $table = 'deporepair.employee';
 
     protected $primaryKey = 'ID';   // 👈 must match DB column name
     public $incrementing = true;            // 👈 true if auto-increment
