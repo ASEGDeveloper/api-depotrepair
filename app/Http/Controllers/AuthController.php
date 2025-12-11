@@ -30,6 +30,8 @@ class AuthController extends Controller
             return response()->json(['error' => 'Invalid user name or password'], 401);
         }
 
+        return "login sucessfully";
+
         // Delete old tokens (optional)
         $employee->tokens()->delete();
 
