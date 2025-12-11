@@ -28,6 +28,7 @@ class TnaEntryController extends Controller
 
   public function createOrUpdateTNAEntry(TnaRequest $request)
   {
+    return $request;
     try {
         // Check employee status
        $status = $this->tnaService->toCheckUserStatusTaskNo($request->employeecode, $request->jobcode);
