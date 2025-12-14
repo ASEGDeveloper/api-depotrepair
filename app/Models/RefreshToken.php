@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class RefreshToken extends Model
 {
+
+    protected $table = 'deporepair.refresh_tokens';
+
     protected $fillable = ['employee_id', 'token', 'expires_at'];
 
    // protected $dates = ['expires_at'];
