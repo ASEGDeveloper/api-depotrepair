@@ -49,6 +49,10 @@ return [
 
     'expiration' => null,
 
+    // ✅ ADD THIS LINE
+    'personal_access_tokens_table' => 'deporepair.personal_access_tokens',
+
+
     /*
     |--------------------------------------------------------------------------
     | Token Prefix
