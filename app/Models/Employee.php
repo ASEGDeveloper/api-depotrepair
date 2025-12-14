@@ -30,4 +30,14 @@ class Employee extends Authenticatable
     {
         return $this->hasMany(RefreshToken::class);
     }
+
+
+    /**
+     * Override the tokens() relationship to use the schema-qualified token model
+     */
+    public function tokens()
+    {
+        return $this->morphMany(PersonalAccessToken::class, 'tokenable');
+    }
+    
 }
