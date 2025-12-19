@@ -18,9 +18,25 @@ Route::middleware('api.token')->post('/tna-entries', [TnaEntryController::class,
 
 Route::post('/test-tna', [TnaControllerTest::class, 'createOrUpdateTNAEntry']); 
 
+ 
+
+Route::get('/test-sanctum-model', function() {
+    $model = config('sanctum.personal_access_token_model');
+    $instance = new $model;
+    
+    return response()->json([
+        'model_class' => $model,
+        'table_name' => $instance->getTable(),
+        'connection' => $instance->getConnectionName(),
+    ]);
+});
+
+
+
+
 Route::middleware('auth:sanctum')->group(function () {
 
-    Route::post('/logout', [AuthController::class, 'logout']);
+  Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/employees', [AuthController::class, 'getEmployees']); 
 
     Route::prefix('customers')->group(function () {
