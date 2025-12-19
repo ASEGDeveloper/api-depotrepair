@@ -100,6 +100,24 @@ return [
 
 
 
+// 'sqlsrv' => [
+//     'driver' => 'sqlsrv',
+//     'url' => env('DATABASE_URL'),
+//     'host' => env('DB_HOST', 'localhost'),
+//     'port' => env('DB_PORT', '1433'),
+//     'database' => env('DB_DATABASE', 'forge'),
+//     'username' => env('DB_USERNAME', 'forge'),
+//     'password' => env('DB_PASSWORD', ''),
+//     'charset' => 'utf8',
+//     //'prefix' => 'deporepair.',  // Add this line
+//    // 'prefix' => env('DB_PREFIX', 'deporepair_'),
+//     'prefix_indexes' => true,
+//     'schema' => 'deporepair', // ← Add this if needed
+//     'options' => [
+//         'Encrypt' => env('DB_ENCRYPT', false),
+//         'TrustServerCertificate' => env('DB_TRUST_SERVER_CERTIFICATE', true),
+//     ],
+
 'sqlsrv' => [
     'driver' => 'sqlsrv',
     'url' => env('DATABASE_URL'),
@@ -109,14 +127,14 @@ return [
     'username' => env('DB_USERNAME', 'forge'),
     'password' => env('DB_PASSWORD', ''),
     'charset' => 'utf8',
-    //'prefix' => 'deporepair.',  // Add this line
-   // 'prefix' => env('DB_PREFIX', 'deporepair_'),
+    'prefix' => 'deporepair.',  // ✅ UNCOMMENT THIS
     'prefix_indexes' => true,
-    'schema' => 'deporepair', // ← Add this if needed
+    // 'schema' => 'deporepair', // ❌ REMOVE OR COMMENT THIS
     'options' => [
         'Encrypt' => env('DB_ENCRYPT', false),
         'TrustServerCertificate' => env('DB_TRUST_SERVER_CERTIFICATE', true),
     ],
+
 ],
         
 //     'sqlsrv' => [
