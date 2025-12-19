@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 use App\Models\RefreshToken;
  use App\Traits\ApiResponse;
  use Illuminate\Support\Facades\Cache;
-
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -81,15 +81,36 @@ class AuthController extends Controller
 
 
 
-    public function logout(Request $request)
-    {
-        $employee = $request->user();
-        // Delete all access tokens
-        $employee->tokens()->delete();
-        // Delete all refresh tokens
-        $employee->refreshTokens()->delete();
-        return response()->json(['message' => 'Logged out successfully']);
-    }
+public function logout(Request $request)
+{
+    $employee = $request->user();
+    
+    // Delete access tokens with raw SQL
+    DB::statement(
+        'DELETE FROM deporepair.personal_access_tokens WHERE tokenable_id = ? AND tokenable_type = ?',
+        [$employee->id, get_class($employee)]
+    );
+    
+    // Delete refresh tokens with raw SQL
+    DB::statement(
+        'DELETE FROM deporepair.refresh_tokens WHERE employee_id = ?',
+        [$employee->id]
+    );
+    
+    return response()->json(['message' => 'Logged out successfully']);
+}
+
+
+
+    // public function logout(Request $request)
+    // {
+    //     $employee = $request->user();
+    //     // Delete all access tokens
+    //     $employee->tokens()->delete();
+    //     // Delete all refresh tokens
+    //     $employee->refreshTokens()->delete();
+    //     return response()->json(['message' => 'Logged out successfully']);
+    // }
 
     // public function getEmployees(Request $request)
     // {
