@@ -4,6 +4,10 @@ use App\Http\Middleware\PublicApiTokenMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Laravel\Sanctum\Sanctum;
+
+// ✅ ADD THIS - Force Sanctum to use custom model early
+Sanctum::usePersonalAccessTokenModel(\App\Models\PersonalAccessToken::class);
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
