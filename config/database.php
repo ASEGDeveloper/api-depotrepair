@@ -112,6 +112,7 @@ return [
     //'prefix' => 'deporepair.',  // Add this line
    // 'prefix' => env('DB_PREFIX', 'deporepair_'),
     'prefix_indexes' => true,
+    'schema' => 'deporepair', // ← Add this if needed
     'options' => [
         'Encrypt' => env('DB_ENCRYPT', false),
         'TrustServerCertificate' => env('DB_TRUST_SERVER_CERTIFICATE', true),
