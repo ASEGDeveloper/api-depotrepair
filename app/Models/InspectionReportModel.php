@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 
 class InspectionReportModel extends Model
 {
-     protected $table = 'inspection_report_dpr';
+     protected $table = 'deporepair.inspection_report_dpr';
      protected $primaryKey = 'id';
 
     public $timestamps = true;

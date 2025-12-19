@@ -21,12 +21,7 @@ Route::post('/test-tna', [TnaControllerTest::class, 'createOrUpdateTNAEntry']);
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/employees', [AuthController::class, 'getEmployees']);
-    // Route::post('/customers', [CustomerController::class, 'store']);
-    // Route::get('/customer-list-list', [CustomerController::class, 'getCustomersList']);   
-    // Route::post('/search-customer-list', [CustomerController::class, 'searchCustomer']); 
-    // Route::post('/getsingle-customer/{id}', [CustomerController::class, 'getsingleCustomer']); 
-
+    Route::get('/employees', [AuthController::class, 'getEmployees']); 
 
     Route::prefix('customers')->group(function () {
         Route::post('/getsingle-customer/{id}', [CustomerController::class, 'getsingleCustomer']);

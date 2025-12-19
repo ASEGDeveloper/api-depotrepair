@@ -10,7 +10,7 @@ class CustomerModel extends Model
 {
     use HasFactory;
 
-    protected $table = 'customers_dpr';
+    protected $table = 'deporepair.customers_dpr';
     protected $primaryKey = 'ID';
 
     public $timestamps = true;

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 
 class InstallBaseModel extends Model
 {
-    protected $table = 'installbase_dpr';
+    protected $table = 'deporepair.installbase_dpr';
     protected $primaryKey = 'ID';
 
     public $timestamps = true;

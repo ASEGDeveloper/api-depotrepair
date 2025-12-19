@@ -369,13 +369,13 @@
             </tr>
 
             <tr>
-                <th>Manufacturer Serial Number</th>
+                <th>Last Cargo</th>
                 <th>Vacuum reading</th>
                 <th>Results : Accepted</th>
                 <th>Surveyor</th>
             </tr>
             <tr>
-                <td>{{ $data['serialNumber'] ?? 'N/A' }}</td>
+                <td>{{ $data['Last_Cargo'] ?? 'N/A' }}</td>
                 <td>{{ $data['Vacuum_Reading'] ?? 'N/A' }}</td>
                 <td>{{ $data['Results'] ?? 'N/A' }}</td>
                 <td>{{ $data['Surveyor'] ?? 'N/A' }}</td>

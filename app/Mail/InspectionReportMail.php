@@ -10,12 +10,18 @@ class InspectionReportMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $name; // contact person name
+    public $name;  
+    public $surveyType;
+    public $surveyDate;
+    public $itemNumber;
     public $pdfContent;
 
-    public function __construct($name, $pdfContent)
+    public function __construct($name,$surveyType, $surveyDate, $itemNumber, $pdfContent)
     {
         $this->name = $name;
+        $this->surveyType = $surveyType;
+        $this->surveyDate = $surveyDate;
+        $this->itemNumber = $itemNumber;
         $this->pdfContent = $pdfContent;
     }
 
@@ -25,6 +31,9 @@ class InspectionReportMail extends Mailable
             ->view('emails.inspection')
             ->with([
                 'name' => $this->name,
+                'surveyType' => $this->surveyType,
+                'surveyDate' => $this->surveyDate,
+                'itemNumber' => $this->itemNumber,
             ])
             ->attachData($this->pdfContent, 'InspectionReport.pdf', [
                 'mime' => 'application/pdf',

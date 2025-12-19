@@ -10,7 +10,7 @@ class ItemMasterModel extends Model
 {
     use HasFactory;
 
-    protected $table = 'item_master_dpr';
+    protected $table = 'deporepair.item_master_dpr';
     protected $primaryKey = 'ID';
 
     // Disable default timestamp handling since we have custom fields

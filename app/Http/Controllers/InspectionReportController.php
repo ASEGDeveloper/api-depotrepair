@@ -13,6 +13,7 @@ use Mockery\Matcher\Any;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\InspectionReportMail;
+use Illuminate\Support\Carbon;
 
 class InspectionReportController extends Controller
 {
@@ -576,7 +577,13 @@ class InspectionReportController extends Controller
 
         // Fetch inspection details
         $data = $this->inspectionService->getInspectionDetails($inspectionID);
-        $data = $data->getData(true); // convert to array
+        $data = $data->getData(true); // convert to array 
+
+
+         $surveyType= $data['Survey_Type'];
+       //  $surveyDate= $data['Survey_Date'];
+        $surveyDate =   Carbon::parse($data['Survey_Date'])->format('d-m-y');
+         $itemNumber = $data['Unit_Number'];
 
         // Generate PDF
         $pdf = Pdf::loadView('pdf_template', compact('data'))
@@ -597,7 +604,7 @@ class InspectionReportController extends Controller
             $email = $c['email'];
             $name  = $c['name'];
 
-            Mail::to($email)->send(new InspectionReportMail($name, $pdfContent));
+            Mail::to($email)->send(new InspectionReportMail($name, $surveyType, $surveyDate, $itemNumber, $pdfContent));
         }
 
         return response()->json(['status' => 'Emails sent successfully']);

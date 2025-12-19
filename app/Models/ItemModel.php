@@ -9,7 +9,7 @@ class ItemModel extends Model
 {
     use HasFactory;
 
-    protected $table = 'items_dpr';
+    protected $table = 'deporepair.items_dpr';
     protected $primaryKey = 'ID';
 
     public $timestamps = true;
