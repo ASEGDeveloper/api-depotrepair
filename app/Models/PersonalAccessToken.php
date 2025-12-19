@@ -1,11 +1,10 @@
 <?php
+
 namespace App\Models;
 
-use Laravel\Sanctum\PersonalAccessToken as SanctumToken;
+use Laravel\Sanctum\PersonalAccessToken as SanctumPersonalAccessToken;
 
-class PersonalAccessToken extends SanctumToken
+class PersonalAccessToken extends SanctumPersonalAccessToken
 {
-    // Explicitly specify the schema-qualified table name
     protected $table = 'deporepair.personal_access_tokens';
-  // protected $table = 'personal_access_tokens';
 }
