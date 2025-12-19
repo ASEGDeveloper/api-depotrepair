@@ -7,4 +7,5 @@ use Laravel\Sanctum\PersonalAccessToken as SanctumPersonalAccessToken;
 class PersonalAccessToken extends SanctumPersonalAccessToken
 {
     protected $table = 'deporepair.personal_access_tokens';
+     protected $connection = 'sqlsrv';
 }

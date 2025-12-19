@@ -88,9 +88,9 @@ class AuthController extends Controller
     {
         $employee = $request->user();
         // Delete all access tokens
-      //  $employee->tokens()->delete();
+        $employee->tokens()->delete();
         // Delete all refresh tokens
-       // $employee->refreshTokens()->delete();
+         $employee->refreshTokens()->delete();
         return response()->json(['message' => 'Logged out successfully']);
     }
 

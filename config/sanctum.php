@@ -54,13 +54,15 @@ return [
     |
     */
 
-    'expiration' => null,
 
-    
-
-    // ✅ ADD THIS LINE
+      // ✅ ADD THIS LINE
     'personal_access_token_model' => \App\Models\PersonalAccessToken::class,
-    'personal_access_tokens_table' => 'deporepair.personal_access_tokens', 
+ //   'personal_access_tokens_table' => 'deporepair.personal_access_tokens', 
+
+
+    'expiration' => null, 
+
+  
 
     /*
     |--------------------------------------------------------------------------
