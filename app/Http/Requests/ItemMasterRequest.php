@@ -15,8 +15,8 @@ class ItemMasterRequest extends FormRequest
     {
         return [
             // InventoryItemID will be auto-generated, so we remove 'required'
-            'InventoryItemID' => 'nullable|string|max:50|unique:item_master_dpr,InventoryItemID',
-            'ItemNumber' => 'required|string|max:100|unique:item_master_dpr,ItemNumber',
+            'InventoryItemID' => 'nullable|string|max:50|unique:deporepair.item_master_dpr,InventoryItemID',
+            'ItemNumber' => 'required|string|max:100|unique:deporepair.item_master_dpr,ItemNumber',
             'TankType' => 'nullable|string|max:100',
             'Manufacturer' => 'nullable|string|max:150',
             'UnPortableTankType' => 'nullable|string|max:150',
