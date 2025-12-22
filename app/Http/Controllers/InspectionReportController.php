@@ -488,6 +488,8 @@ class InspectionReportController extends Controller
         $data =  $this->inspectionService->getInspectionDetails($inspectionID); 
         $data = $data->getData(true); // 'true' makes it an associative array      
 
+        return $data;
+
         $pdf = Pdf::loadView('pdf_template', compact('data'))
             ->setPaper('a4', 'portrait')
             ->setOptions([

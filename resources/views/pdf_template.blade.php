@@ -408,8 +408,6 @@
 
         <table width="100%" cellspacing="0" cellpadding="6" style="border-collapse: collapse;">
             <tbody>
-                {{-- Before the images loop --}}
-            @if(!empty($data['images']) && is_array($data['images']))
                 @foreach(array_chunk($data['images'], 3) as $imageRow)
                 <tr class="no-break">
                     @foreach($imageRow as $img)
@@ -440,7 +438,6 @@
 
                 </tr>
                 @endforeach
-            @endif
             </tbody>
         </table>
 
@@ -452,7 +449,6 @@
                 <tr class="no-break">
 
                     {{-- LEFT SIDE — CUSTOMER SIGNATURE --}}
-                    @if(!empty($data['signature']) && is_array($data['signature']))
                     @if(!empty($data['signature']['custSignatureName']))
                     <td style="width: 50%; vertical-align: top; padding: 8px;">
 
@@ -490,9 +486,8 @@
 
 
                     {{-- RIGHT SIDE — SURVEYOR SIGNATURE (Always stays Right) --}}
-                    @if(!empty($data['surveyor']) && is_array($data['surveyor']))
                     <td class="surveyor-align-right" style="width: 50%; vertical-align: top; padding: 8px; text-align: right;">
-                    
+
                         @if(!empty($data['surveyor']['Surveyor_Name']))
                         {{-- The div containing the heading will be right-aligned by the parent <td>'s style --}}
                         <div style="font-weight: bold; margin-bottom: 6px;">Surveyor Signature</div>
@@ -526,8 +521,7 @@
                         @endif
 
                     </td>
-                   @endif
-                   @endif
+
                 </tr>
             </table>
 
