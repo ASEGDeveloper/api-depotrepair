@@ -80,6 +80,9 @@ class InspectionReportController extends Controller
 
     public function showInspectionFetch($id)
     {
+
+        return $id;
+        
         $inspection = InspectionReportModel::find($id);
         $images =  $this->inspectionService->getInspectionImages($id);
         $inspection->images = $images;
