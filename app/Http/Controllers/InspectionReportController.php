@@ -85,7 +85,7 @@ class InspectionReportController extends Controller
 
         $inspection = InspectionReportModel::find($id);
 
-        return  $inspection;
+       // return  $inspection;
 
         $images =  $this->inspectionService->getInspectionImages($id);
         $inspection->images = $images;
