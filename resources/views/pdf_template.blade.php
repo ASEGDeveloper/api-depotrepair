@@ -296,9 +296,7 @@
                 <div>Email: <a href="mailto:service@cryotechme.com">service@cryotechme.com</a></div>
             </td>
         </tr>
-    </table>
-
-
+    </table> 
 
 
     <div class="page-content">
@@ -310,10 +308,10 @@
                 <th style="width: 25%;">Survey Type:</th>
             </tr>
             <tr>
-                <td>{{ $data['Tank_Type'] ?? 'N/A' }}</td>
-                <td>{{ $data['Unit_Number'] ?? 'N/A' }}</td>
-                <td>{{ $data['Customer_Name'] ?? 'N/A' }}</td>
-                <td>{{ $data['Survey_Type'] ?? 'N/A' }}</td>
+                <td>{{ @$data['Tank_Type'] ?? 'N/A' }}</td>
+                <td>{{ @$data['Unit_Number'] ?? 'N/A' }}</td>
+                <td>{{ @$data['Customer_Name'] ?? 'N/A' }}</td>
+                <td>{{ @$data['Survey_Type'] ?? 'N/A' }}</td>
             </tr>
 
             <tr>
@@ -323,11 +321,12 @@
                 <th>Location of Inspection</th>
             </tr>
             <tr>
-                <td>{{ $data['Manufacturer'] ?? 'N/A' }}</td>
-                <td>{{ $data['Un_Portable_Tank_Type'] ?? 'N/A' }}</td>
-                <td>{{ $data['Survey_Date'] ?? 'N/A' }}</td>
-                <td>{{ $data['Location_of_Inspection'] ?? 'N/A' }}</td>
+                <td>{{ @$data['Manufacturer'] ?? 'N/A' }}</td>
+                <td>{{ @$data['Un_Portable_Tank_Type'] ?? 'N/A' }}</td>
+                <td>{{ @$data['Survey_Date'] ?? 'N/A' }}</td>
+                <td>{{ @$data['Location_of_Inspection'] ?? 'N/A' }}</td>
             </tr>
+
 
             <tr>
                 <th>Manufacturer Serial No</th>
@@ -336,10 +335,10 @@
                 <th>Outer tank material</th>
             </tr>
             <tr>
-                <td>{{ $data['manufacturerSerialNo'] ?? 'N/A' }}</td>
-                <td>{{ $data['mawp'] ?? 'N/A' }}</td>
-                <td>{{ $data['Inner_Tank_Material'] ?? 'N/A' }}</td>
-                <td>{{ $data['Outer_Tank_Material'] ?? 'N/A' }}</td>
+                <td>{{ @$data['manufacturerSerialNo'] ?? 'N/A' }}</td>
+                <td>{{ @$data['mawp'] ?? 'N/A' }}</td>
+                <td>{{ @$data['Inner_Tank_Material'] ?? 'N/A' }}</td>
+                <td>{{ @$data['Outer_Tank_Material'] ?? 'N/A' }}</td>
             </tr>
 
             <tr>
@@ -349,10 +348,10 @@
                 <th>Next CSC Due</th>
             </tr>
             <tr>
-                <td>{{ $data['Max_Gross_Weight_kg'] ?? 'N/A' }}</td>
-                <td>{{ $data['Tare_Weight_kg'] ?? 'N/A' }}</td>
-                <td>{{ $data['Capacity_L'] ?? 'N/A' }}</td>
-                <td>{{ $data['Next_CSC_Due'] ?? 'N/A' }}</td>
+                <td>{{ @$data['Max_Gross_Weight_kg'] ?? 'N/A' }}</td>
+                <td>{{ @$data['Tare_Weight_kg'] ?? 'N/A' }}</td>
+                <td>{{ @$data['Capacity_L'] ?? 'N/A' }}</td>
+                <td>{{ @$data['Next_CSC_Due'] ?? 'N/A' }}</td>
             </tr>
 
             <tr>
@@ -362,10 +361,10 @@
                 <th>Next test Due (MM-YY)</th>
             </tr>
             <tr>
-                <td>{{ $data['Initial_Test_MMM_YY'] ?? 'N/A' }}</td>
-                <td>{{ $data['Last_2_5yr_Test_MMM_YY'] ?? 'N/A' }}</td>
-                <td>{{ $data['Last_5yr_Test_MMM_YY'] ?? 'N/A' }}</td>
-                <td>{{ $data['Next_Test_Due_MMM_YY'] ?? 'N/A' }}</td>
+                <td>{{ @$data['Initial_Test_MMM_YY'] ?? 'N/A' }}</td>
+                <td>{{ @$data['Last_2_5yr_Test_MMM_YY'] ?? 'N/A' }}</td>
+                <td>{{ @$data['Last_5yr_Test_MMM_YY'] ?? 'N/A' }}</td>
+                <td>{{ @$data['Next_Test_Due_MMM_YY'] ?? 'N/A' }}</td>
             </tr>
 
             <tr>
@@ -375,10 +374,10 @@
                 <th>Surveyor</th>
             </tr>
             <tr>
-                <td>{{ $data['Last_Cargo'] ?? 'N/A' }}</td>
-                <td>{{ $data['Vacuum_Reading'] ?? 'N/A' }}</td>
-                <td>{{ $data['Results'] ?? 'N/A' }}</td>
-                <td>{{ $data['Surveyor'] ?? 'N/A' }}</td>
+                <td>{{ @$data['Last_Cargo'] ?? 'N/A' }}</td>
+                <td>{{ @$data['Vacuum_Reading'] ?? 'N/A' }}</td>
+                <td>{{ @$data['Results'] ?? 'N/A' }}</td>
+                <td>{{ @$data['Surveyor'] ?? 'N/A' }}</td>
             </tr>
 
 
@@ -399,7 +398,7 @@
             <tr>
                 <td colspan="4"
                     style="padding: 8px; border: 1px solid rgb(0, 0, 0); white-space: pre-line; min-height: 35px;">
-                    {{ ltrim($data['Comments'] ?? 'N/A', " \t\n\r\0\x0B") }}
+                    {{ ltrim(@$data['Comments'] ?? 'N/A', " \t\n\r\0\x0B") }}
                 </td>
             </tr>
         </table>
