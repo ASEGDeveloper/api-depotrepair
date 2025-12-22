@@ -10,10 +10,12 @@ class ItemMasterModel extends Model
 {
     use HasFactory;
 
+     protected $connection = 'sqlsrv'; 
+
     protected $table = 'deporepair.item_master_dpr';
     protected $primaryKey = 'ID';
 
-    public $timestamps = true;
+    public $timestamps = false;
     
     // Define your actual timestamp column names
     const CREATED_AT = 'Creation_date';  // or whatever the actual column name is
