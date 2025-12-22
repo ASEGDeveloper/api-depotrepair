@@ -16,23 +16,7 @@ Route::post('refresh', [AuthController::class, 'refresh']);
 
 Route::middleware('api.token')->post('/tna-entries', [TnaEntryController::class, 'createOrUpdateTNAEntry']);
 
-Route::post('/test-tna', [TnaControllerTest::class, 'createOrUpdateTNAEntry']); 
-
- 
-
-Route::get('/test-sanctum-model', function() {
-    $model = config('sanctum.personal_access_token_model');
-    $instance = new $model;
-    
-    return response()->json([
-        'model_class' => $model,
-        'table_name' => $instance->getTable(),
-        'connection' => $instance->getConnectionName(),
-    ]);
-});
-
-
-
+Route::post('/test-tna', [TnaControllerTest::class, 'createOrUpdateTNAEntry']);  
 
 Route::middleware('auth:sanctum')->group(function () {
 

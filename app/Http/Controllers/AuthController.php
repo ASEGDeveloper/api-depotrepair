@@ -78,10 +78,7 @@ class AuthController extends Controller
         $data = ['accessToken'=>$accessToken->plainTextToken];
         return $this->successResponse($data, 'New access token has been issued successfully.!'); 
     }
-
-
-
-    
+ 
 
 
     public function logout(Request $request)

@@ -8,6 +8,8 @@ use Laravel\Sanctum\Sanctum;
 
 // ✅ ADD THIS - Force Sanctum to use custom model early
 Sanctum::usePersonalAccessTokenModel(\App\Models\PersonalAccessToken::class);
+//ItemMasterModel::useItemMasterModel(\App\Models\ItemMasterModel::class);
+
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
