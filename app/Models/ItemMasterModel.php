@@ -13,10 +13,12 @@ class ItemMasterModel extends Model
     protected $table = 'deporepair.item_master_dpr';
     protected $primaryKey = 'ID';
 
-    // Disable default timestamp handling since we have custom fields
-    public $timestamps = false;
+    public $timestamps = true;
+    
+    // Define your actual timestamp column names
+    const CREATED_AT = 'Creation_date';  // or whatever the actual column name is
+    const UPDATED_AT = 'Updated_date';   // or whatever the actual column name is
 
-    // Define the fillable fields based on the table columns
     protected $fillable = [
         'InventoryItemID',
         'ItemNumber',
@@ -34,9 +36,6 @@ class ItemMasterModel extends Model
         'DATALOAD_TIME'
     ];
 
-    /**
-     * Automatically set Created_by and Updated_by fields
-     */
     protected static function boot()
     {
         parent::boot();
@@ -45,18 +44,11 @@ class ItemMasterModel extends Model
             $userID = Auth::check() ? Auth::user()->EmployeeID : 'system';
             $model->Created_by = $userID;
             $model->Updated_by = $userID;
-
-            // Optionally set Creation_date and Updated_date
-            $model->Creation_date = now();
-            $model->Updated_date = now();
         });
 
         static::updating(function ($model) {
             $userID = Auth::check() ? Auth::user()->EmployeeID : 'system';
             $model->Updated_by = $userID;
-
-            // Update Updated_date automatically
-            $model->Updated_date = now();
         });
     }
 }
