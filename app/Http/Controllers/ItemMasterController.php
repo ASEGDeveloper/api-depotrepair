@@ -12,7 +12,7 @@ class ItemMasterController extends Controller
 {
     // Create or Update Item
     // ItemMasterRequest
-    public function save(ItemMasterRequest $request, $itemID = null)
+    public function save(Request $request, $itemID = null)
     {
 
         $uniqueItemNumber = $request->ItemNumber;
