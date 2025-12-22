@@ -35,13 +35,13 @@ class InspectionService
     }
 
     public function getLogo(){
-      return  DB::table('cryotech_logo')->select('logo')->first();
+      return  DB::table('deporepair.cryotech_logo')->select('logo')->first();
     }
 
     public function getInspectionImages($inspectionID) 
     {
         
-        return DB::table('inspection_images')->where('inspection_id', $inspectionID)
+        return DB::table('deporepair.inspection_images')->where('inspection_id', $inspectionID)
             ->where('is_deleted', 0)->select('image_data','description')->orderBy('id','desc')->get();
         
     }
@@ -50,7 +50,7 @@ class InspectionService
      public function getSignature($inspectionID) 
     {
         
-        return DB::table('inspection_signatures')->where('inspection_id', $inspectionID)
+        return DB::table('deporepair.inspection_signatures')->where('inspection_id', $inspectionID)
         ->select('custSignatureName','Type','signature_data','date')->where('Type','Customer')->orderBy('ID', 'desc')->first();
         
     }
@@ -58,20 +58,14 @@ class InspectionService
     public function getCustomerID($inspectionID) 
     {
 
-      return  DB::table('inspection_report_dpr as ird')
-                ->join('installbase_items_dpr as iid', 'iid.Serial_Numbers', '=', 'ird.SerialNumber')
-                ->join('installbase_dpr as insid', 'insid.ID', '=', 'iid.installbase_id')
+      return  DB::table('deporepair.inspection_report_dpr as ird')
+                ->join('deporepair.installbase_items_dpr as iid', 'iid.Serial_Numbers', '=', 'ird.SerialNumber')
+                ->join('deporepair.installbase_dpr as insid', 'insid.ID', '=', 'iid.installbase_id')
                 ->where('ird.id', '=', $inspectionID)
                 ->select('insid.CustomerID')
                 ->first();
 
-        
-    // return   DB::table('inspection_report_dpr as ird')
-    //             ->join('installbase_items_dpr as iid', 'iid.Serial_Numbers', '=', 'ird.SerialNumber')
-    //             ->join('installbase_dpr as insid', 'insid.ID', '=', 'iid.installbase_id')
-    //             ->where('ird.id', $inspectionID)   // replace $inspectionID with your variable
-    //             ->select('insid.CustomerID')
-    //             ->first();
+    
         
     }
 
@@ -80,7 +74,7 @@ class InspectionService
     {
 
         
-    return DB::table('sites_dpr')
+    return DB::table('deporepair.sites_dpr')
         ->select('Contact_Person', 'Email', 'Position','BillTo','ShipTo')
         ->where('Customer_ID', $customerID)
         ->get();
@@ -90,7 +84,7 @@ class InspectionService
      public function getSurSignature($inspectionID) 
     {
         
-        return DB::table('inspection_signatures')->where('inspection_id', $inspectionID)
+        return DB::table('deporepair.inspection_signatures')->where('inspection_id', $inspectionID)
         ->select('Surveyor_Name','Type','signature_data','date')->where('Type','Surveyor')->first();
         
     }

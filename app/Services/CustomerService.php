@@ -34,63 +34,7 @@ class CustomerService
 
         return $query->get();
     }
-
-
-// public function createCustomer($data)
-// {
-//     DB::beginTransaction();
-
-//     try {
-//         // Ensure customer is unique by CustomerNumber
-//         $customer = CustomerModel::firstOrCreate(
-//             ['CustomerNumber' => $data->CustomerNumber ?? null], // unique key
-//             [
-//                 'OrganizationID' => '9608',
-//                 'CustomerName'   => $data->CustomerName ?? null,
-//                 'AccountID'      => mt_rand(100000, 999999),
-//                 'TRN'            => $data->TRN ?? null,
-//                 'PaymentTerms'   => $data->PaymentTerms ?? null,
-//             ]
-//         );
-
-//         // Insert customer sites
-//         $sites = $data->Sites ?? [];
-//         if (is_array($sites)) {
-//             foreach ($sites as $site) {
-//                 $siteObj = is_array($site) ? (object) $site : $site;
-
-//                 CustomerSiteModel::create([
-//                     'Customer_ID'    => $customer->ID,
-//                     'CustomerSite'   => $siteObj->CustomerSite ?? $siteObj->customerSite ?? null,
-//                     'SiteAddress'    => $siteObj->SiteAddress ?? $siteObj->siteAddress ?? null,
-//                     'Contact_Person' => $siteObj->Contact_Person ?? $siteObj->contactPerson ?? null,
-//                     'Email'          => $siteObj->Email ?? $siteObj->email ?? null,
-//                     'Mobile_Number'  => $siteObj->Mobile_Number ?? $siteObj->mobile ?? null,
-//                     'Position'       => $siteObj->Position ?? $siteObj->position ?? null,
-//                     'BillTo'         => $siteObj->BillTo ?? $siteObj->billTo ?? 0,
-//                     'ShipTo'         => $siteObj->ShipTo ?? $siteObj->shipTo ?? 0,
-//                 ]);
-//             }
-//         }
-
-//         DB::commit();
-//         return response()->json([
-//             'success' => true,
-//             'message' => 'Customer created successfully',
-//             'customer' => $customer,
-//         ]);
-
-//     } catch (\Exception $e) {
-//         DB::rollBack();
-//         return response()->json([
-//             'success' => false,
-//             'message' => 'Failed to create customer',
-//             'error'   => $e->getMessage(),
-//         ], 500);
-//     }
-// }
-
-
+ 
 
     public function createCustomer($data)
     {

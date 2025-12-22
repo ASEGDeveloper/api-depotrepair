@@ -169,9 +169,9 @@ public function getInstallBase(Request $request)
         $search = trim($request->input('search', ''));
 
         // Base query with join
-        $query = DB::table('installbase_dpr as ib')
-            ->join('installbase_items_dpr as ibi', 'ib.ID', '=', 'ibi.installbase_id')
-            ->join('customers_dpr as cd','cd.ID','=','ib.CustomerID')
+        $query = DB::table('deporepair.installbase_dpr as ib')
+            ->join('deporepair.installbase_items_dpr as ibi', 'ib.ID', '=', 'ibi.installbase_id')
+            ->join('deporepair.customers_dpr as cd','cd.ID','=','ib.CustomerID')
             ->select(
                 'ib.ID',
                 'cd.CustomerName as Customer_Name',
@@ -283,10 +283,10 @@ public function getInstallBase(Request $request)
 public function searchInstallBase(Request $request)
 {  
     try {
-        $query = DB::table('installbase_dpr as ib')
-            ->join('installbase_items_dpr as ibi', 'ib.ID', '=', 'ibi.installbase_id')
-            ->join('customers_dpr as cd', 'cd.ID', '=', 'ib.customerID')
-            ->leftJoin('inspection_report_dpr as ird', 'ird.serialNumber', '=', 'ibi.Serial_Numbers')
+        $query = DB::table('deporepair.installbase_dpr as ib')
+            ->join('deporepair.installbase_items_dpr as ibi', 'ib.ID', '=', 'ibi.installbase_id')
+            ->join('deporepair.customers_dpr as cd', 'cd.ID', '=', 'ib.customerID')
+            ->leftJoin('deporepair.inspection_report_dpr as ird', 'ird.serialNumber', '=', 'ibi.Serial_Numbers')
             ->select(
                 'ib.ID',
                 'cd.CustomerName as Customer_Name',
@@ -332,55 +332,6 @@ public function searchInstallBase(Request $request)
 
 
 
-
-
-    // public function searchInstallBase(Request $request)
-    // {
-    //     try {
-    //         $query = InstallBaseModel::query();
-
-    //         // ✅ Check if any search filters are provided
-    //         $hasFilter = $request->filled(['ITEM', 'SerialNumbers', 'CustomerName','Creation_Date']);
-
-    //         if ($hasFilter) {
-    //             if ($request->filled('ITEM')) {
-    //                 $query->where('ITEM', 'LIKE', '%' . $request->ITEM . '%');
-    //             }
-
-    //             if ($request->filled('SerialNumbers')) {
-    //                 $query->orWhere('Serial_Numbers', 'LIKE', '%' . $request->SerialNumbers . '%');
-    //             }
-
-    //             if ($request->filled('CustomerName')) {
-    //                 $query->orWhere('Customer_Name', 'LIKE', '%' . $request->CustomerName . '%');
-    //             }
-
-    //           if ($request->filled('Creation_Date')) {
-    //             $query->whereDate('Creation_Date', $request->Creation_Date);
-    //         }
-
-    //                 }
-
-    //         // ✅ Select the fields you want to return (include ID)
-    //         $results = $query->select('ID', 'ITEM', 'Serial_Numbers', 'Customer_Name')
-    //                          ->orderBy('ID', 'desc')
-    //                          ->get();
-
-    //         return response()->json([
-    //             'status'  => 'success',
-    //             'message' => $results->isEmpty() ? 'No matching records found.' : 'Install base records fetched successfully.',
-    //             'data'    => $results
-    //         ], 200);
-
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'status'  => 'error',
-    //             'message' => 'Failed to search install base records.',
-    //             'error'   => $e->getMessage(),
-    //         ], 500);
-    //     }
-    // }
-
     public function show($id)
     {
         $item = InstallBaseModel::find($id);
@@ -396,17 +347,17 @@ public function getItems($serialNumber)
     // Check if the record exists in installbase_dpr
    // $installBase = DB::table('installbase_dpr')->find($id);
 
-   $installBase=DB::table('installbase_items_dpr')->where('Serial_Numbers',$serialNumber)->first();
+   $installBase=DB::table('deporepair.installbase_items_dpr')->where('Serial_Numbers',$serialNumber)->first();
 
     if (!$installBase) {
         return response()->json(['message' => 'Item not found.'], 404);
     }
 
     // Fetch full joined data from related tables
-    $data = DB::table('installbase_items_dpr as ibi')
-    ->join('item_master_dpr as im', 'ibi.Item_Numbers', '=', 'im.ItemNumber')
-    ->join('installbase_dpr as ib', 'ib.ID', '=', 'ibi.installbase_id')
-    ->join('customers_dpr as cd', 'cd.ID', '=', 'ib.CustomerID')
+    $data = DB::table('deporepair.installbase_items_dpr as ibi')
+    ->join('deporepair.item_master_dpr as im', 'ibi.Item_Numbers', '=', 'im.ItemNumber')
+    ->join('deporepair.installbase_dpr as ib', 'ib.ID', '=', 'ibi.installbase_id')
+    ->join('deporepair.deporepair.customers_dpr as cd', 'cd.ID', '=', 'ib.CustomerID')
     ->where('ibi.Serial_Numbers', $serialNumber)
     ->select(
         'ibi.Item_Numbers',
@@ -437,8 +388,8 @@ public function getItems($serialNumber)
 public function getCustomerName($id)
 {
     // Fetch main install base (single row)
-    $installBase = DB::table('installbase_dpr as ib') // alias should match
-    ->join('customers_dpr as cd', 'cd.ID', '=', 'ib.CustomerID')
+    $installBase = DB::table('deporepair.installbase_dpr as ib') // alias should match
+    ->join('deporepair.customers_dpr as cd', 'cd.ID', '=', 'ib.CustomerID')
     ->where('ib.ID', $id)
     ->select('cd.CustomerName as Customer_Name')
     ->first();
@@ -449,7 +400,7 @@ public function getCustomerName($id)
     }
 
     // Fetch all related installbase_items_dpr rows
-    $items = DB::table('installbase_items_dpr')
+    $items = DB::table('deporepair.installbase_items_dpr')
         ->where('installbase_id', $id)
         ->select(
             'ID as InstallBaseDetailsID',

@@ -334,7 +334,7 @@ class InspectionReportController extends Controller
                 }
 
                 // Insert into the database
-                $newId = DB::table('inspection_images')->insertGetId($data);
+                $newId = DB::table('deporepair.inspection_images')->insertGetId($data);
 
                 // IMPORTANT: Never return the full Base64 string in the JSON response
                 // The JSON encoder might still struggle with very large data strings,
@@ -382,7 +382,7 @@ class InspectionReportController extends Controller
 
             if (!empty($request->signature)) {
 
-                DB::table('inspection_signatures')->insert([
+                DB::table('deporepair.inspection_signatures')->insert([
                     'inspection_id'     => $request->inspectionID,
                     'custSignatureName' => $request->custSignatureName,
                     'signature_data'    => $base64Image,  // PURE base64 image
@@ -422,7 +422,7 @@ class InspectionReportController extends Controller
 
             if (!empty($request->surveyorSignature)) {
 
-                DB::table('inspection_signatures')->insert([
+                DB::table('deporepair.inspection_signatures')->insert([
                     'inspection_id'     => $request->inspectionID,
                     'Surveyor_Name' => $request->surveyorSignatureName,
                     'signature_data'    => $base64Image,  // PURE base64 image
@@ -459,7 +459,7 @@ class InspectionReportController extends Controller
 
     private function reportStatusUpdate($inspectionID)
     {
-        DB::table('inspection_report_dpr')
+        DB::table('deporepair.inspection_report_dpr')
             ->where('id', $inspectionID)
             ->update([
                 'Status' => 'Report Generated', // set the new status 
@@ -503,7 +503,7 @@ class InspectionReportController extends Controller
     public function showInspectionImages($id)
     {
 
-        $images = DB::table('inspection_images')
+        $images = DB::table('deporepair.inspection_images')
             ->where('inspection_id', $id)
             ->where('is_deleted', 0)
             ->select('id', 'inspection_id', 'description', 'image_data')
@@ -521,7 +521,7 @@ class InspectionReportController extends Controller
     public function delete(Request $request, $id)
     {
         try {
-            DB::table('inspection_images')
+            DB::table('deporepair.inspection_images')
                 ->where('id', $id)
                 ->update([
                     'is_deleted' => 1
@@ -551,21 +551,7 @@ class InspectionReportController extends Controller
     }
 
 
-    // public function sendEmail(Request $request )
-    // { 
-
-    //     $contacts = $request->input('contacts');  
-
-    //     foreach ($contacts as $c) {
-    //         $email = $c['email'];
-    //         $name  = $c['name'];
-
-    //         // Send email to each contact with their name
-    //        Mail::to($email)->send(new InspectionReportMail($name));
-    //     }
-
-    //     return response()->json(['status' => 'Emails sent successfully']);
-    // }
+    
 
 
     public function sendEmail(Request $request)
