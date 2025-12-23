@@ -8,6 +8,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class Employee extends Authenticatable
 {
     use HasApiTokens;
+
+    const CRYOTECH_NOT_ALLOWED = 0;
+    const CRYOTECH_ONLY        = 1;
+    const CRYOTECH_BOTH        = 2;
+
+    
     
     //protected $table = 'deporepair.employee';
 
@@ -16,6 +22,8 @@ class Employee extends Authenticatable
     protected $primaryKey = 'ID';   // 👈 must match DB column name
     public $incrementing = true;            // 👈 true if auto-increment
     protected $keyType = 'int';   
+
+    
 
     
     protected $fillable = [

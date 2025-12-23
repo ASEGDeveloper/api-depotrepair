@@ -284,7 +284,7 @@
     <table class="pdf-header">
         <tr>
             <td style="width: 50%; text-align: left;">
-                <img src="{{ $data['logo']['logo'] }}"
+                <img src="{{ @$data['logo']['logo'] }}"
                     alt="Logo"
                     style="max-width: 200px; height: auto;">
             </td>

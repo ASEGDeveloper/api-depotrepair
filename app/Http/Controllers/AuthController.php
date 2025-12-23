@@ -22,7 +22,12 @@ class AuthController extends Controller
         ]); 
 
 
-        $employee = Employee::where('EmployeeEmail', $request->EmployeeEmail)->first();
+       $employee = Employee::where('EmployeeEmail', $request->EmployeeEmail)
+                        ->whereIn('isCryotech', [
+                            Employee::CRYOTECH_ONLY,
+                            Employee::CRYOTECH_BOTH
+                        ])
+                        ->first();
 
         
         // // Compare MD5 password
