@@ -6,8 +6,8 @@ use App\Models\Employee; // or User if you modified the User model
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\RefreshToken;
- use App\Traits\ApiResponse;
- use Illuminate\Support\Facades\Cache;
+use App\Traits\ApiResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
@@ -19,42 +19,105 @@ class AuthController extends Controller
         $request->validate([
             'EmployeeEmail' => 'required|email',
             'EmployeePassword' => 'required',
-        ]); 
+        ]);
 
+        $employee = Employee::where('EmployeeEmail', $request->EmployeeEmail)
+            ->whereIn('isCryotech', [
+                Employee::CRYOTECH_ONLY,
+                Employee::CRYOTECH_BOTH
+            ])
+            ->first();
 
-       $employee = Employee::where('EmployeeEmail', $request->EmployeeEmail)
-                        ->whereIn('isCryotech', [
-                            Employee::CRYOTECH_ONLY,
-                            Employee::CRYOTECH_BOTH
-                        ])
-                        ->first();
-
-        
-        // // Compare MD5 password
-        if (strtolower(trim($employee->EmployeePassword)) !== md5($request->EmployeePassword)) {
-            return response()->json(['error' => 'Invalid user name or password'], 401);
+        // ❌ User not found OR access not allowed
+        if (!$employee) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Access not allowed or user not found'
+            ], 403);
         }
 
-      //return "login sucessfully";
+        // ❌ Password mismatch
+        if (strtolower(trim($employee->EmployeePassword)) !== md5($request->EmployeePassword)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid email or password'
+            ], 401);
+        }
 
-        // Delete old tokens (optional)
+        // ✅ Delete old tokens
         $employee->tokens()->delete();
 
-        $accessToken = $employee->createToken('API Token', ['*'], now()->addMinutes(120));
+        // ✅ Create access token
+        $accessToken = $employee->createToken(
+            'API Token',
+            ['*'],
+            now()->addMinutes(120)
+        );
 
-        // Create refresh token (long-lived, 7 days)
+        // ✅ Create refresh token
         $refreshToken = Str::random(64);
         $employee->refreshTokens()->create([
             'token' => hash('sha256', $refreshToken),
-            'expires_at' => now()->addDays(7)
-        ]); 
+            'expires_at' => now()->addDays(7),
+        ]);
 
-        $data = ['accessToken'=>$accessToken->plainTextToken,'refreshToken'=>$refreshToken,'employee'=>$employee];
+        $data = [
+            'accessToken' => $accessToken->plainTextToken,
+            'refreshToken' => $refreshToken,
+            'employee' => $employee,
+        ];
 
-        return $this->successResponse($data, 'logged in successfully!');
-
- 
+        return response()->json([
+            'success' => true,
+            'message' => 'Logged in successfully',
+            'data' => $data
+        ], 200);
     }
+
+
+
+
+    // public function login(Request $request)
+    // {
+    //     $request->validate([
+    //         'EmployeeEmail' => 'required|email',
+    //         'EmployeePassword' => 'required',
+    //     ]); 
+
+
+    //    $employee = Employee::where('EmployeeEmail', $request->EmployeeEmail)
+    //                     ->whereIn('isCryotech', [
+    //                         Employee::CRYOTECH_ONLY,
+    //                         Employee::CRYOTECH_BOTH
+    //                     ])
+    //                     ->first();
+
+
+    //     // // Compare MD5 password
+    //     if (strtolower(trim($employee->EmployeePassword)) !== md5($request->EmployeePassword)) {
+    //         return response()->json(['error' => 'Invalid user name or password'], 401);
+    //     }
+
+    //   //return "login sucessfully";
+
+    //     // Delete old tokens (optional)
+    //     $employee->tokens()->delete();
+
+    //     $accessToken = $employee->createToken('API Token', ['*'], now()->addMinutes(120));
+
+    //     // Create refresh token (long-lived, 7 days)
+    //     $refreshToken = Str::random(64);
+    //     $employee->refreshTokens()->create([
+    //         'token' => hash('sha256', $refreshToken),
+    //         'expires_at' => now()->addDays(7)
+    //     ]); 
+
+    //     $data = ['accessToken'=>$accessToken->plainTextToken,'refreshToken'=>$refreshToken,'employee'=>$employee];
+
+    //     return $this->successResponse($data, 'logged in successfully!');
+
+
+    // }
 
 
     public function refresh(Request $request)
@@ -78,12 +141,12 @@ class AuthController extends Controller
         $employee->tokens()->delete();
 
         // Create new access token
-        $accessToken = $employee->createToken('API Token', ['*'], now()->addMinutes(15)); 
+        $accessToken = $employee->createToken('API Token', ['*'], now()->addMinutes(15));
 
-        $data = ['accessToken'=>$accessToken->plainTextToken];
-        return $this->successResponse($data, 'New access token has been issued successfully.!'); 
+        $data = ['accessToken' => $accessToken->plainTextToken];
+        return $this->successResponse($data, 'New access token has been issued successfully.!');
     }
- 
+
 
 
     public function logout(Request $request)
@@ -92,58 +155,55 @@ class AuthController extends Controller
         // Delete all access tokens
         $employee->tokens()->delete();
         // Delete all refresh tokens
-         $employee->refreshTokens()->delete();
+        $employee->refreshTokens()->delete();
         return response()->json(['message' => 'Logged out successfully']);
     }
 
     // public function getEmployees(Request $request)
     // {
     //    return Employee::select('*')->limit(5)->get(); // this is for testing purpose
-       
+
     // }
 
- 
-
-public function getEmployees(Request $request)
-{
-    $page   = $request->input('page', 1);
-    $limit  = $request->input('limit', 10);
-    $search = $request->input('search', '');
-    $status = $request->input('status', '');
-
-    // create unique cache key based on filters
-    $cacheKey = "employees_page_{$page}_limit_{$limit}_search_{$search}_status_{$status}";
-
-    // cache for 10 minutes (600 seconds)
-    return Cache::remember($cacheKey, 600, function () use ($page, $limit, $search, $status) {
-        $query = Employee::query();
-
-        if (!empty($search)) {
-            $query->where(function ($q) use ($search) {
-                $q->where('EmployeeName', 'like', "%{$search}%")
-                  ->orWhere('EmployeeEmail', 'like', "%{$search}%");
-            });
-        }
-
-        if (!empty($status)) {
-            $query->where('status', $status);
-        }
-
-        $total = $query->count();
-
-        $employees = $query->offset(($page - 1) * $limit)
-                           ->limit($limit)
-                           ->get();
-
-        return [
-            'data'     => $employees,
-            'total'    => $total,
-            'page'     => $page,
-            'per_page' => $limit
-        ];
-    });
-}
 
 
+    public function getEmployees(Request $request)
+    {
+        $page   = $request->input('page', 1);
+        $limit  = $request->input('limit', 10);
+        $search = $request->input('search', '');
+        $status = $request->input('status', '');
 
+        // create unique cache key based on filters
+        $cacheKey = "employees_page_{$page}_limit_{$limit}_search_{$search}_status_{$status}";
+
+        // cache for 10 minutes (600 seconds)
+        return Cache::remember($cacheKey, 600, function () use ($page, $limit, $search, $status) {
+            $query = Employee::query();
+
+            if (!empty($search)) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('EmployeeName', 'like', "%{$search}%")
+                        ->orWhere('EmployeeEmail', 'like', "%{$search}%");
+                });
+            }
+
+            if (!empty($status)) {
+                $query->where('status', $status);
+            }
+
+            $total = $query->count();
+
+            $employees = $query->offset(($page - 1) * $limit)
+                ->limit($limit)
+                ->get();
+
+            return [
+                'data'     => $employees,
+                'total'    => $total,
+                'page'     => $page,
+                'per_page' => $limit
+            ];
+        });
+    }
 }

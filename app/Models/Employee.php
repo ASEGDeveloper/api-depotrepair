@@ -11,19 +11,15 @@ class Employee extends Authenticatable
 
     const CRYOTECH_NOT_ALLOWED = 0;
     const CRYOTECH_ONLY        = 1;
-    const CRYOTECH_BOTH        = 2;
-
-    
+    const CRYOTECH_BOTH        = 2; 
     
     //protected $table = 'deporepair.employee';
 
     protected $table = 'deporepair.employee';
 
-    protected $primaryKey = 'ID';   // 👈 must match DB column name
-    public $incrementing = true;            // 👈 true if auto-increment
-    protected $keyType = 'int';   
-
-    
+    protected $primaryKey = 'ID';    
+    public $incrementing = true;            
+    protected $keyType = 'int';    
 
     
     protected $fillable = [
