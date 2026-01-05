@@ -287,6 +287,7 @@ public function searchInstallBase(Request $request)
             ->join('deporepair.installbase_items_dpr as ibi', 'ib.ID', '=', 'ibi.installbase_id')
             ->join('deporepair.customers_dpr as cd', 'cd.ID', '=', 'ib.customerID')
             ->leftJoin('deporepair.inspection_report_dpr as ird', 'ird.serialNumber', '=', 'ibi.Serial_Numbers')
+            ->whereNull('ird.serialNumber')
             ->select(
                 'ib.ID',
                 'cd.CustomerName as Customer_Name',
@@ -294,6 +295,7 @@ public function searchInstallBase(Request $request)
                 'ibi.Serial_Numbers',
                 'ird.id as InspectionReportID',
             );
+           // ->where("ird.serialNumber", '==','');  
 
         
          if (!empty($request->Customer_Name)) {

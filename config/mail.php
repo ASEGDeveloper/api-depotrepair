@@ -16,6 +16,9 @@ return [
             'timeout' => null,
             'auth_mode' => 'LOGIN', // explicitly set auth mode
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+             
+            // 🔥 THIS IS THE KEY LINE
+             'auto_tls' => false,
         ],
 
         'log' => [
