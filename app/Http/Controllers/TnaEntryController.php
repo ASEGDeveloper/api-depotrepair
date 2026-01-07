@@ -26,53 +26,72 @@ class TnaEntryController extends Controller
   }
  
 
-  public function createOrUpdateTNAEntry(TnaRequest $request)
-  {
-     
-    try {
-        // Check employee status
-       $status = $this->tnaService->toCheckUserStatusTaskNo($request->employeecode, $request->jobcode);
 
-       
-        if (!$status) {
-            return $this->errorResponse('The specified employee does not exist or is currently inactive in the Depot Repair system');
+    public function createOrUpdateTNAEntry(TnaRequest $request)
+    {
+        try {
+            // Check employee status
+            $status = $this->tnaService
+                ->toCheckUserStatusTaskNo($request->employeecode, $request->jobcode);
+
+            if (!$status) {
+                return $this->errorResponse(
+                    'The specified employee does not exist or is currently inactive in the Depot Repair system'
+                );
+            }
+
+            // Check job card
+            $task = $this->tnaService->toCheckJobCard($request->jobcode);
+            if (!$task) {
+                return $this->errorResponse(
+                    'Unable to create the task due to an issue with the job card. Please verify the job details and try again'
+                );
+            }
+
+            // Handlers map
+            $handlers = [
+                'APP'         => AppTaskHandler::class,
+                'Highmessage' => HighmessageTaskHandler::class,
+                'SMS'         => SMSTaskHandler::class,
+            ];
+
+            // Validate source
+            if (!isset($handlers[$request->source])) {
+                return $this->errorResponse('Invalid operation to perform');
+            }
+
+            // Resolve handler
+            $className = $handlers[$request->source];
+
+            if (!class_exists($className)) {
+                throw new \Exception("Handler class not found: {$className}");
+            }
+
+            // Create handler instance
+            $handler = new $className($this->tnaService);
+
+            // Execute handler
+            $response = $handler->handle($request);
+
+            return $this->response($response);
+
+        } catch (\Throwable $e) {
+
+            FacadesLog::error('TNA Create/Update Error', [
+                'message'      => $e->getMessage(),
+                'file'         => $e->getFile(),
+                'line'         => $e->getLine(),
+                'EMPLOYEECODE' => $request->employeecode,
+                'JOBCODE'      => $request->jobcode,
+                'SOURCE'       => $request->source,
+            ]);
+
+            return $this->errorResponse(
+                'An unexpected error occurred. Please try again later.'
+            );
         }
-
-        // Check job card
-        $task = $this->tnaService->toCheckJobCard($request->jobcode);
-        if (!$task) {
-            return $this->errorResponse('Unable to create the task due to an issue with the job card. Please verify the job details and try again');
-        }
-
-        // Define handlers
-        $handlers = [
-            'APP' => AppTaskHandler::class,
-            'Highmessage' => HighmessageTaskHandler::class,
-            'SMS' => SMSTaskHandler::class 
-        ];
-
-        // Validate source
-        if (!isset($handlers[$request->source])) {
-            return $this->errorResponse('Invalid operation to perform');
-        }
-
-        // Execute handler
-        $handler = new $handlers[$request->source]($this->tnaService);
-        $response = $handler->handle($request);
-
-        return $this->response($response);
-
-    } catch (\Exception $e) {
-        // Catch any unexpected error
-        FacadesLog::error('TNA Create/Update Error: '.$e->getMessage(), [
-            'EMPLOYEECODE' => $request->employeecode,
-            'JOBCODE' => $request->jobcode,
-            'SOURCE' => $request->source,
-        ]);
-
-        return $this->errorResponse('An unexpected error occurred. Please try again later.');
     }
-}
+
 
 
 

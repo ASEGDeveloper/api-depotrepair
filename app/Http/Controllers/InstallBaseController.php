@@ -301,8 +301,7 @@ public function searchInstallBase(Request $request)
          if (!empty($request->Customer_Name)) {
             $query->where('cd.CustomerName', 'LIKE', '%' . $request->Customer_Name . '%');
         }
-
-
+ 
 
         // Specific filters applied individually
         if (!empty($request->Item_Numbers)) {
@@ -312,8 +311,6 @@ public function searchInstallBase(Request $request)
         if (!empty($request->Serial_Numbers)) {
             $query->where('ibi.Serial_Numbers', 'LIKE', '%' . $request->Serial_Numbers . '%');
         }
-       
-
         
         $results = $query->orderBy('ib.ID', 'desc')->get();
 

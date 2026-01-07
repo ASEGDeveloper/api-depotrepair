@@ -59,8 +59,21 @@ class InspectionReportModel extends Model
             $model->Created_by = $userID; 
             $model->Creation_date = now();
           
-        });
-
-         
+        }); 
     }
+
+    public function getNextCscDueAttribute($value)
+    {
+        return $value
+            ? Carbon::parse($value)->format('M/Y')
+            : null;
+    }
+
+    public function getSurveyDateAttribute($value)
+    {
+        return $value
+            ? Carbon::parse($value)->format('M/Y')
+            : null;
+    }
+    
 }

@@ -323,7 +323,7 @@
             <tr>
                 <td>{{ @$data['Manufacturer'] ?? 'N/A' }}</td>
                 <td>{{ @$data['Un_Portable_Tank_Type'] ?? 'N/A' }}</td>
-                <td>{{ @$data['Survey_Date'] ?? 'N/A' }}</td>
+                <td> {{ isset($data['Survey_Date']) ? \Carbon\Carbon::parse($data['Survey_Date'])->format('m/d/Y') : 'N/A' }}</td>
                 <td>{{ @$data['Location_of_Inspection'] ?? 'N/A' }}</td>
             </tr>
 
@@ -351,7 +351,10 @@
                 <td>{{ @$data['Max_Gross_Weight_kg'] ?? 'N/A' }}</td>
                 <td>{{ @$data['Tare_Weight_kg'] ?? 'N/A' }}</td>
                 <td>{{ @$data['Capacity_L'] ?? 'N/A' }}</td>
-                <td>{{ @$data['Next_CSC_Due'] ?? 'N/A' }}</td>
+               <td> 
+                   {{ isset($data['Next_CSC_Due']) ? strtoupper(\Carbon\Carbon::parse($data['Next_CSC_Due'])->format('M/Y')) : 'N/A' }}
+ 
+                </td>
             </tr>
 
             <tr>
@@ -361,10 +364,22 @@
                 <th>Next test Due (MM-YY)</th>
             </tr>
             <tr>
-                <td>{{ @$data['Initial_Test_MMM_YY'] ?? 'N/A' }}</td>
-                <td>{{ @$data['Last_2_5yr_Test_MMM_YY'] ?? 'N/A' }}</td>
-                <td>{{ @$data['Last_5yr_Test_MMM_YY'] ?? 'N/A' }}</td>
-                <td>{{ @$data['Next_Test_Due_MMM_YY'] ?? 'N/A' }}</td>
+                <td>  
+                 {{ isset($data['Initial_Test_MMM_YY']) ? strtoupper(\Carbon\Carbon::parse($data['Initial_Test_MMM_YY'])->format('M/Y')) : 'N/A' }}
+ 
+                </td>
+                <td>  
+                 {{ isset($data['Last_2_5yr_Test_MMM_YY']) ? strtoupper(\Carbon\Carbon::parse($data['Last_2_5yr_Test_MMM_YY'])->format('M/Y')) : 'N/A' }}
+
+                </td>
+                <td>
+                  {{ isset($data['Last_5yr_Test_MMM_YY']) ? strtoupper(\Carbon\Carbon::parse($data['Last_5yr_Test_MMM_YY'])->format('M/Y')) : 'N/A' }}
+
+               </td>
+                <td> 
+
+                  {{ isset($data['Next_Test_Due_MMM_YY']) ? strtoupper(\Carbon\Carbon::parse($data['Next_Test_Due_MMM_YY'])->format('M/Y')) : 'N/A' }} 
+                </td>
             </tr>
 
             <tr>
