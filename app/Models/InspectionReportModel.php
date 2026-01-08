@@ -42,6 +42,7 @@ class InspectionReportModel extends Model
     'Tare_Weight_kg',
     'Un_Portable_Tank_Type',
     'Vacuum_reading',
+    'mawp',
     'Comments',
     'Status',
     'DATALOAD_TIME',

@@ -14,6 +14,8 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\InspectionReportMail;
 use Illuminate\Support\Carbon;
+use Illuminate\Validation\Rule;
+
 
 class InspectionReportController extends Controller
 {
@@ -108,11 +110,25 @@ class InspectionReportController extends Controller
 
 
     public function save(Request $request)
-    {
-
-
+    { 
+ 
         try {
 
+            $id = $request->id ?? null;
+
+        //  Check if serial number already exists (excluding current record during update)
+        $serialExists = InspectionReportModel::where('serialNumber', $request->serialNumber)
+            ->when($id, function ($q) use ($id) {
+                $q->where('ID', '!=', $id);
+            })
+            ->exists();
+
+        if ($serialExists) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Serial number already exists.'
+            ], 409); // Conflict
+        } 
 
             $query = InspectionReportModel::updateOrCreate(
                 ['ID' => $id ?? 0],
@@ -124,7 +140,7 @@ class InspectionReportController extends Controller
                     'Capacity_L'             => $request->Capacity,
                     'Tank_Type'             => $request->TankType,
                     'Initial_Test_MMM_YY'          => $request->Initialtest,
-                    'Last_Cargo '             => $request->LastCargo,
+                    'Last_Cargo'             => $request->LastCargo,
                     'Inner_Tank_Material'    => $request->InnertankMaterial,
                     'Last_2_5yr_Test_MMM_YY'     => $request->Last_2_5yr_Test_MMM_YY,
                     'Last_5yr_Test_MMM_YY'          => $request->Last_5yr_Test_MMM_YY,
@@ -141,6 +157,7 @@ class InspectionReportController extends Controller
                     'Tare_Weight_kg'           => $request->TareWeight,
                     'Un_Portable_Tank_Type'   => $request->UnPortableTankType,
                     'Vacuum_reading'       => $request->Vacuum_reading,
+                    'mawp'             => $request->mawp,
                     'Comments'             => $request->comments,
                     'Status'               => $request->status,
                     'DATALOAD_TIME'        => now(),
@@ -177,6 +194,8 @@ class InspectionReportController extends Controller
     public function update(Request $request, $id = null)
     {
 
+      
+    
         try {
 
             // Validate fields
@@ -215,7 +234,7 @@ class InspectionReportController extends Controller
                     'Capacity_L'             => $request->Capacity,
                     'Initial_Test_MMM_YY'          => $request->Initialtest,
                     'Tank_Type'             => $request->TankType,
-                    'Last_Cargo '             => $request->LastCargo,
+                    'Last_Cargo'             => $request->LastCargo,
                     'Inner_Tank_Material'    => $request->InnertankMaterial,
                     'Last_2_5yr_Test_MMM_YY'     => $request->Last_2_5yr_Test_MMM_YY,
                     'Last_5yr_Test_MMM_YY'          => $request->Last_5yr_Test_MMM_YY,
@@ -486,9 +505,7 @@ class InspectionReportController extends Controller
     {
 
         $data =  $this->inspectionService->getInspectionDetails($inspectionID); 
-        $data = $data->getData(true); // 'true' makes it an associative array      
-
-       
+        $data = $data->getData(true); // 'true' makes it an associative array    
 
         $pdf = Pdf::loadView('pdf_template', compact('data'))
             ->setPaper('a4', 'portrait')
