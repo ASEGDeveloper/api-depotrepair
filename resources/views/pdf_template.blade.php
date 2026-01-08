@@ -420,40 +420,41 @@
 
 
 
-        <table width="100%" cellspacing="0" cellpadding="6" style="border-collapse: collapse;">
-            <tbody>
-                @foreach(array_chunk($data['images'], 3) as $imageRow)
-                <tr class="no-break">
-                    @foreach($imageRow as $img)
-                    <td style="width: 33%; text-align: center; vertical-align: top;  ">
-
-                        <img src="{{ $img['image_data'] }}"
-                            alt="Inspection Image"
-                            style="
-                        width: 200px;
-                        height: 150px;
+        <table width="100%"
+       cellspacing="0"
+       cellpadding="6"
+       style="border-collapse: collapse; margin: 0.25in;">
+    <tbody>
+        @foreach(array_chunk($data['images'], 2) as $imageRow)
+        <tr class="no-break">
+            @foreach($imageRow as $img)
+            <td style="width: 50%; text-align: center; vertical-align: top;">
+                <img src="{{ $img['image_data'] }}"
+                    alt="Inspection Image"
+                    style="
+                        width: 260px;
+                        height: 190px;
                         object-fit: cover;
                         display: block;
-                        margin: 0 auto 5px auto;
+                        margin: 0 auto 6px auto;
                         border: 1px solid #999;
                     ">
 
-                        <div style="font-size: 12px; padding: 4px 0;">
-                            {{ $img['description'] ?? 'No description' }}
-                        </div>
-                    </td>
-                    @endforeach
+                <div style="font-size: 12px; padding: 4px 0;">
+                    {{ $img['description'] ?? 'No description' }}
+                </div>
+            </td>
+            @endforeach
 
-                    {{-- Fill empty cells if less than 3 images in the row --}}
-                    @for($i = count($imageRow); $i < 3; $i++)
-                        <td style="width: 33%; ">
-                        </td>
-                        @endfor
+            {{-- Fill empty cell if only 1 image in row --}}
+            @if(count($imageRow) < 2)
+                <td style="width: 50%;"></td>
+            @endif
+        </tr>
+        @endforeach
+    </tbody>
+</table>
 
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
 
 
 

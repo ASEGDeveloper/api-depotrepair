@@ -192,11 +192,9 @@ class InspectionReportController extends Controller
 
 
     public function update(Request $request, $id = null)
-    {
- 
+    { 
     
-        try {
- 
+        try { 
            
             $query = InspectionReportModel::updateOrCreate(
                 ['ID' => $id ?? 0],
