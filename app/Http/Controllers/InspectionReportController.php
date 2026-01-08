@@ -196,34 +196,8 @@ class InspectionReportController extends Controller
  
     
         try {
-
-            // Validate fields
-            // $validated = $request->validate([             
-            //     'Unit_Number'           => 'required|string|max:100',
-            //     'Customer_Name'         => 'required|string|max:150',
-            //     'Capacity'              => 'nullable|string|max:255',
-            //     'Initialtest'           => 'nullable|string|max:255',
-            //     'InnertankMaterial'     => 'nullable|string|max:255',
-            //     'Last2_to_5yrTest'      => 'nullable|string|max:255',
-            //     'Last5yrTest'           => 'nullable|string|max:255',
-            //     'LocationOfInspection'  => 'nullable|string|max:255',
-            //     'Manufacturer'          => 'nullable|string|max:255',
-            //     'MaxGrossWeight'        => 'nullable|string|max:255',
-            //     'NextCSCDue'            => 'nullable|string|max:255',
-            //     'NexttestDue'           => 'nullable|string|max:255',
-            //     'Outertankmaterial'     => 'nullable|string|max:255',
-            //     'Results'               => 'nullable|string|max:255',
-            //     'SurveyDate'            => 'nullable|date',
-            //     'Survey_Type'            => 'nullable|string|max:50',
-            //     'Surveyor'              => 'nullable|string|max:255',
-            //     'TareWeight'            => 'nullable|string|max:255',
-            //     'UnPortableTankType'    => 'nullable|string|max:255',
-            //     'Vacuum_reading'        => 'nullable|string|max:255',
-            //     'comments'              => 'nullable|string|max:500',
-            // ]);
-
-            // dd( $validated);
-            // Create/update record
+ 
+           
             $query = InspectionReportModel::updateOrCreate(
                 ['ID' => $id ?? 0],
                 [
@@ -231,7 +205,7 @@ class InspectionReportController extends Controller
                     'Unit_Number'          => $request->Unit_Number,
                     'Customer_Name'        => $request->Customer_Name,
                     'Capacity_L'             => $request->Capacity,
-                    'Initial_Test_MMM_YY'          => $request->Initialtest,
+                    'Initial_Test_MMM_YY'    => $request->Initialtest,
                     'Tank_Type'             => $request->TankType,
                     'Last_Cargo'             => $request->LastCargo,
                     'Inner_Tank_Material'    => $request->InnertankMaterial,
