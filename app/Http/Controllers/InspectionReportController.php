@@ -193,8 +193,7 @@ class InspectionReportController extends Controller
 
     public function update(Request $request, $id = null)
     {
-
-      
+ 
     
         try {
 
@@ -252,6 +251,7 @@ class InspectionReportController extends Controller
                     'Un_Portable_Tank_Type'   => $request->UnPortableTankType,
                     'Vacuum_reading'       => $request->Vacuum_reading,
                     'Comments'             => $request->comments,
+                    'mawp'             => $request->mawp,
                     'Status'               => $request->status,
                     'DATALOAD_TIME'        => now(),
                 ]
