@@ -24,8 +24,7 @@ class TnaEntryController extends Controller
   {
     $this->tnaService = $tnaService;
   }
- 
-
+  
 
     public function createOrUpdateTNAEntry(TnaRequest $request)
     {

@@ -42,7 +42,7 @@ class InspectionService
     {
         
         return DB::table('deporepair.inspection_images')->where('inspection_id', $inspectionID)
-            ->where('is_deleted', 0)->select('image_data','description')->orderBy('id','desc')->get();
+            ->where('is_deleted', 0)->select('image_data','description')->orderBy('id','asc')->get();
         
     }
 

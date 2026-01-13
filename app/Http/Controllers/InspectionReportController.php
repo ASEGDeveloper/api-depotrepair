@@ -308,33 +308,20 @@ class InspectionReportController extends Controller
                 ];
 
                 // Add image data if uploaded
-                if ($imageFile && $imageFile->isValid()) {
-
-                    // 1. Read raw binary content safely
-                    $binary = file_get_contents($imageFile->getRealPath());
-
-                    // 2. Get the MIME type (e.g., 'image/jpeg')
-                    $mimeType = $imageFile->getClientMimeType();
-
-                    // 3. CORRECTLY construct the Base64 Data URI string.
-                    // This ensures only the Base64 encoded string is used in the text field.
+                if ($imageFile && $imageFile->isValid()) { 
+                     
+                    $binary = file_get_contents($imageFile->getRealPath()); 
+                    $mimeType = $imageFile->getClientMimeType(); 
                     $base64Data = base64_encode($binary);
-                    $dataURI = "data:{$mimeType};base64,{$base64Data}";
-
-                    // Store the Base64 Data URI in the data array
+                    $dataURI = "data:{$mimeType};base64,{$base64Data}";  
                     $data['image_data'] = $dataURI;
                     $data['original_filename'] = $imageFile->getClientOriginalName();
                 }
 
-                // Insert into the database
+       
                 $newId = DB::table('deporepair.inspection_images')->insertGetId($data);
 
-                // IMPORTANT: Never return the full Base64 string in the JSON response
-                // The JSON encoder might still struggle with very large data strings,
-                // even if they are valid UTF-8, and it severely bloats the response.
-                // If you need the image in the response, fetch it separately or send the ID.
-
-                // Only include safe fields in the response
+             
                 $savedRecords[] = [
                     'id'     => $newId,
                     'action' => 'created',
@@ -420,7 +407,7 @@ class InspectionReportController extends Controller
                     'Surveyor_Name' => $request->surveyorSignatureName,
                     'signature_data'    => $base64Image,  // PURE base64 image
                     'Type' => 'Surveyor',
-                    'date'              => date('Y-m-d'),
+                    'date'  => date('Y-m-d'),
                 ]);
             }
 

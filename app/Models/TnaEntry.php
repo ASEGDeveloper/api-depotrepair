@@ -11,32 +11,18 @@ class TnaEntry extends Model
 
     protected $table = 'deporepair.tna_entries_uat'; // schema.table (SQL Server)
 
-   //  protected $table = 'deporepair.tna_entry_duplicate'; // schema.table (SQL Server)
+   // protected $table = 'deporepair.tna_entry_duplicate'; // schema.table (SQL Server)
 
 
     protected $primaryKey = 'ID';
-    public $timestamps = false;
+    
+     // ✅ Enable timestamps
+    public $timestamps = true;
 
-    // protected $fillable = [
-    //         'COMPANYCODE',
-    //         'EMPLOYEECODE',
-    //         'JOBCODE',
-    //         'JOBSEQNO',
-    //         'EXPORTFLAG',
-    //         'OPST',
-    //         'PROJECTEDENDDATE',
-    //         'PROJECTEDENDTIME',
-    //         'OR_UPD_FLG',
-    //         'TAS_DATA_FROM',
-    //         'ENTRY_MODE',
-    //         'IS_MANUAL',
-    //         'SD',
-    //         'ED',
-    //         'STARTDATE',
-    //         'STARTTIME',
-    //         'ENDDATE',
-    //         'ENDTIME'
-    // ];
+    // ✅ Map Laravel timestamps to SQL Server columns
+    const CREATED_AT = 'CREATED_ON';
+    const UPDATED_AT = 'UPDATED_ON';
+    
 
     protected $fillable = [
         'COMPANYCODE',

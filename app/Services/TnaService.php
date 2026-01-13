@@ -65,13 +65,20 @@ class TnaService
     public function updateHightMessagingTask($request)
     {
 
+        $currentDateAndTime = Carbon::now();
+
+        $currentTime = $currentDateAndTime->format('H') . '.' . $currentDateAndTime->format('i');
+
         $default = $this->getDefaultTnaData(
             $request->employeecode,
             $request->jobcode,
-            $request->startdate,
-            $request->starttime,
-            $request->tas_data_from
+            $currentDateAndTime,
+            $currentTime,
+            $request->tas_data_from,
+            '2025-10-12',
+            '18:00'
         );
+
 
         $exists = $this->checkJobCardPunchingStatus($request->employeecode, $request->jobcode);
 
@@ -80,27 +87,62 @@ class TnaService
             TnaEntry::where('EMPLOYEECODE', $request->employeecode)
                 ->where('JOBCODE', $request->jobcode)
                 ->whereNull('ED')
-                ->update(['ED' => $request->startdate, 'ENDDATE' => $request->enddate, 'ENDTIME' => $request->endtime]);
-            return 'High Messaging task updated';
+                ->update(['ED' => $currentDateAndTime, 'ENDDATE' => $currentDateAndTime, 'ENDTIME' => $currentTime]);
+            return 'Record updated';
         } else {
             TnaEntry::create(array_merge($default, [
                 'EMPLOYEECODE' => $request->employeecode,
                 'JOBCODE' => $request->jobcode,
             ]));
-            return 'High Messaging task created';
+            return 'Record created';
         }
+
+
+
+        // $default = $this->getDefaultTnaData(
+        //     $request->employeecode,
+        //     $request->jobcode,
+        //     $request->startdate,
+        //     $request->starttime,
+        //     $request->tas_data_from
+        // );
+
+        // $exists = $this->checkJobCardPunchingStatus($request->employeecode, $request->jobcode);
+
+        // if ($exists) {
+
+        //     TnaEntry::where('EMPLOYEECODE', $request->employeecode)
+        //         ->where('JOBCODE', $request->jobcode)
+        //         ->whereNull('ED')
+        //         ->update(['ED' => $request->startdate, 'ENDDATE' => $request->enddate, 'ENDTIME' => $request->endtime]);
+        //     return 'High Messaging task updated';
+        // } else {
+        //     TnaEntry::create(array_merge($default, [
+        //         'EMPLOYEECODE' => $request->employeecode,
+        //         'JOBCODE' => $request->jobcode,
+        //     ]));
+        //     return 'High Messaging task created';
+        // }
     }
 
 
     public function updateSMSTask($request)
     {
-       $default = $this->getDefaultTnaData(
+
+         $currentDateAndTime = Carbon::now();
+
+        $currentTime = $currentDateAndTime->format('H') . '.' . $currentDateAndTime->format('i');
+
+        $default = $this->getDefaultTnaData(
             $request->employeecode,
             $request->jobcode,
-            $request->startdate,
-            $request->starttime,
-            $request->tas_data_from
+            $currentDateAndTime,
+            $currentTime,
+            $request->tas_data_from,
+            '2025-10-12',
+            '18:00'
         );
+
 
         $exists = $this->checkJobCardPunchingStatus($request->employeecode, $request->jobcode);
 
@@ -109,15 +151,41 @@ class TnaService
             TnaEntry::where('EMPLOYEECODE', $request->employeecode)
                 ->where('JOBCODE', $request->jobcode)
                 ->whereNull('ED')
-                ->update(['ED' => $request->startdate, 'ENDDATE' => $request->enddate, 'ENDTIME' => $request->endtime]);
-            return 'SMS task updated';
+                ->update(['ED' => $currentDateAndTime, 'ENDDATE' => $currentDateAndTime, 'ENDTIME' => $currentTime]);
+            return 'Record updated';
         } else {
             TnaEntry::create(array_merge($default, [
                 'EMPLOYEECODE' => $request->employeecode,
                 'JOBCODE' => $request->jobcode,
             ]));
-            return 'SMS task created';
+            return 'Record created';
         }
+
+        
+    //    $default = $this->getDefaultTnaData(
+    //         $request->employeecode,
+    //         $request->jobcode,
+    //         $request->startdate,
+    //         $request->starttime,
+    //         $request->tas_data_from
+    //     );
+
+    //     $exists = $this->checkJobCardPunchingStatus($request->employeecode, $request->jobcode);
+
+    //     if ($exists) {
+
+    //         TnaEntry::where('EMPLOYEECODE', $request->employeecode)
+    //             ->where('JOBCODE', $request->jobcode)
+    //             ->whereNull('ED')
+    //             ->update(['ED' => $request->startdate, 'ENDDATE' => $request->enddate, 'ENDTIME' => $request->endtime]);
+    //         return 'SMS task updated';
+    //     } else {
+    //         TnaEntry::create(array_merge($default, [
+    //             'EMPLOYEECODE' => $request->employeecode,
+    //             'JOBCODE' => $request->jobcode,
+    //         ]));
+    //         return 'SMS task created';
+    //     }
     }
 
 
@@ -158,10 +226,16 @@ class TnaService
     // Returns true if a record with ED = null exists
     private function checkJobCardPunchingStatus($EMPLOYEECODE, $JOBCODE)
     {
-        return DB::table('deporepair.tna_entry_duplicate')
-            ->where('EMPLOYEECODE', $EMPLOYEECODE)
-            //->where('JOBCODE', $job_code)
-            ->whereNull('ED')
-            ->exists();
+
+        return TnaEntry::where('EMPLOYEECODE', $EMPLOYEECODE)
+                //->where('JOBCODE', $job_code)
+                ->whereNull('ED')
+                ->exists();
+
+        // return DB::table('deporepair.tna_entry_duplicate')
+        //     ->where('EMPLOYEECODE', $EMPLOYEECODE)
+        //     //->where('JOBCODE', $job_code)
+        //     ->whereNull('ED')
+        //     ->exists();
     }
 }
