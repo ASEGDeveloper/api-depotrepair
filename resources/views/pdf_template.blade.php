@@ -4,13 +4,14 @@
 <head>
     <meta charset="utf-8">
     <style>
+ 
         body {
             font-family: DejaVu Sans, sans-serif;
             margin: 0;
             padding: 15px;
             font-size: 12px;
         }
-
+ 
         /* --- Header Styles --- */
 
         /* Header Table - Standard Layout */
@@ -247,10 +248,10 @@
         @page {
             size: A4 portrait;
             /* Reset to standard margins, no need for large top margin */
-            margin-top: 15mm;
-            margin-bottom: 15mm;
-            margin-left: 15mm;
-            margin-right: 15mm;
+            margin-top: 7mm;
+            margin-bottom: 7mm;
+            margin-left: 2mm;
+            margin-right: 2mm;
         }
 
 
@@ -273,7 +274,7 @@
         }
 
         .image-table img {
-            max-height: 250px;
+            max-height: 200px;
             object-fit: contain;
         }
     </style>
@@ -420,33 +421,38 @@
 
 
 
-        <table width="100%"
-       cellspacing="0"
-       cellpadding="6"
-       style="border-collapse: collapse; margin: 0.25in;">
+        <table width="100%" cellspacing="0" cellpadding="0"
+       style="border-collapse: collapse; margin: 0;">
     <tbody>
         @foreach(array_chunk($data['images'], 2) as $imageRow)
         <tr class="no-break">
             @foreach($imageRow as $img)
-            <td style="width: 50%; text-align: center; vertical-align: top;">
-                <img src="{{ $img['image_data'] }}"
-                    alt="Inspection Image"
-                    style="
-                        width: 260px;
-                        height: 190px;
-                        object-fit: cover;
-                        display: block;
-                        margin: 0 auto 6px auto;
-                        border: 1px solid #999;
-                    ">
+            <td style="width: 50%; padding: 1mm; text-align: center; vertical-align: top;">
 
-                <div style="font-size: 12px; padding: 4px 0;">
+                <!-- Fixed image container -->
+                <div style="
+                    width: 100%;
+                    height: 220px;
+                    overflow: hidden;
+                    border: 1px solid #888;
+                ">
+                    <img src="{{ $img['image_data'] }}"
+                         alt="Inspection Image"
+                         style="
+                            width: 100%;
+                            height: 100%;
+                            object-fit: cover;
+                            display: block;
+                         ">
+                </div>
+
+                <div style="font-size: 10.5pt; padding-top: 1mm;">
                     {{ $img['description'] ?? 'No description' }}
                 </div>
+
             </td>
             @endforeach
 
-            {{-- Fill empty cell if only 1 image in row --}}
             @if(count($imageRow) < 2)
                 <td style="width: 50%;"></td>
             @endif
@@ -454,6 +460,9 @@
         @endforeach
     </tbody>
 </table>
+
+
+
 
 
 

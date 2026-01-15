@@ -23,7 +23,7 @@ class InspectionService
         $signature =  $this->getSignature($inspectionID); 
          $inspection->signature = $signature;
          $surSignature =  $this->getSurSignature($inspectionID);
-          $inspection->surveyor = $surSignature;
+         $inspection->surveyor = $surSignature;
          $inspection->logo =  $this->getLogo();
        
 
