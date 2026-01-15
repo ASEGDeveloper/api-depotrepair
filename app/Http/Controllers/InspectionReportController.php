@@ -487,7 +487,7 @@ class InspectionReportController extends Controller
             ->where('inspection_id', $id)
             ->where('is_deleted', 0)
             ->select('id', 'inspection_id', 'description', 'image_data')
-            ->orderBy('id', 'DESC')
+            ->orderBy('id', 'ase')
             ->get();
         if (!$images) {
             return response()->json(['message' => 'Inspection not found.'], 404);
