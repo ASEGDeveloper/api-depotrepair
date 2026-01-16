@@ -21,10 +21,10 @@ class InspectionService
         $images =  $this->getInspectionImages($inspectionID);
         $inspection->images = $images;
         $signature =  $this->getSignature($inspectionID); 
-         $inspection->signature = $signature;
-         $surSignature =  $this->getSurSignature($inspectionID);
-         $inspection->surveyor = $surSignature;
-         $inspection->logo =  $this->getLogo();
+        $inspection->signature = $signature;
+        $surSignature =  $this->getSurSignature($inspectionID);
+        $inspection->surveyor = $surSignature;
+        $inspection->logo =  $this->getLogo();
        
 
         if (!$inspection) {
