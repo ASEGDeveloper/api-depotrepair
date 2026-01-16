@@ -308,15 +308,89 @@ class InspectionReportController extends Controller
                 ];
 
                 // Add image data if uploaded
-                if ($imageFile && $imageFile->isValid()) { 
+                // if ($imageFile && $imageFile->isValid()) { 
                      
-                    $binary = file_get_contents($imageFile->getRealPath()); 
-                    $mimeType = $imageFile->getClientMimeType(); 
-                    $base64Data = base64_encode($binary);
-                    $dataURI = "data:{$mimeType};base64,{$base64Data}";  
-                    $data['image_data'] = $dataURI;
-                    $data['original_filename'] = $imageFile->getClientOriginalName();
-                }
+                //     $binary = file_get_contents($imageFile->getRealPath()); 
+                //     $mimeType = $imageFile->getClientMimeType(); 
+                //     $base64Data = base64_encode($binary);
+                //     $dataURI = "data:{$mimeType};base64,{$base64Data}";  
+                //     $data['image_data'] = $dataURI;
+                //     $data['original_filename'] = $imageFile->getClientOriginalName();
+                // }
+
+
+if ($imageFile && $imageFile->isValid()) {
+
+    $sourcePath = $imageFile->getRealPath();
+    $mimeType   = $imageFile->getClientMimeType();
+
+    // Target size
+    $targetWidth = 760;
+
+    // Get original image size
+    list($width, $height) = getimagesize($sourcePath);
+    $ratio = $width / $height;
+    $targetHeight = intval($targetWidth / $ratio);
+
+    // Create source image
+    switch ($mimeType) {
+        case 'image/jpeg':
+            $sourceImage = imagecreatefromjpeg($sourcePath);
+            break;
+        case 'image/png':
+            $sourceImage = imagecreatefrompng($sourcePath);
+            break;
+        case 'image/webp':
+            $sourceImage = imagecreatefromwebp($sourcePath);
+            break;
+        default:
+            throw new Exception('Unsupported image type');
+    }
+
+    // Create resized image
+    $resizedImage = imagecreatetruecolor($targetWidth, $targetHeight);
+
+    // Preserve transparency for PNG
+    if ($mimeType === 'image/png') {
+        imagealphablending($resizedImage, false);
+        imagesavealpha($resizedImage, true);
+    }
+
+    imagecopyresampled(
+        $resizedImage,
+        $sourceImage,
+        0, 0, 0, 0,
+        $targetWidth,
+        $targetHeight,
+        $width,
+        $height
+    );
+
+    // Capture output buffer
+    ob_start();
+    if ($mimeType === 'image/jpeg') {
+        imagejpeg($resizedImage, null, 75); // quality 75%
+    } elseif ($mimeType === 'image/png') {
+        imagepng($resizedImage, null, 6);
+    } elseif ($mimeType === 'image/webp') {
+        imagewebp($resizedImage, null, 75);
+    }
+    $imageData = ob_get_clean();
+
+    // Free memory
+    imagedestroy($sourceImage);
+    imagedestroy($resizedImage);
+
+    // Convert to Base64
+    $base64Data = base64_encode($imageData);
+    $dataURI = "data:{$mimeType};base64,{$base64Data}";
+
+    $data['image_data'] = $dataURI;
+    $data['original_filename'] = $imageFile->getClientOriginalName();
+}
+
+
+
 
        
                 $newId = DB::table('deporepair.inspection_images')->insertGetId($data);
