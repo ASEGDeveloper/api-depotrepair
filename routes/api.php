@@ -8,6 +8,9 @@ use App\Http\Controllers\InspectionReportController;
 use App\Http\Controllers\InstallBaseController;
 use App\Http\Controllers\ItemMasterController;
 use App\Http\Controllers\TnaEntryController;
+use App\Http\Controllers\HMController;
+
+
 use Tests\Feature\TnaControllerTest;
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -15,6 +18,12 @@ Route::post('refresh', [AuthController::class, 'refresh']);
 
 
 Route::middleware('api.token')->post('/tna-entries', [TnaEntryController::class, 'createOrUpdateTNAEntry']);
+
+Route::middleware('api.token')->post('/hm/records', [HMController::class, 'store'])->name('hm.records.store');
+
+Route::middleware('api.token')
+    ->post('/hm/full', [HMController::class, 'addFullRecords'])
+    ->name('hm.full.addFullRecords');
 
 Route::post('/test-tna', [TnaControllerTest::class, 'createOrUpdateTNAEntry']);  
 

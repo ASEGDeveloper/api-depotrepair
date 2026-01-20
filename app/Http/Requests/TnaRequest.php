@@ -24,8 +24,7 @@ class TnaRequest extends FormRequest
           return [ 
             'employeecode' => 'required',
             'jobcode' => 'required',
-            'tas_data_from' => 'required',
-            'source'=>'required'
+            'tas_data_from' => 'required', 
           ];
     }
 
@@ -34,8 +33,7 @@ class TnaRequest extends FormRequest
         return [
             'employeecode.required' => 'Employee Code is required.', 
             'jobcode.required'      => 'Job Code is required.',
-            'tas_data_from.required'=> 'Time In is required.',
-            'source.required'=> 'Source is  required.',
+            'tas_data_from.required'=> 'Time In is required.' 
         ];
     }
 

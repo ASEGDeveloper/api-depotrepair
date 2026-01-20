@@ -224,18 +224,16 @@ class TnaService
 
 
     // Returns true if a record with ED = null exists
-    private function checkJobCardPunchingStatus($EMPLOYEECODE, $JOBCODE)
-    {
-
+    public function checkJobCardPunchingStatus($EMPLOYEECODE, $JOBCODE)
+    { 
         return TnaEntry::where('EMPLOYEECODE', $EMPLOYEECODE)
                 //->where('JOBCODE', $job_code)
-                ->whereNull('ED')
-                ->exists();
-
-        // return DB::table('deporepair.tna_entry_duplicate')
-        //     ->where('EMPLOYEECODE', $EMPLOYEECODE)
-        //     //->where('JOBCODE', $job_code)
-        //     ->whereNull('ED')
-        //     ->exists();
+               //  ->whereNull('ED')
+                ->whereNull('ENDTIME')
+                ->exists(); 
     }
+
+
+  
+
 }
