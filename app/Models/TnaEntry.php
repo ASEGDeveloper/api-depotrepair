@@ -48,6 +48,7 @@ class TnaEntry extends Model
         'UPDATED_BY',
         'UPDATED_ON',
         'LOGIN_ID',
+        'Action'
 ];
  
 

@@ -43,6 +43,7 @@ class HMService
                     'TAS_DATA_FROM'      => $request->tas_data_from,
                     'PROJECTEDENDDATE'   => '2025-10-12',
                     'PROJECTEDENDTIME'   => '18:00',
+                    'Action'    =>'Start'       
                 ]);
             });
 
@@ -77,7 +78,8 @@ public function updateHM($request): array
                 ->update([
                     'ENDDATE' => $request->enddate,
                     'ENDTIME' => $request->endtime,
-                    'ED'  => $request->enddate                     
+                    'ED'  => $request->enddate,
+                    'Action'    =>'Closed'                 
                 ]);
 
             if ($affectedRows === 0) {
@@ -107,7 +109,7 @@ public function updateHM($request): array
 
 
 
- public function fullCreateHM($request)
+ public function createFullHM($request)
     {
         try {
             // Check if job card is already open
@@ -131,12 +133,13 @@ public function updateHM($request): array
                     'STARTDATE'          => $request->startdate,
                     'STARTTIME'          => $request->starttime,
                     'ED'                 => $request->startdate,
-                     'SD'  => $request->enddate,  
+                    'SD'  => $request->enddate,  
                     'ENDDATE' => $request->enddate,
                     'ENDTIME' => $request->endtime,                   
                     'TAS_DATA_FROM'      => $request->tas_data_from,
                     'PROJECTEDENDDATE'   => '2025-10-12',
                     'PROJECTEDENDTIME'   => '18:00',
+                    'Action'    =>'Full'  
                 ]);
             });
 

@@ -234,6 +234,19 @@ class TnaService
     }
 
 
+
+public function isTaskOpen(string $employeeCode, string $jobCode): bool
+{
+    return TnaEntry::where('employeecode', $employeeCode)
+        ->where('jobcode', $jobCode)
+        ->where(function ($query) {
+            $query->whereNull('enddate')
+                  ->orWhereNull('endtime');
+        })
+        ->exists();
+}
+
+
   
 
 }
