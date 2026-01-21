@@ -17,9 +17,7 @@ class HMService
     }
 
     public function createHM($request): array
-    {
-
-   
+    { 
         try {
             // Check if job card is already open
             $isJobOpen = $this->tnaService->checkJobCardPunchingStatus(

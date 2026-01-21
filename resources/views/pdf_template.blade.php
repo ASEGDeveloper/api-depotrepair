@@ -334,7 +334,7 @@
                 <th>Outer tank material</th>
             </tr>
             <tr>
-                <td>{{ @$data['manufacturerSerialNo'] ?? 'N/A' }}</td>
+                <td>{{ @$data['serialNumber'] ?? 'N/A' }}</td>
                 <td>{{ @$data['mawp'] ?? 'N/A' }}</td>
                 <td>{{ @$data['Inner_Tank_Material'] ?? 'N/A' }}</td>
                 <td>{{ @$data['Outer_Tank_Material'] ?? 'N/A' }}</td>

@@ -18,9 +18,7 @@ use Illuminate\Validation\Rule;
 
 
 class InspectionReportController extends Controller
-{
-
-
+{ 
     protected $inspectionService;
 
     public function __construct(InspectionService $inspectionService)

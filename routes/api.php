@@ -10,7 +10,6 @@ use App\Http\Controllers\ItemMasterController;
 use App\Http\Controllers\TnaEntryController;
 use App\Http\Controllers\HMController;
 
-
 use Tests\Feature\TnaControllerTest;
 
 Route::post('/login', [AuthController::class, 'login']);
