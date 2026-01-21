@@ -4,14 +4,13 @@
 <head>
     <meta charset="utf-8">
     <style>
- 
         body {
             font-family: DejaVu Sans, sans-serif;
             margin: 0;
             padding: 15px;
             font-size: 12px;
         }
- 
+
         /* --- Header Styles --- */
 
         /* Header Table - Standard Layout */
@@ -285,9 +284,7 @@
     <table class="pdf-header">
         <tr>
             <td style="width: 50%; text-align: left;">
-                <img src="{{ @$data['logo']['logo'] }}"
-                    alt="Logo"
-                    style="max-width: 200px; height: auto;">
+                <img src="{{ @$data['logo']['logo'] }}" alt="Logo" style="max-width: 200px; height: auto;">
             </td>
             <td class="company-info" style="text-align: right;">
                 <div class="company-title">CRYOTECH MIDDLE EAST L.L.C.</div>
@@ -297,7 +294,7 @@
                 <div>Email: <a href="mailto:service@cryotechme.com">service@cryotechme.com</a></div>
             </td>
         </tr>
-    </table> 
+    </table>
 
 
     <div class="page-content">
@@ -324,7 +321,8 @@
             <tr>
                 <td>{{ @$data['Manufacturer'] ?? 'N/A' }}</td>
                 <td>{{ @$data['Un_Portable_Tank_Type'] ?? 'N/A' }}</td>
-                <td> {{ isset($data['Survey_Date']) ? \Carbon\Carbon::parse($data['Survey_Date'])->format('m/d/Y') : 'N/A' }}</td>
+                <td> {{ isset($data['Survey_Date']) ? \Carbon\Carbon::parse($data['Survey_Date'])->format('m/d/Y') : 'N/A' }}
+                </td>
                 <td>{{ @$data['Location_of_Inspection'] ?? 'N/A' }}</td>
             </tr>
 
@@ -352,9 +350,9 @@
                 <td>{{ @$data['Max_Gross_Weight_kg'] ?? 'N/A' }}</td>
                 <td>{{ @$data['Tare_Weight_kg'] ?? 'N/A' }}</td>
                 <td>{{ @$data['Capacity_L'] ?? 'N/A' }}</td>
-               <td> 
-                   {{ isset($data['Next_CSC_Due']) ? strtoupper(\Carbon\Carbon::parse($data['Next_CSC_Due'])->format('M/Y')) : 'N/A' }}
- 
+                <td>
+                    {{ isset($data['Next_CSC_Due']) ? strtoupper(\Carbon\Carbon::parse($data['Next_CSC_Due'])->format('M/Y')) : 'N/A' }}
+
                 </td>
             </tr>
 
@@ -365,21 +363,21 @@
                 <th>Next test Due (MM-YY)</th>
             </tr>
             <tr>
-                <td>  
-                 {{ isset($data['Initial_Test_MMM_YY']) ? strtoupper(\Carbon\Carbon::parse($data['Initial_Test_MMM_YY'])->format('M/Y')) : 'N/A' }}
- 
-                </td>
-                <td>  
-                 {{ isset($data['Last_2_5yr_Test_MMM_YY']) ? strtoupper(\Carbon\Carbon::parse($data['Last_2_5yr_Test_MMM_YY'])->format('M/Y')) : 'N/A' }}
+                <td>
+                    {{ isset($data['Initial_Test_MMM_YY']) ? strtoupper(\Carbon\Carbon::parse($data['Initial_Test_MMM_YY'])->format('M/Y')) : 'N/A' }}
 
                 </td>
                 <td>
-                  {{ isset($data['Last_5yr_Test_MMM_YY']) ? strtoupper(\Carbon\Carbon::parse($data['Last_5yr_Test_MMM_YY'])->format('M/Y')) : 'N/A' }}
+                    {{ isset($data['Last_2_5yr_Test_MMM_YY']) ? strtoupper(\Carbon\Carbon::parse($data['Last_2_5yr_Test_MMM_YY'])->format('M/Y')) : 'N/A' }}
 
-               </td>
-                <td> 
+                </td>
+                <td>
+                    {{ isset($data['Last_5yr_Test_MMM_YY']) ? strtoupper(\Carbon\Carbon::parse($data['Last_5yr_Test_MMM_YY'])->format('M/Y')) : 'N/A' }}
 
-                  {{ isset($data['Next_Test_Due_MMM_YY']) ? strtoupper(\Carbon\Carbon::parse($data['Next_Test_Due_MMM_YY'])->format('M/Y')) : 'N/A' }} 
+                </td>
+                <td>
+
+                    {{ isset($data['Next_Test_Due_MMM_YY']) ? strtoupper(\Carbon\Carbon::parse($data['Next_Test_Due_MMM_YY'])->format('M/Y')) : 'N/A' }}
                 </td>
             </tr>
 
@@ -397,7 +395,7 @@
             </tr>
 
 
-            
+
 
 
         </table>
@@ -406,7 +404,8 @@
         <table class="content-table">
 
             <tr>
-                <td colspan="4" style="padding: 6px; font-weight: bold; background: rgb(241, 241, 241); border: 1px solid rgb(0, 0, 0);">
+                <td colspan="4"
+                    style="padding: 6px; font-weight: bold; background: rgb(241, 241, 241); border: 1px solid rgb(0, 0, 0);">
                     Comments:
                 </td>
             </tr>
@@ -421,45 +420,47 @@
 
 
 
-        <table width="100%" cellspacing="0" cellpadding="0"
-       style="border-collapse: collapse; margin: 0;">
-    <tbody>
-        @foreach(array_chunk($data['images'], 2) as $imageRow)
-        <tr class="no-break">
-            @foreach($imageRow as $img)
-            <td style="width: 50%; padding: 1mm; text-align: center; vertical-align: top;">
+        <table width="100%" cellspacing="0" cellpadding="0" style="border-collapse: collapse; margin: 0;">
+            <tbody>
+                @foreach(array_chunk($data['images'], 2) as $imageRow)
+                    <tr class="no-break">
+                        @foreach($imageRow as $img)
+                            <td style="width: 50%; padding: 1mm; text-align: center; vertical-align: top;">
 
-                <!-- Fixed image container -->
-                <div style="
-                    width: 100%;
-                    height: 220px;
-                    overflow: hidden;
-                    border: 1px solid #888;
-                ">
-                    <img src="{{ $img['image_data'] }}"
-                         alt="Inspection Image"
-                         style="
-                            width: 100%;
-                            height: 100%;
-                            object-fit: cover;
-                            display: block;
-                         ">
-                </div>
+                                <!-- Flexible image container -->
+                                <div style="
+                                    width: 100%;
+                                    max-height: 220px;
+                                    overflow: hidden;
+                                    border: 1px solid #888;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                ">
+                                    <img src="{{ $img['image_data'] }}" alt="Inspection Image" style="
+                                        max-width: 100%;
+                                        max-height: 220px;
+                                        height: auto;
+                                        width: auto;
+                                        object-fit: contain;
+                                        display: block;
+                                    ">
+                                </div>
 
-                <div style="font-size: 10.5pt; padding-top: 1mm;">
-                    {{ $img['description'] ?? 'No description' }}
-                </div>
+                                <div style="font-size: 10.5pt; padding-top: 1mm; text-align: left;">
+                                    {{ $img['description'] ?? 'No description' }}
+                                </div>
 
-            </td>
-            @endforeach
+                            </td>
+                        @endforeach
 
-            @if(count($imageRow) < 2)
-                <td style="width: 50%;"></td>
-            @endif
-        </tr>
-        @endforeach
-    </tbody>
-</table>
+                        @if(count($imageRow) < 2)
+                            <td style="width: 50%;"></td>
+                        @endif
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
 
 
 
@@ -474,74 +475,76 @@
 
                     {{-- LEFT SIDE — CUSTOMER SIGNATURE --}}
                     @if(!empty($data['signature']['custSignatureName']))
-                    <td style="width: 50%; vertical-align: top; padding: 8px;">
+                        <td style="width: 50%; vertical-align: top; padding: 8px;">
 
-                        <div style="font-weight: bold; margin-bottom: 6px;">Customer Signature</div>
+                            <div style="font-weight: bold; margin-bottom: 6px;">Customer Signature</div>
 
-                        <table width="100%" style="font-size: 12px;">
-                            <tr>
-                                <td>
-                                    <strong>Customer Name:</strong>
-                                    {{ $data['signature']['custSignatureName'] ?? 'N/A' }}
-                                </td>
-                            </tr>
+                            <table width="100%" style="font-size: 12px;">
+                                <tr>
+                                    <td>
+                                        <strong>Customer Name:</strong>
+                                        {{ $data['signature']['custSignatureName'] ?? 'N/A' }}
+                                    </td>
+                                </tr>
 
-                            <tr>
-                                <td>
-                                    @if(!empty($data['signature']['signature_data']))
-                                    <img src="data:image/png;base64,{{ $data['signature']['signature_data'] }}"
-                                        alt="Customer Signature"
-                                        style="max-width: 200px; height: auto; margin-top: 5px;">
-                                    @endif
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td>
+                                        @if(!empty($data['signature']['signature_data']))
+                                            <img src="data:image/png;base64,{{ $data['signature']['signature_data'] }}"
+                                                alt="Customer Signature"
+                                                style="max-width: 200px; height: auto; margin-top: 5px;">
+                                        @endif
+                                    </td>
+                                </tr>
 
-                            <tr>
-                                <td><strong>Date:</strong> {{ $data['signature']['date'] ?? 'N/A' }}</td>
-                            </tr>
-                        </table>
+                                <tr>
+                                    <td><strong>Date:</strong> {{ $data['signature']['date'] ?? 'N/A' }}</td>
+                                </tr>
+                            </table>
 
-                    </td>
+                        </td>
                     @else
-                    {{-- If no customer signature, left cell stays empty --}}
-                    <td style="width: 50%; padding: 8px;"></td>
+                        {{-- If no customer signature, left cell stays empty --}}
+                        <td style="width: 50%; padding: 8px;"></td>
                     @endif
 
 
 
                     {{-- RIGHT SIDE — SURVEYOR SIGNATURE (Always stays Right) --}}
-                    <td class="surveyor-align-right" style="width: 50%; vertical-align: top; padding: 8px; text-align: right;">
+                    <td class="surveyor-align-right"
+                        style="width: 50%; vertical-align: top; padding: 8px; text-align: right;">
 
                         @if(!empty($data['surveyor']['Surveyor_Name']))
-                        {{-- The div containing the heading will be right-aligned by the parent <td>'s style --}}
-                        <div style="font-weight: bold; margin-bottom: 6px;">Surveyor Signature</div>
+                                {{-- The div containing the heading will be right-aligned by the parent
+                            <td>'s style --}}
+                                <div style="font-weight: bold; margin-bottom: 6px;">Surveyor Signature</div>
 
-                        <table width="100%" style="font-size: 12px;">
-                            <tr>
-                                {{-- MODIFICATION 1: Ensure the Name field is right-aligned --}}
-                                <td style="text-align: right;">
-                                    <strong>Surveyor Name:</strong>
-                                    {{ $data['surveyor']['Surveyor_Name'] ?? 'N/A' }}
-                                </td>
-                            </tr>
+                                <table width="100%" style="font-size: 12px;">
+                                    <tr>
+                                        {{-- MODIFICATION 1: Ensure the Name field is right-aligned --}}
+                                        <td style="text-align: right;">
+                                            <strong>Surveyor Name:</strong>
+                                            {{ $data['surveyor']['Surveyor_Name'] ?? 'N/A' }}
+                                        </td>
+                                    </tr>
 
-                            <tr>
-                                {{-- MODIFICATION 2: Ensure the Signature image block is right-aligned --}}
-                                <td style="text-align: right;">
-                                    @if(!empty($data['surveyor']['signature_data']))
-                                    <img
-                                        src="data:image/png;base64,{{ $data['surveyor']['signature_data'] }}"
-                                        alt="Surveyor Signature"
-                                        style="max-width: 200px; height: auto; margin-top: 5px;">
-                                    @endif
-                                </td>
-                            </tr>
+                                    <tr>
+                                        {{-- MODIFICATION 2: Ensure the Signature image block is right-aligned --}}
+                                        <td style="text-align: right;">
+                                            @if(!empty($data['surveyor']['signature_data']))
+                                                <img src="data:image/png;base64,{{ $data['surveyor']['signature_data'] }}"
+                                                    alt="Surveyor Signature"
+                                                    style="max-width: 200px; height: auto; margin-top: 5px;">
+                                            @endif
+                                        </td>
+                                    </tr>
 
-                            <tr>
-                                {{-- MODIFICATION 3: Ensure the Date field is right-aligned --}}
-                                <td style="text-align: right;"><strong>Date:</strong> {{ $data['surveyor']['date'] ?? 'N/A' }}</td>
-                            </tr>
-                        </table>
+                                    <tr>
+                                        {{-- MODIFICATION 3: Ensure the Date field is right-aligned --}}
+                                        <td style="text-align: right;"><strong>Date:</strong>
+                                            {{ $data['surveyor']['date'] ?? 'N/A' }}</td>
+                                    </tr>
+                                </table>
                         @endif
 
                     </td>
