@@ -163,8 +163,13 @@ class HMController extends Controller
 
     private function handleTaskServer(Request $request)
     {
-        // Task Server logic
-        return response()->json(['message' => 'Task server logic pending']);
+        $input = json_decode($request->getContent());
+
+        if (!$input) {
+            return $this->errorResponse('Invalid JSON payload', 422);
+        }
+
+       return $this->tnaService->updateTnaTask( $input);
     }
 
 
