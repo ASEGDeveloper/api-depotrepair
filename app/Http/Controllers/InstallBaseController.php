@@ -338,16 +338,16 @@ public function searchInstallBase(Request $request)
             ->leftJoin('deporepair.inspection_report_dpr as ird', function ($join) {
                 $join->on('ird.serialNumber', '=', 'ibi.Serial_Numbers');
             })
-            ->where(function ($q) {
-                $q->whereNull('ird.serialNumber')
-                  ->orWhere('ird.serialNumber', '');
-            })
+            // ->where(function ($q) {
+            //     $q->whereNull('ird.serialNumber')
+            //       ->orWhere('ird.serialNumber', '');
+            // })
             ->select(
                 'ib.ID',
                 'cd.CustomerName as Customer_Name',
                 'ibi.Item_Numbers',
                 'ibi.Serial_Numbers',
-               // DB::raw('NULL as InspectionReportID')
+                DB::raw('NULL as InspectionReportID')
             );
 
         // Apply filters safely
