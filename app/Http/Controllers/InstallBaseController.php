@@ -355,9 +355,12 @@ public function searchInstallBase(Request $request)
             $query->where('cd.CustomerName', 'LIKE', '%' . trim($request->Customer_Name) . '%');
         }
 
-        if ($request->filled('Item_Numbers')) {
-            $query->where('ibi.Item_Numbers', 'LIKE', '%' . trim($request->Item_Numbers) . '%');
-        }
+            if ($request->filled('Item_Numbers')) {
+                $query->whereRaw(
+                    "TRIM(ibi.Item_Numbers) LIKE ?",
+                    ['%' . trim($request->Item_Numbers) . '%']
+                );
+            }
 
         if ($request->filled('Serial_Numbers')) {
             $query->where('ibi.Serial_Numbers', 'LIKE', '%' . trim($request->Serial_Numbers) . '%');
