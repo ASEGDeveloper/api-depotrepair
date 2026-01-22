@@ -347,7 +347,7 @@ public function searchInstallBase(Request $request)
                 'cd.CustomerName as Customer_Name',
                 'ibi.Item_Numbers',
                 'ibi.Serial_Numbers',
-                DB::raw('NULL as InspectionReportID')
+               // DB::raw('NULL as InspectionReportID')
             );
 
         // Apply filters safely
