@@ -280,45 +280,99 @@ public function getInstallBase(Request $request)
     // }
 
 
+// public function searchInstallBase(Request $request)
+// {  
+//     try {
+//         $query = DB::table('deporepair.installbase_dpr as ib')
+//             ->join('deporepair.installbase_items_dpr as ibi', 'ib.ID', '=', 'ibi.installbase_id')
+//             ->join('deporepair.customers_dpr as cd', 'cd.ID', '=', 'ib.customerID')
+//             ->leftJoin('deporepair.inspection_report_dpr as ird', 'ird.serialNumber', '=', 'ibi.Serial_Numbers')
+//             ->whereNull('ird.serialNumber')
+//             ->select(
+//                 'ib.ID',
+//                 'cd.CustomerName as Customer_Name',
+//                 'ibi.Item_Numbers',
+//                 'ibi.Serial_Numbers',
+//                 'ird.id as InspectionReportID',
+//             );
+//            // ->where("ird.serialNumber", '==','');  
+
+        
+//          if (!empty($request->Customer_Name)) {
+//             $query->where('cd.CustomerName', 'LIKE', '%' . $request->Customer_Name . '%');
+//         }
+ 
+
+//         // Specific filters applied individually
+//         if (!empty($request->Item_Numbers)) {
+//             $query->where('ibi.Item_Numbers', 'LIKE', '%' . $request->Item_Numbers . '%');
+//         }
+
+//         if (!empty($request->Serial_Numbers)) {
+//             $query->where('ibi.Serial_Numbers', 'LIKE', '%' . $request->Serial_Numbers . '%');
+//         }
+        
+//         $results = $query->orderBy('ib.ID', 'desc')->get();
+
+//         return response()->json([
+//             'status'  => 'success',
+//             'message' => $results->isEmpty() ? 'No matching records found.' : 'Install base records fetched successfully.',
+//             'data'    => $results
+//         ]);
+//     } catch (\Exception $e) {
+//         return response()->json([
+//             'status'  => 'error',
+//             'message' => 'Failed to search install base records.',
+//             'error'   => $e->getMessage(),
+//         ], 500);
+//     }
+// }
+
+
 public function searchInstallBase(Request $request)
-{  
+{
     try {
         $query = DB::table('deporepair.installbase_dpr as ib')
             ->join('deporepair.installbase_items_dpr as ibi', 'ib.ID', '=', 'ibi.installbase_id')
             ->join('deporepair.customers_dpr as cd', 'cd.ID', '=', 'ib.customerID')
-            ->leftJoin('deporepair.inspection_report_dpr as ird', 'ird.serialNumber', '=', 'ibi.Serial_Numbers')
-            ->whereNull('ird.serialNumber')
+            ->leftJoin('deporepair.inspection_report_dpr as ird', function ($join) {
+                $join->on('ird.serialNumber', '=', 'ibi.Serial_Numbers');
+            })
+            ->where(function ($q) {
+                $q->whereNull('ird.serialNumber')
+                  ->orWhere('ird.serialNumber', '');
+            })
             ->select(
                 'ib.ID',
                 'cd.CustomerName as Customer_Name',
                 'ibi.Item_Numbers',
                 'ibi.Serial_Numbers',
-                'ird.id as InspectionReportID',
+                DB::raw('NULL as InspectionReportID')
             );
-           // ->where("ird.serialNumber", '==','');  
 
-        
-         if (!empty($request->Customer_Name)) {
-            $query->where('cd.CustomerName', 'LIKE', '%' . $request->Customer_Name . '%');
-        }
- 
-
-        // Specific filters applied individually
-        if (!empty($request->Item_Numbers)) {
-            $query->where('ibi.Item_Numbers', 'LIKE', '%' . $request->Item_Numbers . '%');
+        // Apply filters safely
+        if ($request->filled('Customer_Name')) {
+            $query->where('cd.CustomerName', 'LIKE', '%' . trim($request->Customer_Name) . '%');
         }
 
-        if (!empty($request->Serial_Numbers)) {
-            $query->where('ibi.Serial_Numbers', 'LIKE', '%' . $request->Serial_Numbers . '%');
+        if ($request->filled('Item_Numbers')) {
+            $query->where('ibi.Item_Numbers', 'LIKE', '%' . trim($request->Item_Numbers) . '%');
         }
-        
-        $results = $query->orderBy('ib.ID', 'desc')->get();
+
+        if ($request->filled('Serial_Numbers')) {
+            $query->where('ibi.Serial_Numbers', 'LIKE', '%' . trim($request->Serial_Numbers) . '%');
+        }
+
+        $results = $query->orderByDesc('ib.ID')->get();
 
         return response()->json([
             'status'  => 'success',
-            'message' => $results->isEmpty() ? 'No matching records found.' : 'Install base records fetched successfully.',
+            'message' => $results->isEmpty()
+                ? 'No matching records found.'
+                : 'Install base records fetched successfully.',
             'data'    => $results
         ]);
+
     } catch (\Exception $e) {
         return response()->json([
             'status'  => 'error',
@@ -327,7 +381,6 @@ public function searchInstallBase(Request $request)
         ], 500);
     }
 }
-
 
 
 
