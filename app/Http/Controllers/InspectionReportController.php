@@ -115,18 +115,18 @@ class InspectionReportController extends Controller
             $id = $request->id ?? null;
 
             //  Check if serial number already exists (excluding current record during update)
-            $serialExists = InspectionReportModel::where('serialNumber', $request->serialNumber)
-                ->when($id, function ($q) use ($id) {
-                    $q->where('ID', '!=', $id);
-                })
-                ->exists();
+            // $serialExists = InspectionReportModel::where('serialNumber', $request->serialNumber)
+            //     ->when($id, function ($q) use ($id) {
+            //         $q->where('ID', '!=', $id);
+            //     })
+            //     ->exists();
 
-            if ($serialExists) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Serial number already exists.'
-                ], 409); // Conflict
-            }
+            // if ($serialExists) {
+            //     return response()->json([
+            //         'status' => 'error',
+            //         'message' => 'Serial number already exists.'
+            //     ], 409); // Conflict
+            // }
 
             $query = InspectionReportModel::updateOrCreate(
                 ['ID' => $id ?? 0],
@@ -159,6 +159,7 @@ class InspectionReportController extends Controller
                     'Comments' => $request->comments,
                     'Status' => $request->status,
                     'DATALOAD_TIME' => now(),
+                    'reference_id' =>$request->reference_id
                 ]
             );
 

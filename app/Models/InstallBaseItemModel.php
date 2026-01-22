@@ -25,6 +25,7 @@ class InstallBaseItemModel extends Model
         'updated_by',
         'updated_date',
         'isDeleted',
+        'reference_id'
     ];
 
     protected static function boot()

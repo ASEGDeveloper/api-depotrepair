@@ -46,7 +46,8 @@ class InspectionReportModel extends Model
     'Comments',
     'Status',
     'DATALOAD_TIME',
-    'Created_By'
+    'Created_By',
+    'reference_id'
 ];
 
 
