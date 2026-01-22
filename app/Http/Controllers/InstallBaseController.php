@@ -344,12 +344,10 @@ public function searchInstallBase(Request $request)
             // })
             //->whereNotIn('ird.Status', ['Report Generated', 'Save', 'Draft'])
 
-            ->where(function ($q) {
-                $q->whereNull('ird.Status');
+            // ->where(function ($q) {
+            //     $q->whereNull('ird.Status');
                    
-            })
-
-
+            // }) 
              
             ->select(
                 'ib.ID',
