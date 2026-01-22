@@ -135,7 +135,7 @@ class HMController extends Controller
         $validator = Validator::make((array) $input, [
             'employeecode' => 'required',
             'jobcode' => 'required',
-            'tas_data_from' => 'required|in:Highmessage',
+            'tas_data_from' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -150,8 +150,15 @@ class HMController extends Controller
 
     private function handleSms(Request $request)
     {
-        // SMS specific logic
-        return response()->json(['message' => 'SMS logic pending']);
+        
+    $input = json_decode($request->getContent());
+
+        if (!$input) {
+            return $this->errorResponse('Invalid JSON payload', 422);
+        }
+
+       return $this->tnaService->updateSMSTask( $input);
+
     }
 
     private function handleTaskServer(Request $request)

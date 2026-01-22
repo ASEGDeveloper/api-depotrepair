@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\TnaEntry;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Constants\Status;
 use Exception;
 
 class HMService
@@ -34,16 +35,22 @@ class HMService
 
             DB::transaction(function () use ($request) {
                 TnaEntry::create([
-                    'COMPANYCODE'        => $request->companycode,
+                    'COMPANYCODE'        => '01',
                     'EMPLOYEECODE'       => $request->employeecode,
                     'JOBCODE'            => $request->jobcode,
                     'STARTDATE'          => $request->startdate,
                     'STARTTIME'          => $request->starttime,
                     'SD'                 => $request->startdate,
+                    'JOBSEQNO'          => 1,
+                    'EXPORTFLAG'        => 'Y',
+                    'OPST'              => 0,
+                    'OR_UPD_FLG'        => 'U',
+                    'ENTRY_MODE'        => 'Auto',
+                    'IS_MANUAL'         => 'N',
                     'TAS_DATA_FROM'      => $request->tas_data_from,
                     'PROJECTEDENDDATE'   => '2025-10-12',
                     'PROJECTEDENDTIME'   => '18:00',
-                    'Action'    =>'Start'       
+                    'Action'    =>Status::START   
                 ]);
             });
 
@@ -79,7 +86,7 @@ public function updateHM($request): array
                     'ENDDATE' => $request->enddate,
                     'ENDTIME' => $request->endtime,
                     'ED'  => $request->enddate,
-                    'Action'    =>'Closed'                 
+                    'Action'    =>Status::CLOSED               
                 ]);
 
             if ($affectedRows === 0) {
@@ -127,7 +134,7 @@ public function updateHM($request): array
 
             DB::transaction(function () use ($request) {
                 TnaEntry::create([
-                    'COMPANYCODE'        => $request->companycode,
+                    'COMPANYCODE'        => '01',
                     'EMPLOYEECODE'       => $request->employeecode,
                     'JOBCODE'            => $request->jobcode,
                     'STARTDATE'          => $request->startdate,
@@ -135,11 +142,17 @@ public function updateHM($request): array
                     'ED'                 => $request->startdate,
                     'SD'  => $request->enddate,  
                     'ENDDATE' => $request->enddate,
-                    'ENDTIME' => $request->endtime,                   
+                    'ENDTIME' => $request->endtime,   
+                    'JOBSEQNO'          => 1,
+                    'EXPORTFLAG'        => 'Y',
+                    'OPST'              => 0,
+                    'OR_UPD_FLG'        => 'U',
+                    'ENTRY_MODE'        => 'Auto',
+                    'IS_MANUAL'         => 'N',                
                     'TAS_DATA_FROM'      => $request->tas_data_from,
                     'PROJECTEDENDDATE'   => '2025-10-12',
                     'PROJECTEDENDTIME'   => '18:00',
-                    'Action'    =>'Full'  
+                    'Action'    =>Status::FULL
                 ]);
             });
 

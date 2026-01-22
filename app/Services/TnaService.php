@@ -5,6 +5,7 @@ namespace App\Services;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\TnaEntry;
+use App\Constants\Status;
 
 class TnaService
 {
@@ -151,41 +152,19 @@ class TnaService
             TnaEntry::where('EMPLOYEECODE', $request->employeecode)
                 ->where('JOBCODE', $request->jobcode)
                 ->whereNull('ED')
-                ->update(['ED' => $currentDateAndTime, 'ENDDATE' => $currentDateAndTime, 'ENDTIME' => $currentTime]);
+                ->update(['ED' => $currentDateAndTime, 'ENDDATE' => $currentDateAndTime, 'ENDTIME' => $currentTime,'Action'=>Status::CLOSED]);
             return 'Record updated';
         } else {
             TnaEntry::create(array_merge($default, [
                 'EMPLOYEECODE' => $request->employeecode,
                 'JOBCODE' => $request->jobcode,
+                'Action'    =>Status::START
             ]));
             return 'Record created';
         }
 
         
-    //    $default = $this->getDefaultTnaData(
-    //         $request->employeecode,
-    //         $request->jobcode,
-    //         $request->startdate,
-    //         $request->starttime,
-    //         $request->tas_data_from
-    //     );
-
-    //     $exists = $this->checkJobCardPunchingStatus($request->employeecode, $request->jobcode);
-
-    //     if ($exists) {
-
-    //         TnaEntry::where('EMPLOYEECODE', $request->employeecode)
-    //             ->where('JOBCODE', $request->jobcode)
-    //             ->whereNull('ED')
-    //             ->update(['ED' => $request->startdate, 'ENDDATE' => $request->enddate, 'ENDTIME' => $request->endtime]);
-    //         return 'SMS task updated';
-    //     } else {
-    //         TnaEntry::create(array_merge($default, [
-    //             'EMPLOYEECODE' => $request->employeecode,
-    //             'JOBCODE' => $request->jobcode,
-    //         ]));
-    //         return 'SMS task created';
-    //     }
+   
     }
 
 
