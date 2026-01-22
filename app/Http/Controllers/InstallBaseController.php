@@ -342,7 +342,15 @@ public function searchInstallBase(Request $request)
             //     $q->whereNull('ird.serialNumber')
             //       ->orWhere('ird.serialNumber', '');
             // })
-            ->whereNotIn('ird.Status', ['Report Generated', 'Save', 'Draft'])
+            //->whereNotIn('ird.Status', ['Report Generated', 'Save', 'Draft'])
+
+            ->where(function ($q) {
+                $q->whereNull('ird.Status');
+                   
+            })
+
+
+             
             ->select(
                 'ib.ID',
                 'cd.CustomerName as Customer_Name',
