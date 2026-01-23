@@ -406,14 +406,14 @@ public function searchInstallBase(Request $request)
     }
 
 
-public function getItems($reference_id)
+public function getItems($serialNumber)
 {
     // Check if the record exists in installbase_dpr
    // $installBase = DB::table('installbase_dpr')->find($id);
 
-  // $installBase=DB::table('deporepair.installbase_items_dpr')->where('Serial_Numbers',$serialNumber)->first();
+  $installBase=DB::table('deporepair.installbase_items_dpr')->where('Serial_Numbers',$serialNumber)->first();
 
-  $installBase=DB::table('deporepair.installbase_items_dpr')->where('reference_id',$reference_id)->first();
+ // $installBase=DB::table('deporepair.installbase_items_dpr')->where('reference_id',$reference_id)->first();
 
     if (!$installBase) {
         return response()->json(['message' => 'Item not found.'], 404);
@@ -424,8 +424,8 @@ public function getItems($reference_id)
     ->join('deporepair.item_master_dpr as im', 'ibi.Item_Numbers', '=', 'im.ItemNumber')
     ->join('deporepair.installbase_dpr as ib', 'ib.ID', '=', 'ibi.installbase_id')
     ->join('deporepair.deporepair.customers_dpr as cd', 'cd.ID', '=', 'ib.CustomerID')
-   // ->where('ibi.Serial_Numbers', $serialNumber)
-   ->where('ibi.reference_id', $reference_id)
+    ->where('ibi.Serial_Numbers', $serialNumber)
+ //  ->where('ibi.reference_id', $serialNumber)
     ->select(
         'ibi.Item_Numbers',
         'ibi.Serial_Numbers',

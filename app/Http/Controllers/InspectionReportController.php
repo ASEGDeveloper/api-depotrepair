@@ -15,10 +15,11 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\InspectionReportMail;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
+use Str;
 
 
 class InspectionReportController extends Controller
-{ 
+{
     protected $inspectionService;
 
     public function __construct(InspectionService $inspectionService)
@@ -107,79 +108,140 @@ class InspectionReportController extends Controller
 
 
 
+    // public function save(Request $request)
+    // {
+
+    //     try {
+
+    //         $id = $request->id ?? null;
+
+
+
+    //         $query = InspectionReportModel::updateOrCreate(
+    //             ['ID' => $id ?? 0],
+    //             [
+    //                 'Inspection_ID' => $this->generateCode(),
+    //                 'serialNumber' => $request->serialNumber,
+    //                 'Unit_Number' => $request->Unit_Number,
+    //                 'Customer_Name' => $request->Customer_Name,
+    //                 'Capacity_L' => $request->Capacity,
+    //                 'Tank_Type' => $request->TankType,
+    //                 'Initial_Test_MMM_YY' => $request->Initialtest,
+    //                 'Last_Cargo' => $request->LastCargo,
+    //                 'Inner_Tank_Material' => $request->InnertankMaterial,
+    //                 'Last_2_5yr_Test_MMM_YY' => $request->Last_2_5yr_Test_MMM_YY,
+    //                 'Last_5yr_Test_MMM_YY' => $request->Last_5yr_Test_MMM_YY,
+    //                 'Location_of_Inspection' => $request->LocationOfInspection,
+    //                 'Manufacturer' => $request->Manufacturer,
+    //                 'Max_Gross_Weight_kg' => $request->MaxGrossWeight,
+    //                 'Next_CSC_Due' => $request->NextCSCDue,
+    //                 'Next_Test_Due_MMM_YY' => $request->Next_Test_Due_MMM_YY,
+    //                 'Outer_Tank_Material' => $request->OuterTankMaterial,
+    //                 'Results' => $request->Results,
+    //                 'Survey_Date' => $request->SurveyDate,
+    //                 'Survey_Type' => $request->SurveyType,
+    //                 'Surveyor' => $request->Surveyor,
+    //                 'Tare_Weight_kg' => $request->TareWeight,
+    //                 'Un_Portable_Tank_Type' => $request->UnPortableTankType,
+    //                 'Vacuum_reading' => $request->Vacuum_reading,
+    //                 'mawp' => $request->mawp,
+    //                 'Comments' => $request->comments,
+    //                 'Status' => $request->status,
+    //                 'DATALOAD_TIME' => now(),
+    //                 'reference_id' =>$request->reference_id
+    //             ]
+    //         );
+
+    //         return response()->json([
+    //             'status' => 'success',
+    //             'last_inserted_id' => $query->ID,
+    //             'message' => $query->ID
+    //                 ? 'Inspection report record updated successfully.'
+    //                 : 'Inspection report record created successfully.',
+    //             'data' => $query
+    //         ], 200);
+    //     } catch (\Illuminate\Validation\ValidationException $e) {
+
+    //         return response()->json([
+    //             'status' => 'error',
+    //             'message' => 'Validation failed.',
+    //             'errors' => $e->errors(),
+    //         ], 422);
+    //     } catch (\Exception $e) {
+
+    //         return response()->json([
+    //             'status' => 'error',
+    //             'message' => 'An unexpected error occurred while saving the inspection report.',
+    //             'error' => $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
+
+
+
     public function save(Request $request)
     {
-
         try {
 
             $id = $request->id ?? null;
 
-            //  Check if serial number already exists (excluding current record during update)
-            // $serialExists = InspectionReportModel::where('serialNumber', $request->serialNumber)
-            //     ->when($id, function ($q) use ($id) {
-            //         $q->where('ID', '!=', $id);
-            //     })
-            //     ->exists();
+            // Fetch existing record if ID is present
+            $existing = $id
+                ? InspectionReportModel::where('ID', $id)->first()
+                : null;
 
-            // if ($serialExists) {
-            //     return response()->json([
-            //         'status' => 'error',
-            //         'message' => 'Serial number already exists.'
-            //     ], 409); // Conflict
-            // }
+            // Prepare data
+            $data = [
+                'Inspection_ID' => $this->generateCode(),
+                'serialNumber' => $request->serialNumber,
+                'Unit_Number' => $request->Unit_Number,
+                'Customer_Name' => $request->Customer_Name,
+                'Capacity_L' => $request->Capacity,
+                'Tank_Type' => $request->TankType,
+                'Initial_Test_MMM_YY' => $request->Initialtest,
+                'Last_Cargo' => $request->LastCargo,
+                'Inner_Tank_Material' => $request->InnertankMaterial,
+                'Last_2_5yr_Test_MMM_YY' => $request->Last_2_5yr_Test_MMM_YY,
+                'Last_5yr_Test_MMM_YY' => $request->Last_5yr_Test_MMM_YY,
+                'Location_of_Inspection' => $request->LocationOfInspection,
+                'Manufacturer' => $request->Manufacturer,
+                'Max_Gross_Weight_kg' => $request->MaxGrossWeight,
+                'Next_CSC_Due' => $request->NextCSCDue,
+                'Next_Test_Due_MMM_YY' => $request->Next_Test_Due_MMM_YY,
+                'Outer_Tank_Material' => $request->OuterTankMaterial,
+                'Results' => $request->Results,
+                'Survey_Date' => $request->SurveyDate,
+                'Survey_Type' => $request->SurveyType,
+                'Surveyor' => $request->Surveyor,
+                'Tare_Weight_kg' => $request->TareWeight,
+                'Un_Portable_Tank_Type' => $request->UnPortableTankType,
+                'Vacuum_reading' => $request->Vacuum_reading,
+                'mawp' => $request->mawp,
+                'Comments' => $request->comments,
+                'DATALOAD_TIME' => now(),
+                'reference_id' => $request->reference_id
+            ];
+
+            // ✅ Only update status if NOT already "Report Generated"
+            if (!$existing || $existing->Status !== 'Report Generated') {
+                $data['Status'] = $request->status;
+            }
 
             $query = InspectionReportModel::updateOrCreate(
-                ['ID' => $id ?? 0],
-                [
-                    'Inspection_ID' => $this->generateCode(),
-                    'serialNumber' => $request->serialNumber,
-                    'Unit_Number' => $request->Unit_Number,
-                    'Customer_Name' => $request->Customer_Name,
-                    'Capacity_L' => $request->Capacity,
-                    'Tank_Type' => $request->TankType,
-                    'Initial_Test_MMM_YY' => $request->Initialtest,
-                    'Last_Cargo' => $request->LastCargo,
-                    'Inner_Tank_Material' => $request->InnertankMaterial,
-                    'Last_2_5yr_Test_MMM_YY' => $request->Last_2_5yr_Test_MMM_YY,
-                    'Last_5yr_Test_MMM_YY' => $request->Last_5yr_Test_MMM_YY,
-                    'Location_of_Inspection' => $request->LocationOfInspection,
-                    'Manufacturer' => $request->Manufacturer,
-                    'Max_Gross_Weight_kg' => $request->MaxGrossWeight,
-                    'Next_CSC_Due' => $request->NextCSCDue,
-                    'Next_Test_Due_MMM_YY' => $request->Next_Test_Due_MMM_YY,
-                    'Outer_Tank_Material' => $request->OuterTankMaterial,
-                    'Results' => $request->Results,
-                    'Survey_Date' => $request->SurveyDate,
-                    'Survey_Type' => $request->SurveyType,
-                    'Surveyor' => $request->Surveyor,
-                    'Tare_Weight_kg' => $request->TareWeight,
-                    'Un_Portable_Tank_Type' => $request->UnPortableTankType,
-                    'Vacuum_reading' => $request->Vacuum_reading,
-                    'mawp' => $request->mawp,
-                    'Comments' => $request->comments,
-                    'Status' => $request->status,
-                    'DATALOAD_TIME' => now(),
-                    'reference_id' =>$request->reference_id
-                ]
+                ['ID' => $id],
+                $data
             );
 
             return response()->json([
                 'status' => 'success',
                 'last_inserted_id' => $query->ID,
-                'message' => $query->ID
+                'message' => $existing
                     ? 'Inspection report record updated successfully.'
                     : 'Inspection report record created successfully.',
                 'data' => $query
             ], 200);
-        } catch (\Illuminate\Validation\ValidationException $e) {
 
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Validation failed.',
-                'errors' => $e->errors(),
-            ], 422);
         } catch (\Exception $e) {
-
             return response()->json([
                 'status' => 'error',
                 'message' => 'An unexpected error occurred while saving the inspection report.',
@@ -191,68 +253,142 @@ class InspectionReportController extends Controller
 
 
     public function update(Request $request, $id = null)
-    {
+{
+    try {
 
-        try {
+        // Fetch existing record (if updating)
+        $existing = $id
+            ? InspectionReportModel::where('ID', $id)->first()
+            : null;
 
-            $query = InspectionReportModel::updateOrCreate(
-                ['ID' => $id ?? 0],
-                [
-                    //'Inspection_ID'        => $this->generateCode(),
-                    'Unit_Number' => $request->Unit_Number,
-                    'Customer_Name' => $request->Customer_Name,
-                    'Capacity_L' => $request->Capacity,
-                    'Initial_Test_MMM_YY' => $request->Initialtest,
-                    'Tank_Type' => $request->TankType,
-                    'Last_Cargo' => $request->LastCargo,
-                    'Inner_Tank_Material' => $request->InnertankMaterial,
-                    'Last_2_5yr_Test_MMM_YY' => $request->Last_2_5yr_Test_MMM_YY,
-                    'Last_5yr_Test_MMM_YY' => $request->Last_5yr_Test_MMM_YY,
-                    'Location_of_Inspection' => $request->LocationOfInspection,
-                    'Manufacturer' => $request->Manufacturer,
-                    'Max_Gross_Weight_kg' => $request->MaxGrossWeight,
-                    'Next_CSC_Due' => $request->NextCSCDue,
-                    'Next_Test_Due_MMM_YY' => $request->Next_Test_Due_MMM_YY,
-                    'Outer_Tank_Material' => $request->OuterTankMaterial,
-                    'Results' => $request->Results,
-                    'Survey_Date' => $request->SurveyDate,
-                    'Survey_Type' => $request->SurveyType,
-                    'Surveyor' => $request->Surveyor,
-                    'Tare_Weight_kg' => $request->TareWeight,
-                    'Un_Portable_Tank_Type' => $request->UnPortableTankType,
-                    'Vacuum_reading' => $request->Vacuum_reading,
-                    'Comments' => $request->comments,
-                    'mawp' => $request->mawp,
-                    'Status' => $request->status,
-                    'DATALOAD_TIME' => now(),
-                ]
-            );
+        // Prepare update data
+        $data = [
+            //'Inspection_ID' => $this->generateCode(),
+            'Unit_Number' => $request->Unit_Number,
+            'Customer_Name' => $request->Customer_Name,
+            'Capacity_L' => $request->Capacity,
+            'Initial_Test_MMM_YY' => $request->Initialtest,
+            'Tank_Type' => $request->TankType,
+            'Last_Cargo' => $request->LastCargo,
+            'Inner_Tank_Material' => $request->InnertankMaterial,
+            'Last_2_5yr_Test_MMM_YY' => $request->Last_2_5yr_Test_MMM_YY,
+            'Last_5yr_Test_MMM_YY' => $request->Last_5yr_Test_MMM_YY,
+            'Location_of_Inspection' => $request->LocationOfInspection,
+            'Manufacturer' => $request->Manufacturer,
+            'Max_Gross_Weight_kg' => $request->MaxGrossWeight,
+            'Next_CSC_Due' => $request->NextCSCDue,
+            'Next_Test_Due_MMM_YY' => $request->Next_Test_Due_MMM_YY,
+            'Outer_Tank_Material' => $request->OuterTankMaterial,
+            'Results' => $request->Results,
+            'Survey_Date' => $request->SurveyDate,
+            'Survey_Type' => $request->SurveyType,
+            'Surveyor' => $request->Surveyor,
+            'Tare_Weight_kg' => $request->TareWeight,
+            'Un_Portable_Tank_Type' => $request->UnPortableTankType,
+            'Vacuum_reading' => $request->Vacuum_reading,
+            'Comments' => $request->comments,
+            'mawp' => $request->mawp,
+            'DATALOAD_TIME' => now(),
+        ];
 
-
-
-            return response()->json([
-                'status' => 'success',
-                'message' => $id
-                    ? 'Inspection report record updated successfully.'
-                    : 'Inspection report record created successfully.',
-                'data' => $query->Status
-            ], 200);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Validation failed.',
-                'errors' => $e->errors(),
-            ], 422);
-        } catch (\Exception $e) {
-
-            return response()->json([
-                'status' => 'error',
-                'message' => 'An unexpected error occurred while saving the inspection report.',
-                'error' => $e->getMessage(),
-            ], 500);
+        // ✅ Only update Status if NOT already "Report Generated"
+        if ($existing->Status !== 'Report Generated') {
+            $data['Status'] = $request->status;
         }
+
+        $query = InspectionReportModel::updateOrCreate(
+            ['ID' => $id ?? 0],
+            $data
+        );
+
+        return response()->json([
+            'status' => 'success',
+            'message' => $id
+                ? 'Inspection report record updated successfully.'
+                : 'Inspection report record created successfully.',
+            'data' => $query->Status
+        ], 200);
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Validation failed.',
+            'errors' => $e->errors(),
+        ], 422);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'An unexpected error occurred while saving the inspection report.',
+            'error' => $e->getMessage(),
+        ], 500);
     }
+}
+
+
+
+    // public function update(Request $request, $id = null)
+    // {
+
+    //     try {
+
+    //         $query = InspectionReportModel::updateOrCreate(
+    //             ['ID' => $id ?? 0],
+    //             [
+    //                 //'Inspection_ID'        => $this->generateCode(),
+    //                 'Unit_Number' => $request->Unit_Number,
+    //                 'Customer_Name' => $request->Customer_Name,
+    //                 'Capacity_L' => $request->Capacity,
+    //                 'Initial_Test_MMM_YY' => $request->Initialtest,
+    //                 'Tank_Type' => $request->TankType,
+    //                 'Last_Cargo' => $request->LastCargo,
+    //                 'Inner_Tank_Material' => $request->InnertankMaterial,
+    //                 'Last_2_5yr_Test_MMM_YY' => $request->Last_2_5yr_Test_MMM_YY,
+    //                 'Last_5yr_Test_MMM_YY' => $request->Last_5yr_Test_MMM_YY,
+    //                 'Location_of_Inspection' => $request->LocationOfInspection,
+    //                 'Manufacturer' => $request->Manufacturer,
+    //                 'Max_Gross_Weight_kg' => $request->MaxGrossWeight,
+    //                 'Next_CSC_Due' => $request->NextCSCDue,
+    //                 'Next_Test_Due_MMM_YY' => $request->Next_Test_Due_MMM_YY,
+    //                 'Outer_Tank_Material' => $request->OuterTankMaterial,
+    //                 'Results' => $request->Results,
+    //                 'Survey_Date' => $request->SurveyDate,
+    //                 'Survey_Type' => $request->SurveyType,
+    //                 'Surveyor' => $request->Surveyor,
+    //                 'Tare_Weight_kg' => $request->TareWeight,
+    //                 'Un_Portable_Tank_Type' => $request->UnPortableTankType,
+    //                 'Vacuum_reading' => $request->Vacuum_reading,
+    //                 'Comments' => $request->comments,
+    //                 'mawp' => $request->mawp,
+    //                 'Status' => $request->status,
+    //                 'DATALOAD_TIME' => now(),
+    //             ]
+    //         );
+
+
+
+    //         return response()->json([
+    //             'status' => 'success',
+    //             'message' => $id
+    //                 ? 'Inspection report record updated successfully.'
+    //                 : 'Inspection report record created successfully.',
+    //             'data' => $query->Status
+    //         ], 200);
+    //     } catch (\Illuminate\Validation\ValidationException $e) {
+
+    //         return response()->json([
+    //             'status' => 'error',
+    //             'message' => 'Validation failed.',
+    //             'errors' => $e->errors(),
+    //         ], 422);
+    //     } catch (\Exception $e) {
+
+    //         return response()->json([
+    //             'status' => 'error',
+    //             'message' => 'An unexpected error occurred while saving the inspection report.',
+    //             'error' => $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
 
 
 
@@ -391,95 +527,98 @@ class InspectionReportController extends Controller
                 // }
 
 
-               if ($imageFile && $imageFile->isValid()) {
+                if ($imageFile && $imageFile->isValid()) {
 
-    $sourcePath = $imageFile->getRealPath();
-    $mimeType   = $imageFile->getClientMimeType();
+                    $sourcePath = $imageFile->getRealPath();
+                    $mimeType = $imageFile->getClientMimeType();
 
-    [$origWidth, $origHeight] = getimagesize($sourcePath);
+                    [$origWidth, $origHeight] = getimagesize($sourcePath);
 
-    // Create source image
-    switch ($mimeType) {
-        case 'image/jpeg':
-            $sourceImage = imagecreatefromjpeg($sourcePath);
-            break;
-        case 'image/png':
-            $sourceImage = imagecreatefrompng($sourcePath);
-            break;
-        case 'image/webp':
-            $sourceImage = imagecreatefromwebp($sourcePath);
-            break;
-        default:
-            throw new Exception('Unsupported image type');
-    }
+                    // Create source image
+                    switch ($mimeType) {
+                        case 'image/jpeg':
+                            $sourceImage = imagecreatefromjpeg($sourcePath);
+                            break;
+                        case 'image/png':
+                            $sourceImage = imagecreatefrompng($sourcePath);
+                            break;
+                        case 'image/webp':
+                            $sourceImage = imagecreatefromwebp($sourcePath);
+                            break;
+                        default:
+                            throw new Exception('Unsupported image type');
+                    }
 
-    /**
-     * 🔥 FIX ORIENTATION (JPEG only)
-     */
-    if ($mimeType === 'image/jpeg' && function_exists('exif_read_data')) {
-        $exif = @exif_read_data($sourcePath);
+                    /**
+                     * 🔥 FIX ORIENTATION (JPEG only)
+                     */
+                    if ($mimeType === 'image/jpeg' && function_exists('exif_read_data')) {
+                        $exif = @exif_read_data($sourcePath);
 
-        if (!empty($exif['Orientation'])) {
-            switch ($exif['Orientation']) {
-                case 3:
-                    $sourceImage = imagerotate($sourceImage, 180, 0);
-                    break;
-                case 6: // Portrait → rotate right
-                    $sourceImage = imagerotate($sourceImage, -90, 0);
-                    [$origWidth, $origHeight] = [$origHeight, $origWidth];
-                    break;
-                case 8: // Portrait → rotate left
-                    $sourceImage = imagerotate($sourceImage, 90, 0);
-                    [$origWidth, $origHeight] = [$origHeight, $origWidth];
-                    break;
-            }
-        }
-    }
+                        if (!empty($exif['Orientation'])) {
+                            switch ($exif['Orientation']) {
+                                case 3:
+                                    $sourceImage = imagerotate($sourceImage, 180, 0);
+                                    break;
+                                case 6: // Portrait → rotate right
+                                    $sourceImage = imagerotate($sourceImage, -90, 0);
+                                    [$origWidth, $origHeight] = [$origHeight, $origWidth];
+                                    break;
+                                case 8: // Portrait → rotate left
+                                    $sourceImage = imagerotate($sourceImage, 90, 0);
+                                    [$origWidth, $origHeight] = [$origHeight, $origWidth];
+                                    break;
+                            }
+                        }
+                    }
 
-    // Max width resize (no distortion)
-    $maxWidth = 760;
+                    // Max width resize (no distortion)
+                    $maxWidth = 760;
 
-    if ($origWidth > $maxWidth) {
-        $scale = $maxWidth / $origWidth;
-        $targetWidth  = $maxWidth;
-        $targetHeight = intval($origHeight * $scale);
-    } else {
-        $targetWidth  = $origWidth;
-        $targetHeight = $origHeight;
-    }
+                    if ($origWidth > $maxWidth) {
+                        $scale = $maxWidth / $origWidth;
+                        $targetWidth = $maxWidth;
+                        $targetHeight = intval($origHeight * $scale);
+                    } else {
+                        $targetWidth = $origWidth;
+                        $targetHeight = $origHeight;
+                    }
 
-    $resizedImage = imagecreatetruecolor($targetWidth, $targetHeight);
+                    $resizedImage = imagecreatetruecolor($targetWidth, $targetHeight);
 
-    if (in_array($mimeType, ['image/png', 'image/webp'])) {
-        imagealphablending($resizedImage, false);
-        imagesavealpha($resizedImage, true);
-    }
+                    if (in_array($mimeType, ['image/png', 'image/webp'])) {
+                        imagealphablending($resizedImage, false);
+                        imagesavealpha($resizedImage, true);
+                    }
 
-    imagecopyresampled(
-        $resizedImage,
-        $sourceImage,
-        0, 0, 0, 0,
-        $targetWidth,
-        $targetHeight,
-        $origWidth,
-        $origHeight
-    );
+                    imagecopyresampled(
+                        $resizedImage,
+                        $sourceImage,
+                        0,
+                        0,
+                        0,
+                        0,
+                        $targetWidth,
+                        $targetHeight,
+                        $origWidth,
+                        $origHeight
+                    );
 
-    // Output
-    ob_start();
-    match ($mimeType) {
-        'image/jpeg' => imagejpeg($resizedImage, null, 75),
-        'image/png'  => imagepng($resizedImage, null, 6),
-        'image/webp' => imagewebp($resizedImage, null, 75),
-    };
-    $imageData = ob_get_clean();
+                    // Output
+                    ob_start();
+                    match ($mimeType) {
+                        'image/jpeg' => imagejpeg($resizedImage, null, 75),
+                        'image/png' => imagepng($resizedImage, null, 6),
+                        'image/webp' => imagewebp($resizedImage, null, 75),
+                    };
+                    $imageData = ob_get_clean();
 
-    imagedestroy($sourceImage);
-    imagedestroy($resizedImage);
+                    imagedestroy($sourceImage);
+                    imagedestroy($resizedImage);
 
-    $data['image_data'] = "data:$mimeType;base64," . base64_encode($imageData);
-    $data['original_filename'] = $imageFile->getClientOriginalName();
-}
+                    $data['image_data'] = "data:$mimeType;base64," . base64_encode($imageData);
+                    $data['original_filename'] = $imageFile->getClientOriginalName();
+                }
 
 
 
@@ -643,7 +782,12 @@ class InspectionReportController extends Controller
                 'isFontSubsettingEnabled' => true,
             ]);
 
-        return $pdf->download("inspection_report.pdf");
+        $surveyType = $data['Survey_Type'] ?? 'inspection';
+        $inspectionId = $data['Inspection_ID'] ?? $inspectionID;
+
+        $reportName = Str::slug($surveyType, '_') . '_' . $inspectionId . '.pdf';
+
+        return $pdf->download($reportName);
     }
 
 
@@ -694,7 +838,7 @@ class InspectionReportController extends Controller
 
         $data = $this->inspectionService->getCustomerID($inspectionID);
         return $this->inspectionService->getCustomerEmail($data->CustomerID);
-    } 
+    }
 
     public function sendEmail(Request $request)
     {
