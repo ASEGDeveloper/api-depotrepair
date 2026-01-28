@@ -23,7 +23,7 @@ class HMController extends Controller
         $this->tnaService = $tnaService;
         $this->hmService = $hmService;
     }
- 
+
 
     public function store(Request $request)
     {
@@ -118,7 +118,7 @@ class HMController extends Controller
 
             if (!$this->tnaService->toCheckJobCard($input->jobcode)) {
                 return $this->errorResponse('Invalid job card. Please verify the details and try again.');
-            } 
+            }
 
             return $this->hmService->createHM($input);
         }
@@ -150,14 +150,39 @@ class HMController extends Controller
 
     private function handleSms(Request $request)
     {
-        
-    $input = json_decode($request->getContent());
+
+        $input = json_decode($request->getContent());
 
         if (!$input) {
             return $this->errorResponse('Invalid JSON payload', 422);
         }
 
-       return $this->tnaService->updateSMSTask( $input);
+        if (
+            !$this->tnaService->toCheckUserStatusTaskNo(
+                $input->employeecode,
+                $input->jobcode
+            )
+        ) {
+            return $this->errorResponse(
+                'Employee does not exist or is inactive'
+            );
+        }
+
+
+        if (
+            !$this->tnaService->toCheckJobCard(
+                $input->jobcode
+            )
+        ) {
+            return $this->errorResponse(
+                'Invalid job card. Please verify the details and try again.'
+            );
+        }
+
+
+
+
+        return $this->tnaService->updateSMSTask($input);
 
     }
 
@@ -169,10 +194,10 @@ class HMController extends Controller
             return $this->errorResponse('Invalid JSON payload', 422);
         }
 
-       return $this->tnaService->updateTnaTask( $input);
+        return $this->tnaService->updateTnaTask($input);
     }
 
 
- 
+
 
 }

@@ -145,7 +145,7 @@ class TnaService
         );
 
 
-        $exists = $this->checkJobCardPunchingStatus($request->employeecode, $request->jobcode);
+        $exists = $this->checkJobCardPunchingStatus($request->employeecode, $request->jobcode); 
 
         if ($exists) {
 
