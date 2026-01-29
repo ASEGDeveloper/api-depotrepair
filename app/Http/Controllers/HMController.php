@@ -104,6 +104,7 @@ class HMController extends Controller
     {
         // CASE 1: End task
         if ($hasEnd && $isTaskOpen) {
+           
             return $this->hmService->updateHM($input);
         }
 
