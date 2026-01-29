@@ -17,7 +17,7 @@ trait ApiResponse
     public function successResponse($data = null, string $message = 'Success', int $status = 200): JsonResponse
     {
         return response()->json([
-            'status' => 'success',
+            'status' => TRUE,
             'message' => $message,
             'data' => $data
         ], $status);
@@ -61,7 +61,7 @@ trait ApiResponse
     public function response(string $message = 'Success', int $status = 200): JsonResponse
     {
         return response()->json([
-            'status' => 'success',
+            'status' => 'Success',
             'message' => $message, 
         ], $status);
     }

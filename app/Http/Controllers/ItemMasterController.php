@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 
-use App\Http\Requests\ItemMasterRequest;
+ 
 use App\Models\ItemMasterModel;
 use Illuminate\Http\Request;
 
@@ -14,23 +14,22 @@ class ItemMasterController extends Controller
     // ItemMasterRequest
     public function save(Request $request, $itemID = null)
     {
-
         $uniqueItemNumber = $request->ItemNumber;
 
-            if ($uniqueItemNumber) {
-                $count = ItemMasterModel::where('ItemNumber', $uniqueItemNumber)
-                            ->when($request->itemID, fn($q) => $q->where('ID', '!=', $request->itemID))
-                            ->count();
+        if ($uniqueItemNumber) {
+            $count = ItemMasterModel::where('ItemNumber', $uniqueItemNumber)
+                ->when($request->itemID, fn($q) => $q->where('ID', '!=', $request->itemID))
+                ->count();
 
-                if ($count > 0) {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Item Number already exists.'
-                    ], 422);
-                }
+            if ($count > 0) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Item Number already exists.'
+                ], 422);
             }
+        }
 
-       
+
         $item = ItemMasterModel::updateOrCreate(
             ['ID' => $request->itemID ?? 0],
             [
@@ -56,7 +55,7 @@ class ItemMasterController extends Controller
     }
 
     public function update(Request $request, $itemID)
-    { 
+    {
         try {
             // Validate incoming data
             $validated = $request->validate([
@@ -66,8 +65,8 @@ class ItemMasterController extends Controller
                 'UnPortableTankType' => 'nullable|string|max:255',
                 'Capacity'           => 'nullable|numeric',
                 'Description'        => 'nullable|string',
-                'PrimaryUOM'         => 'nullable|string|max:255', 
-                 'MAWP'         => 'nullable|string|max:255', 
+                'PrimaryUOM'         => 'nullable|string|max:255',
+                'MAWP'         => 'nullable|string|max:255',
                 'PurchasingFLAG'     => 'nullable|boolean',
             ]);
 
@@ -83,7 +82,7 @@ class ItemMasterController extends Controller
                 'Capacity'           => $validated['Capacity'] ?? $item->Capacity,
                 'Description'        => $validated['Description'] ?? $item->Description,
                 'PrimaryUOM'         => $validated['PrimaryUOM'] ?? $item->PrimaryUOM,
-                 'MAWP'              => $validated['MAWP'] ??  $item->MAWP,
+                'MAWP'              => $validated['MAWP'] ??  $item->MAWP,
                 'PurchasingFLAG'     => $validated['PurchasingFLAG'] ?? $item->PurchasingFLAG,
                 'DATALOAD_TIME'      => now(),
             ]);
@@ -139,57 +138,57 @@ class ItemMasterController extends Controller
 
     public function getItemsList(Request $request)
     {
-    
-    $page   = $request->input('page', 1);
-    $limit  = $request->input('limit', 10);
-    $search = $request->input('search', '');
-    $status = $request->input('status', '');
 
-    $query = ItemMasterModel::query()
-        ->select([
-            'id',
-            'InventoryItemID',
-            'ItemNumber',
-            'TankType',
-            'Manufacturer',
-            'UnPortableTankType',
-            'Capacity',
-            'Description',
-            'PrimaryUOM', 
-        ])
-        ->orderBy('ID', 'desc');
+        $page   = $request->input('page', 1);
+        $limit  = $request->input('limit', 10);
+        $search = $request->input('search', '');
+        $status = $request->input('status', '');
 
-    // Apply search filter
-    if (!empty($search)) {
-        $query->where(function ($q) use ($search) {
-            $q->where('ItemNumber', 'like', "%{$search}%")
-                ->orWhere('TankType', 'like', "%{$search}%")
-                ->orWhere('Manufacturer', 'like', "%{$search}%")
-                ->orWhere('UnPortableTankType', 'like', "%{$search}%")
-                ->orWhere('Capacity', 'like', "%{$search}%")
-                ->orWhere('Description', 'like', "%{$search}%")
-                ->orWhere('PrimaryUOM', 'like', "%{$search}%");
-        });
+        $query = ItemMasterModel::query()
+            ->select([
+                'id',
+                'InventoryItemID',
+                'ItemNumber',
+                'TankType',
+                'Manufacturer',
+                'UnPortableTankType',
+                'Capacity',
+                'Description',
+                'PrimaryUOM',
+            ])
+            ->orderBy('ID', 'desc');
+
+        // Apply search filter
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('ItemNumber', 'like', "%{$search}%")
+                    ->orWhere('TankType', 'like', "%{$search}%")
+                    ->orWhere('Manufacturer', 'like', "%{$search}%")
+                    ->orWhere('UnPortableTankType', 'like', "%{$search}%")
+                    ->orWhere('Capacity', 'like', "%{$search}%")
+                    ->orWhere('Description', 'like', "%{$search}%")
+                    ->orWhere('PrimaryUOM', 'like', "%{$search}%");
+            });
+        }
+
+        // Optional status filter (if applicable in your table)
+        if (!empty($status)) {
+            $query->where('PurchasingFLAG', $status);
+        }
+
+        $total = $query->count();
+
+        $items = $query->offset(($page - 1) * $limit)
+            ->limit($limit)
+            ->get();
+
+        return response()->json([
+            'data'      => $items,
+            'total'     => $total,
+            'page'      => $page,
+            'per_page'  => $limit
+        ]);
     }
-
-    // Optional status filter (if applicable in your table)
-    if (!empty($status)) {
-        $query->where('PurchasingFLAG', $status);
-    }
-
-    $total = $query->count();
-
-    $items = $query->offset(($page - 1) * $limit)
-        ->limit($limit)
-        ->get();
-
-    return response()->json([
-        'data'      => $items,
-        'total'     => $total,
-        'page'      => $page,
-        'per_page'  => $limit
-    ]);
-}
 
 
 

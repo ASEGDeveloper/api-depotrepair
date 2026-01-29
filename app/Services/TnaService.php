@@ -6,17 +6,19 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\TnaEntry;
 use App\Constants\Status;
+use App\Traits\ApiResponse;
 
 class TnaService
 {
 
+    use ApiResponse;
 
     public function toCheckUserStatusTaskNo($empId, $taskNo)
     {
         return DB::table('deporepair.employee')
             ->where('EmployeeID', $empId)
             ->where('EmployeeStatus', 'Active')
-            ->first(); 
+            ->first();
     }
 
     public function toCheckJobCard($taskNo)
@@ -52,13 +54,17 @@ class TnaService
                 ->where('JOBCODE', $request->jobcode)
                 ->whereNull('ED')
                 ->update(['ED' => $currentDateAndTime, 'ENDDATE' => $currentDateAndTime, 'ENDTIME' => $currentTime]);
-            return 'Record updated';
+            //  return 'Record updated';
+            $data = ['EMPLOYEECODE' => $request->employeecode, 'JOBCODE' => $request->jobcode, 'ED' => $currentDateAndTime, 'ENDDATE' => $currentDateAndTime, 'ENDTIME' => $currentTime];
+            return $this->successResponse($data, 'Task updated successfully.');
         } else {
-            TnaEntry::create(array_merge($default, [
+            $data = TnaEntry::create(array_merge($default, [
                 'EMPLOYEECODE' => $request->employeecode,
                 'JOBCODE' => $request->jobcode,
+
             ]));
-            return 'Record created';
+            return $this->successResponse($data, 'Task created successfully.');
+            // return 'Record created';
         }
     }
 
@@ -130,7 +136,7 @@ class TnaService
     public function updateSMSTask($request)
     {
 
-         $currentDateAndTime = Carbon::now();
+        $currentDateAndTime = Carbon::now();
 
         $currentTime = $currentDateAndTime->format('H') . '.' . $currentDateAndTime->format('i');
 
@@ -145,26 +151,31 @@ class TnaService
         );
 
 
-        $exists = $this->checkJobCardPunchingStatus($request->employeecode, $request->jobcode); 
+        $exists = $this->checkJobCardPunchingStatus($request->employeecode, $request->jobcode);
 
         if ($exists) {
 
-            TnaEntry::where('EMPLOYEECODE', $request->employeecode)
+            $update = TnaEntry::where('EMPLOYEECODE', $request->employeecode)
                 ->where('JOBCODE', $request->jobcode)
                 ->whereNull('ED')
-                ->update(['ED' => $currentDateAndTime, 'ENDDATE' => $currentDateAndTime, 'ENDTIME' => $currentTime,'Action'=>Status::CLOSED]);
-            return 'Record updated';
+                ->update(['ED' => $currentDateAndTime, 'ENDDATE' => $currentDateAndTime, 'ENDTIME' => $currentTime, 'Action' => Status::CLOSED]);
+
+            $data = [
+                'EMPLOYEECODE' => $request->employeecode,
+                'JOBCODE'      => $request->jobcode,
+                'ED'           => $currentDateAndTime,
+                'ENDDATE'      => $currentDateAndTime,
+                'ENDTIME'      => $currentTime,
+            ];
+            return $this->successResponse($data, 'Task updated successfully.');
         } else {
-            TnaEntry::create(array_merge($default, [
+            $create = TnaEntry::create(array_merge($default, [
                 'EMPLOYEECODE' => $request->employeecode,
                 'JOBCODE' => $request->jobcode,
-                'Action'    =>Status::START
+                'Action'    => Status::START
             ]));
-            return 'Record created';
+            return $this->successResponse($create, 'Task created successfully.');
         }
-
-        
-   
     }
 
 
@@ -204,28 +215,24 @@ class TnaService
 
     // Returns true if a record with ED = null exists
     public function checkJobCardPunchingStatus($EMPLOYEECODE, $JOBCODE)
-    { 
+    {
         return TnaEntry::where('EMPLOYEECODE', $EMPLOYEECODE)
-                //->where('JOBCODE', $job_code)
-               //  ->whereNull('ED')
-                ->whereNull('ENDTIME')
-                ->exists(); 
+            //->where('JOBCODE', $job_code)
+            //  ->whereNull('ED')
+            ->whereNull('ENDTIME')
+            ->exists();
     }
 
 
 
-public function isTaskOpen(string $employeeCode, string $jobCode): bool
-{
-    return TnaEntry::where('employeecode', $employeeCode)
-        ->where('jobcode', $jobCode)
-        ->where(function ($query) {
-            $query->whereNull('enddate')
-                  ->orWhereNull('endtime');
-        })
-        ->exists();
-}
-
-
-  
-
+    public function isTaskOpen(string $employeeCode, string $jobCode): bool
+    {
+        return TnaEntry::where('employeecode', $employeeCode)
+            ->where('jobcode', $jobCode)
+            ->where(function ($query) {
+                $query->whereNull('enddate')
+                    ->orWhereNull('endtime');
+            })
+            ->exists();
+    }
 }

@@ -10,6 +10,8 @@ use App\Traits\ApiResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
+use Illuminate\Http\JsonResponse;
+
 class HMController extends Controller
 {
 
@@ -29,14 +31,24 @@ class HMController extends Controller
     {
         try {
             $input = json_decode($request->getContent());
-            $source = $input->tas_data_from;
+            $source = $input->tas_data_from ?? null;
+
+            $allowedSources = ['Highmessage', 'SMS', 'TAS'];
+
+            // Validate mandatory and allowed values
+            if (empty($source) || !in_array($source, $allowedSources)) {
+                return $this->errorResponse(
+                    'tas_data_from is required and must be one of: Highmessage, SMS, TAS.'
+                );
+            }
+
+
 
             return match ($source) {
                 'Highmessage' => $this->handleHighMessage($request),
                 'SMS' => $this->handleSms($request),
-                default => $this->handleTaskServer($request),
+                'TAS'         => $this->handleTaskServer($request),
             };
-
         } catch (\Throwable $e) {
             Log::error('TNA Store Error', [
                 'message' => $e->getMessage(),
@@ -49,8 +61,6 @@ class HMController extends Controller
         }
     }
 
-
-
     private function handleHighMessage(Request $request)
     {
         $input = json_decode($request->getContent());
@@ -59,7 +69,9 @@ class HMController extends Controller
             return $this->errorResponse('Invalid JSON payload', 422);
         }
 
-        $this->validateHighMessage($input);
+        if ($response = $this->validateHighMessage($request)) {
+            return $response;
+        }
 
         $hasStart = !empty($input->startdate) && !empty($input->starttime);
         $hasEnd = !empty($input->enddate) && !empty($input->endtime);
@@ -130,22 +142,39 @@ class HMController extends Controller
     }
 
 
-    private function validateHighMessage($input): void
+    private function validateHighMessage(Request $request): ?JsonResponse
     {
-        $validator = Validator::make((array) $input, [
-            'employeecode' => 'required',
-            'jobcode' => 'required',
-            'tas_data_from' => 'required',
+        // ✅ Decode JSON as ARRAY
+        $input = json_decode($request->getContent(), true);
+
+        // ✅ Handle invalid / empty JSON
+        if (!is_array($input)) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Invalid JSON payload',
+            ], 400);
+        }
+
+        $validator = Validator::make($input, [
+            'companycode'   => 'required|string',
+            'employeecode'  => 'required|string',
+            'jobcode'       => 'required|string',
+            'tas_data_from' => 'required|string',
+            'startdate' => 'required|string',
+            'starttime'=> 'required|string',
         ]);
 
         if ($validator->fails()) {
-            abort(
-                response()->json([
-                    'message' => $validator->errors()->first(),
-                ], 422)
-            );
+            return response()->json([
+                'status'  => 'error',
+                'message' => $validator->errors()->first(),
+                'errors'  => $validator->errors(),
+            ], 422);
         }
+
+        return null; // ✅ validation passed
     }
+
 
 
     private function handleSms(Request $request)
@@ -156,6 +185,12 @@ class HMController extends Controller
         if (!$input) {
             return $this->errorResponse('Invalid JSON payload', 422);
         }
+
+
+        if ($response = $this->validateSMSMessage($request)) {
+            return $response;
+        }
+
 
         if (
             !$this->tnaService->toCheckUserStatusTaskNo(
@@ -179,12 +214,44 @@ class HMController extends Controller
             );
         }
 
-
-
-
         return $this->tnaService->updateSMSTask($input);
-
     }
+
+
+
+
+    private function validateSMSMessage(Request $request): ?JsonResponse
+    {
+        // ✅ Decode JSON as ARRAY
+        $input = json_decode($request->getContent(), true);
+
+        // ✅ Handle invalid / empty JSON
+        if (!is_array($input)) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Invalid JSON payload',
+            ], 400);
+        }
+
+        $validator = Validator::make($input, [
+            'employeecode' => 'required',
+            'jobcode' => 'required',
+            'tas_data_from' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => $validator->errors()->first(),
+                'errors'  => $validator->errors(),
+            ], 422);
+        }
+
+        return null; // ✅ validation passed
+    }
+
+
+
 
     private function handleTaskServer(Request $request)
     {
@@ -194,10 +261,34 @@ class HMController extends Controller
             return $this->errorResponse('Invalid JSON payload', 422);
         }
 
+        if ($response = $this->validateSMSMessage($request)) {
+            return $response;
+        }
+
+        if (
+            !$this->tnaService->toCheckUserStatusTaskNo(
+                $input->employeecode,
+                $input->jobcode
+            )
+        ) {
+            return $this->errorResponse(
+                'Employee does not exist or is inactive'
+            );
+        }
+
+
+        if (
+            !$this->tnaService->toCheckJobCard(
+                $input->jobcode
+            )
+        ) {
+            return $this->errorResponse(
+                'Invalid job card. Please verify the details and try again.'
+            );
+        } 
+
         return $this->tnaService->updateTnaTask($input);
     }
 
-
-
-
+    
 }
