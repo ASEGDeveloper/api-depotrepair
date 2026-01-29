@@ -52,12 +52,28 @@ class TnaService
 
             TnaEntry::where('EMPLOYEECODE', $request->employeecode)
                 ->where('JOBCODE', $request->jobcode)
+                ->where('TAS_DATA_FROM', $request->tas_data_from)
                 ->whereNull('ED')
                 ->update(['ED' => $currentDateAndTime, 'ENDDATE' => $currentDateAndTime, 'ENDTIME' => $currentTime]);
-            //  return 'Record updated';
+             
             $data = ['EMPLOYEECODE' => $request->employeecode, 'JOBCODE' => $request->jobcode, 'ED' => $currentDateAndTime, 'ENDDATE' => $currentDateAndTime, 'ENDTIME' => $currentTime];
             return $this->successResponse($data, 'Task updated successfully.');
         } else {
+            $jobCardOpen = $this->getOpenJobCode($request->employeecode);
+
+            if ($jobCardOpen) {
+                // Return a message that job card is already open
+                return $this->errorResponse("Job card '$jobCardOpen' is already open");
+            }
+
+            $anyJobCardOpen= $this->isJobCodeAlreadyOpen($request->jobcode);
+
+            if ($anyJobCardOpen) {
+                // Return a message that job card is already open
+                return $this->errorResponse("Job card '$anyJobCardOpen' is already open ");
+            }
+
+
             $data = TnaEntry::create(array_merge($default, [
                 'EMPLOYEECODE' => $request->employeecode,
                 'JOBCODE' => $request->jobcode,
@@ -150,13 +166,13 @@ class TnaService
             '18:00'
         );
 
-
         $exists = $this->checkJobCardPunchingStatus($request->employeecode, $request->jobcode);
 
         if ($exists) {
 
-            $update = TnaEntry::where('EMPLOYEECODE', $request->employeecode)
+            TnaEntry::where('EMPLOYEECODE', $request->employeecode)
                 ->where('JOBCODE', $request->jobcode)
+                ->where('TAS_DATA_FROM', $request->tas_data_from)
                 ->whereNull('ED')
                 ->update(['ED' => $currentDateAndTime, 'ENDDATE' => $currentDateAndTime, 'ENDTIME' => $currentTime, 'Action' => Status::CLOSED]);
 
@@ -169,6 +185,21 @@ class TnaService
             ];
             return $this->successResponse($data, 'Task updated successfully.');
         } else {
+            $jobCardOpen = $this->getOpenJobCode($request->employeecode);
+
+            if ($jobCardOpen) {
+                // Return a message that job card is already open
+                return $this->errorResponse("Job card '$jobCardOpen' is already open ");
+            }
+
+           $anyJobCardOpen= $this->isJobCodeAlreadyOpen($request->jobcode);
+
+            if ($anyJobCardOpen) {
+                // Return a message that job card is already open
+                return $this->errorResponse("Job card '$anyJobCardOpen' is already open ");
+            }
+
+
             $create = TnaEntry::create(array_merge($default, [
                 'EMPLOYEECODE' => $request->employeecode,
                 'JOBCODE' => $request->jobcode,
@@ -189,8 +220,9 @@ class TnaService
         $projectedEndDate = null,
         $projectedEndTime = null
     ) {
-        return [
-            'COMPANYCODE'       => '01',
+        return [ 
+            'COMPANYCODE' =>'01',
+            'EMPLOYEECODE'      => $employeeCode,
             'EMPLOYEECODE'      => $employeeCode,
             'JOBCODE'           => $jobCode,
             'STARTDATE'         => $startDate,
@@ -217,7 +249,7 @@ class TnaService
     public function checkJobCardPunchingStatus($EMPLOYEECODE, $JOBCODE)
     {
         return TnaEntry::where('EMPLOYEECODE', $EMPLOYEECODE)
-            //->where('JOBCODE', $job_code)
+            ->where('JOBCODE', $JOBCODE)
             //  ->whereNull('ED')
             ->whereNull('ENDTIME')
             ->exists();
@@ -235,4 +267,22 @@ class TnaService
             })
             ->exists();
     }
+
+
+    // Returns true if a record with ED = null exists
+    public function getOpenJobCode($EMPLOYEECODE)
+    {
+        return TnaEntry::where('EMPLOYEECODE', $EMPLOYEECODE)
+            ->whereNull('ED')
+            ->value('JOBCODE'); // returns the first matching JOBCODE or null
+    }
+
+
+public function isJobCodeAlreadyOpen($JOBCODE)
+{
+    return TnaEntry::where('JOBCODE', $JOBCODE)
+        ->whereNull('ED')      // still open
+        ->value('JOBCODE');            // true if at least one open record exists
+}
+
 }

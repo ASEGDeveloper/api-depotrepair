@@ -40,9 +40,7 @@ class HMController extends Controller
                 return $this->errorResponse(
                     'tas_data_from is required and must be one of: Highmessage, SMS, TAS.'
                 );
-            }
-
-
+            } 
 
             return match ($source) {
                 'Highmessage' => $this->handleHighMessage($request),
@@ -216,9 +214,7 @@ class HMController extends Controller
 
         return $this->tnaService->updateSMSTask($input);
     }
-
-
-
+ 
 
     private function validateSMSMessage(Request $request): ?JsonResponse
     {
@@ -249,9 +245,7 @@ class HMController extends Controller
 
         return null; // ✅ validation passed
     }
-
-
-
+ 
 
     private function handleTaskServer(Request $request)
     {
