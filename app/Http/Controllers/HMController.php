@@ -156,12 +156,12 @@ class HMController extends Controller
         }
 
         $validator = Validator::make($input, [
-            'companycode'   => 'required|string',
-            'employeecode'  => 'required|string',
-            'jobcode'       => 'required|string',
-            'tas_data_from' => 'required|string',
-            'startdate' => 'required|string',
-            'starttime'=> 'required|string',
+            'companycode'   => 'required',
+            'employeecode'  => 'required',
+            'jobcode'       => 'required',
+            'tas_data_from' => 'required',
+            'startdate' => 'required',
+            'starttime'=> 'required',
         ]);
 
         if ($validator->fails()) {
