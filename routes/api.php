@@ -9,6 +9,7 @@ use App\Http\Controllers\InstallBaseController;
 use App\Http\Controllers\ItemMasterController;
 use App\Http\Controllers\TnaEntryController;
 use App\Http\Controllers\HMController;
+use App\Http\Controllers\GatePassController;
 
 use Tests\Feature\TnaControllerTest;
 
@@ -96,6 +97,10 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:api');
 
+
+Route::get('/gate-pass/{gatePassNo}', [GatePassController::class, 'getByGatePassNo']);
+Route::post('/gate-pass/approve/{approvalId}', [GatePassController::class, 'approveGatePass']);
+Route::post('/gate-pass/reject/{approvalId}', [GatePassController::class, 'rejectGatePass']);
 
 Route::get('/hello', function () {
     return 'Hello World';
