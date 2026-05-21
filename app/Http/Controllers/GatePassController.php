@@ -107,16 +107,16 @@ class GatePassController extends Controller
         ", [(int) $gatePassId, $action, $comment]);
     }
 
-    public function getByGatePassNo($gatePassNo)
+     public function getByGatePassNo($gatePassNo)
     {
         try {
             $gatePass = DB::selectOne("
                 SELECT gp.id, gp.gate_pass_no, gp.wo_number, gp.customer_name, gp.customer_number,
-                       gp.site, gp.department AS department_id, d.department_name, gp.business_unit,
+                       gp.site, gp.department AS department_id, b.Branch_Name as department_name, gp.business_unit,
                        gp.vehicle_registration_number, gp.remarks, gp.technician_name, gp.technician_email,
                        gp.status, gp.created_by, gp.created_date, gp.updated_by, gp.updated_date,gp.driver_name,gp.driver_mobile_no
                 FROM deporepair.gate_pass gp
-                LEFT JOIN deporepair.departments d ON gp.department = d.id
+                LEFT JOIN deporepair.branches b ON gp.department = b.id
                 WHERE gp.gate_pass_no = ?
                   AND gp.status = 'PENDING_APPROVAL'
             ", [$gatePassNo]);
@@ -135,6 +135,36 @@ class GatePassController extends Controller
             return $this->errorResponse('Failed to fetch gate pass', 500, $e->getMessage());
         }
     }
+
+
+    // public function getByGatePassNo($gatePassNo)
+    // {
+    //     try {
+    //         $gatePass = DB::selectOne("
+    //             SELECT gp.id, gp.gate_pass_no, gp.wo_number, gp.customer_name, gp.customer_number,
+    //                    gp.site, gp.department AS department_id, d.department_name, gp.business_unit,
+    //                    gp.vehicle_registration_number, gp.remarks, gp.technician_name, gp.technician_email,
+    //                    gp.status, gp.created_by, gp.created_date, gp.updated_by, gp.updated_date,gp.driver_name,gp.driver_mobile_no
+    //             FROM deporepair.gate_pass gp
+    //             LEFT JOIN deporepair.departments d ON gp.department = d.id
+    //             WHERE gp.gate_pass_no = ?
+    //               AND gp.status = 'PENDING_APPROVAL'
+    //         ", [$gatePassNo]);
+
+    //         if (!$gatePass) {
+    //             return $this->failedResponse('Gate pass not found', 404);
+    //         }
+
+    //         $items = $this->getGatePassItems($gatePass->id);
+
+    //         $data = (array) $gatePass;
+    //         $data['items'] = $items;
+
+    //         return $this->successResponse($data, 'Gate pass fetched successfully');
+    //     } catch (\Throwable $e) {
+    //         return $this->errorResponse('Failed to fetch gate pass', 500, $e->getMessage());
+    //     }
+    // }
 
    private function getGatePassItems($gatePassId)
 {
