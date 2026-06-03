@@ -214,6 +214,34 @@ class AuthController extends Controller
 
 
 
+    public function securityRefresh(Request $request)
+    {
+        $request->validate([
+            'refresh_token' => 'required'
+        ]);
+
+        $hashedToken = hash('sha256', $request->refresh_token);
+        $refreshToken = RefreshToken::where('token', $hashedToken)->first();
+
+
+        if (!$refreshToken || $refreshToken->expires_at->isPast()) {
+            return response()->json(['message' => 'Invalid or expired refresh token'], 401);
+        }
+
+
+        $employee = $refreshToken->employee;
+
+        // Delete old access tokens
+        $employee->tokens()->delete();
+
+        // Create new access token
+        $accessToken = $employee->createToken('API Token', ['*'], now()->addMinutes(15));
+
+        $data = ['accessToken' => $accessToken->plainTextToken];
+        return $this->successResponse($data, 'New access token has been issued successfully.!');
+    }
+
+
     public function logout(Request $request)
     {
         $employee = $request->user();
