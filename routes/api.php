@@ -16,6 +16,9 @@ use Tests\Feature\TnaControllerTest;
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('refresh', [AuthController::class, 'refresh']);
 
+Route::post('/security_login', [AuthController::class, 'securityLogin']);
+
+
 
 Route::middleware('api.token')->post('/tna-entries', [TnaEntryController::class, 'createOrUpdateTNAEntry']);
 
@@ -39,7 +42,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/search', [CustomerController::class, 'searchCustomer']);
         Route::post('/{id}', [CustomerController::class, 'getsingleCustomer']);
     });
-
 
 
     Route::prefix('items')->group(function () {
