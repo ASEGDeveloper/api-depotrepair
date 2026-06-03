@@ -225,7 +225,7 @@ class AuthController extends Controller
 
 
         if (!$refreshToken || $refreshToken->expires_at->isPast()) {
-            return response()->json(['message' => 'Invalid or expired refresh token'], 401);
+            return response()->json(['message' => 'Invalid or expired refresh token','success' => false,], 401);
         }
 
 
