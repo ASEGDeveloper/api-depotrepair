@@ -415,7 +415,7 @@ public function getItems($itemNumberOrSerial, $serialNumber = null)
    
 
     if ($serialNumber === null) {
-        $serialNumber = $itemNumberOrSerial;
+        $serialNumber = $itemNumberOrSerial.'/'.$serialNumber;
         $itemNumber   = null;
     } else {
         $itemNumber = null; // will be resolved from query
