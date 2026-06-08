@@ -72,8 +72,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/', [InstallBaseController::class, 'save']); // Create item
         Route::put('/{id}', [InstallBaseController::class, 'update']); // update the records
         Route::post('/search', [InstallBaseController::class, 'searchInstallBase']);
-        Route::get('item/{itemNumber}/{serialNumber}', [InstallBaseController::class, 'getItems']);
-        Route::get('item/{serialNumber}', [InstallBaseController::class, 'getItems']);
+        Route::get('item/{itemCode}/{subCode?}', [InstallBaseController::class, 'getItems']);
+       // Route::get('item/{serialNumber}', [InstallBaseController::class, 'getItems']);
         Route::get('customer/{id}', [InstallBaseController::class, 'getCustomerName']);
         Route::get('{id}', [InstallBaseController::class, 'show']); // keep last — wildcard must not swallow specific routes above
     });
