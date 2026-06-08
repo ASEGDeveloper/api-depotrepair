@@ -413,7 +413,7 @@ public function getItems($itemNumberOrSerial, $serialNumber = null)
     //   item/{itemNumber}/{serialNumber} → two params
     if ($serialNumber === null) {
         $serialNumber = $itemNumberOrSerial;
-        $itemNumber   = null;
+        $itemNumber   = $itemNumberOrSerial;
     } else {
         $itemNumber = $itemNumberOrSerial;
     }
