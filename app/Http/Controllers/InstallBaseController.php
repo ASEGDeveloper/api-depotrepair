@@ -418,7 +418,9 @@ public function getItems($itemNumberOrSerial, $serialNumber = null)
         $serialNumber = $itemNumberOrSerial;
         $itemNumber   = null;
         
-    // } else {
+      }
+      
+      //else {
     //     $itemNumber = $itemNumberOrSerial;
     // }
 
