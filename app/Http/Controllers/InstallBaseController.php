@@ -417,48 +417,31 @@ public function getItems($itemNumberOrSerial, $serialNumber = null)
     if ($serialNumber === null) {
         $serialNumber = $itemNumberOrSerial;
         $itemNumber   = null;
-        
-      }
-      
-      //else {
-    //     $itemNumber = $itemNumberOrSerial;
-    // }
+    } else {
+        $itemNumber = null; // will be resolved from query
+    }
 
     $existsQuery = DB::table('deporepair.installbase_items_dpr')
         ->where('Serial_Numbers', $serialNumber);
- 
-
-
-    // if ($itemNumber !== null) {
-    //     $existsQuery->where('Item_Numbers', $itemNumber);
-    // }
 
     $existsRow = $existsQuery->first();
 
-      if ($itemNumber == null) {
-         $itemNumber = $existsRow->Item_Numbers ;
-     }
-
-
-   
-    
     if (!$existsRow) {
         return response()->json([
             'message'      => 'Item not found.',
-            'searched'     => ['Item_Numbers' => $itemNumber, 'Serial_Numbers' => $serialNumber],
+            'searched'     => ['Serial_Numbers' => $serialNumber],
         ], 404);
     }
+
+    $itemNumber = $existsRow->Item_Numbers;
 
     // Fetch full joined data from related tables
     $query = DB::table('deporepair.installbase_items_dpr as ibi')
     ->join('deporepair.item_master_dpr as im', 'ibi.Item_Numbers', '=', 'im.ItemNumber')
     ->join('deporepair.installbase_dpr as ib', 'ib.ID', '=', 'ibi.installbase_id')
     ->join('deporepair.customers_dpr as cd', 'cd.ID', '=', 'ib.CustomerID')
-    ->where('ibi.Serial_Numbers', $serialNumber);
-
-    if ($itemNumber !== null) {
-        $query->where('ibi.Item_Numbers', $itemNumber);
-    }
+    ->where('ibi.Serial_Numbers', $serialNumber)
+    ->where('ibi.Item_Numbers', $itemNumber);
 
     $data = $query->select(
         'ibi.Item_Numbers',
