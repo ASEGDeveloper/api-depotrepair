@@ -412,12 +412,15 @@ public function getItems($itemNumberOrSerial, $serialNumber = null)
     //   item/{serialNumber}            → single param
     //   item/{itemNumber}/{serialNumber} → two params
 
-    return $itemNumberOrSerial;
+   
 
     if ($serialNumber === null) {
         $serialNumber = $itemNumberOrSerial;
         $itemNumber   = null;
+
+        return "Null section";
     } else {
+         return "Else section";
         $itemNumber = $itemNumberOrSerial;
     }
 
