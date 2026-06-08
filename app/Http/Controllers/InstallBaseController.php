@@ -417,15 +417,16 @@ public function getItems($itemNumberOrSerial, $serialNumber = null)
     if ($serialNumber === null) {
         $serialNumber = $itemNumberOrSerial;
         $itemNumber   = null;
-
-        return "Null section";
+        
     } else {
-         return "Else section";
         $itemNumber = $itemNumberOrSerial;
     }
 
     $existsQuery = DB::table('deporepair.installbase_items_dpr')
         ->where('Serial_Numbers', $serialNumber);
+
+        return  $existsQuery;
+        
 
     if ($itemNumber !== null) {
         $existsQuery->where('Item_Numbers', $itemNumber);
