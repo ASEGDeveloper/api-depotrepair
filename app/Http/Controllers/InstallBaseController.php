@@ -425,8 +425,8 @@ public function getItems($itemNumberOrSerial, $serialNumber = null)
     $existsQuery = DB::table('deporepair.installbase_items_dpr')
         ->where('Serial_Numbers', $serialNumber);
 
-        return  $existsQuery;
-        
+        print_r($existsQuery)  ;
+
 
     if ($itemNumber !== null) {
         $existsQuery->where('Item_Numbers', $itemNumber);
