@@ -411,9 +411,12 @@ public function getItems($itemNumberOrSerial, $serialNumber = null)
     // Support both URL forms:
     //   item/{serialNumber}            → single param
     //   item/{itemNumber}/{serialNumber} → two params
+
+    return $itemNumberOrSerial;
+
     if ($serialNumber === null) {
         $serialNumber = $itemNumberOrSerial;
-        $itemNumber   = $itemNumberOrSerial;
+        $itemNumber   = null;
     } else {
         $itemNumber = $itemNumberOrSerial;
     }
@@ -426,6 +429,7 @@ public function getItems($itemNumberOrSerial, $serialNumber = null)
     }
 
     $existsRow = $existsQuery->first();
+    
     if (!$existsRow) {
         return response()->json([
             'message'      => 'Item not found.',
