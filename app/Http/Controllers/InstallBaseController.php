@@ -425,8 +425,12 @@ public function getItems($itemNumberOrSerial, $serialNumber = null)
         $existsQuery->where('Item_Numbers', $itemNumber);
     }
 
-    if (!$existsQuery->exists()) {
-        return response()->json(['message' => 'Item not found.'], 404);
+    $existsRow = $existsQuery->first();
+    if (!$existsRow) {
+        return response()->json([
+            'message'      => 'Item not found.',
+            'searched'     => ['Item_Numbers' => $itemNumber, 'Serial_Numbers' => $serialNumber],
+        ], 404);
     }
 
     // Fetch full joined data from related tables
@@ -455,7 +459,11 @@ public function getItems($itemNumberOrSerial, $serialNumber = null)
 
 
     if (!$data) {
-        return response()->json(['message' => 'No details found for this item.'], 404);
+        return response()->json([
+            'message'  => 'No details found for this item — join returned nothing.',
+            'searched' => ['Item_Numbers' => $itemNumber, 'Serial_Numbers' => $serialNumber],
+            'raw_item' => $existsRow,
+        ], 404);
     }
 
     return response()->json([
