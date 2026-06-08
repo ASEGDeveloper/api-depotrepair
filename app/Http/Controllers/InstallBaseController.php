@@ -418,20 +418,27 @@ public function getItems($itemNumberOrSerial, $serialNumber = null)
         $serialNumber = $itemNumberOrSerial;
         $itemNumber   = null;
         
-    } else {
-        $itemNumber = $itemNumberOrSerial.$serialNumber ;
-    }
+    // } else {
+    //     $itemNumber = $itemNumberOrSerial;
+    // }
 
     $existsQuery = DB::table('deporepair.installbase_items_dpr')
         ->where('Serial_Numbers', $serialNumber);
  
 
 
-    if ($itemNumber !== null) {
-        $existsQuery->where('Item_Numbers', $itemNumber);
-    }
+    // if ($itemNumber !== null) {
+    //     $existsQuery->where('Item_Numbers', $itemNumber);
+    // }
 
     $existsRow = $existsQuery->first();
+
+      if ($itemNumber == null) {
+         $itemNumber = $existsRow->Item_Numbers ;
+     }
+
+
+   
     
     if (!$existsRow) {
         return response()->json([
