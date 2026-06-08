@@ -107,7 +107,7 @@ class GatePassController extends Controller
         ", [(int) $gatePassId, $action, $comment]);
     }
 
-     public function getByGatePassNo($gatePassNo)
+    public function getByGatePassNo($gatePassNo)
     {
         try {
             $gatePass = DB::selectOne("
@@ -166,9 +166,110 @@ class GatePassController extends Controller
     //     }
     // }
 
-   private function getGatePassItems($gatePassId)
-{
-    return DB::select("
+    public function getSecurityStats(Request $request)
+    {
+        try {
+            $wid = intval($request->user()->Branch_ID);
+
+            $pending = DB::selectOne("
+                SELECT COUNT(*) as cnt FROM deporepair.gate_pass gp
+                WHERE gp.status IN ('QUANTITY_ISSUED')
+                  AND (gp.security_status IS NULL OR gp.security_status = 'PENDING')
+                  AND gp.workshop_location = ?                 
+            ", [$wid])->cnt ?? 0;
+
+            $verified = DB::selectOne("
+                SELECT COUNT(*) as cnt FROM deporepair.gate_pass gp
+                WHERE gp.security_status = 'VERIFIED'
+                  AND gp.workshop_location = ?
+                  AND CAST(gp.security_verified_date AS DATE) = CAST(GETDATE() AS DATE)
+            ", [$wid])->cnt ?? 0;
+
+            $rejected = DB::selectOne("
+                SELECT COUNT(*) as cnt FROM deporepair.gate_pass gp
+                WHERE gp.security_status = 'REJECTED'
+                  AND gp.workshop_location = ?
+                  AND CAST(gp.security_verified_date AS DATE) = CAST(GETDATE() AS DATE)
+            ", [$wid])->cnt ?? 0;
+
+            $pendingReturn = DB::selectOne("
+                SELECT COUNT(DISTINCT gp.id) as cnt FROM deporepair.gate_pass gp
+                INNER JOIN deporepair.gate_pass_items gpi ON gp.id = gpi.gate_pass_id
+                WHERE gp.status IN ('SECURITY_CLEARED')
+                  AND gp.workshop_location = ?
+                  AND UPPER(gpi.item_type) = 'RETURNABLE'
+            ", [$wid])->cnt ?? 0;
+
+            $total = DB::selectOne("
+                SELECT COUNT(*) as cnt FROM deporepair.gate_pass
+                WHERE CAST(created_date AS DATE) = CAST(GETDATE() AS DATE)
+            ")->cnt ?? 0;
+
+            return $this->successResponse([
+                'pending'        => $pending,
+                'verified'       => $verified,
+                'rejected'       => $rejected,
+                'pending_return' => $pendingReturn,
+                'total_today'    => $total,
+            ], 'Security stats fetched successfully');
+        } catch (\Throwable $e) {
+            return $this->errorResponse('Failed to fetch security stats', 500, $e->getMessage());
+        }
+    }
+
+    public function getPendingSecurityChecks(Request $request)
+    {
+        try {
+            $workshopId = intval($request->user()->Branch_ID);
+
+            $results = DB::select("
+                SELECT gp.id, gp.gate_pass_no, gp.wo_number, gp.customer_name, gp.customer_number, gp.site,
+                       gp.department AS department_id, b.Branch_Name as department_name, gp.business_unit,
+                       gp.vehicle_registration_number, gp.remarks, gp.status, gp.created_by, gp.created_date,
+                       gp.security_status, gp.security_verified_by, gp.security_verified_date,
+                       gp.technician_name, gp.technician_email, gp.technician_contact_no,
+                       gp.pass_type, gp.driver_name, gp.driver_mobile_no, gp.supplier_name, gp.supplier_mobile
+                FROM deporepair.gate_pass gp
+                LEFT JOIN deporepair.branches b ON gp.department = b.id
+                WHERE gp.status IN ('QUANTITY_ISSUED', 'SHORTAGE_APPROVED')
+                  AND (gp.security_status IS NULL OR gp.security_status = 'PENDING')
+                  AND gp.workshop_location = ?
+                ORDER BY gp.id DESC
+            ", [$workshopId]);
+
+            return $this->successResponse($results, 'Pending security checks fetched successfully');
+        } catch (\Throwable $e) {
+            return $this->errorResponse('Failed to fetch pending security checks', 500, $e->getMessage());
+        }
+    }
+
+    public function getPendingReturnableChecks(Request $request)
+    {
+        try {
+           $workshopId = intval($request->user()->Branch_ID);
+
+            $results = DB::select("
+                SELECT DISTINCT gp.id, gp.gate_pass_no, gp.wo_number, gp.customer_name, gp.site,
+                       gp.technician_name, gp.technician_email, gp.security_verified_date,
+                       gp.vehicle_registration_number,
+                       gp.pass_type, gp.driver_name, gp.driver_mobile_no, gp.supplier_name, gp.supplier_mobile
+                FROM deporepair.gate_pass gp
+                INNER JOIN deporepair.gate_pass_items gpi ON gp.id = gpi.gate_pass_id
+                WHERE gp.status = 'SECURITY_CLEARED'
+                  AND UPPER(gpi.item_type) = 'RETURNABLE'
+                  AND gp.workshop_location = ?
+                ORDER BY gp.id DESC
+            ", [$workshopId]);
+
+            return $this->successResponse($results, 'Pending returnable checks fetched successfully');
+        } catch (\Throwable $e) {
+            return $this->errorResponse('Failed to fetch pending returnable checks', 500, $e->getMessage());
+        }
+    }
+
+    private function getGatePassItems($gatePassId)
+    {
+        return DB::select("
         SELECT 
             gpi.id,
             gpi.gate_pass_id,
@@ -188,5 +289,5 @@ class GatePassController extends Controller
             ON gpi.item_id = mg.id
         WHERE gpi.gate_pass_id = ?
     ", [(int) $gatePassId]);
-}
+    }
 }

@@ -406,27 +406,41 @@ public function searchInstallBase(Request $request)
     }
 
 
-public function getItems($serialNumber)
+public function getItems($itemNumberOrSerial, $serialNumber = null)
 {
-    // Check if the record exists in installbase_dpr
-   // $installBase = DB::table('installbase_dpr')->find($id);
+    // Support both URL forms:
+    //   item/{serialNumber}            → single param
+    //   item/{itemNumber}/{serialNumber} → two params
+    if ($serialNumber === null) {
+        $serialNumber = $itemNumberOrSerial;
+        $itemNumber   = null;
+    } else {
+        $itemNumber = $itemNumberOrSerial;
+    }
 
-  $installBase=DB::table('deporepair.installbase_items_dpr')->where('Serial_Numbers',$serialNumber)->first();
+    $existsQuery = DB::table('deporepair.installbase_items_dpr')
+        ->where('Serial_Numbers', $serialNumber);
 
- // $installBase=DB::table('deporepair.installbase_items_dpr')->where('reference_id',$reference_id)->first();
+    if ($itemNumber !== null) {
+        $existsQuery->where('Item_Numbers', $itemNumber);
+    }
 
-    if (!$installBase) {
+    if (!$existsQuery->exists()) {
         return response()->json(['message' => 'Item not found.'], 404);
     }
 
     // Fetch full joined data from related tables
-    $data = DB::table('deporepair.installbase_items_dpr as ibi')
+    $query = DB::table('deporepair.installbase_items_dpr as ibi')
     ->join('deporepair.item_master_dpr as im', 'ibi.Item_Numbers', '=', 'im.ItemNumber')
     ->join('deporepair.installbase_dpr as ib', 'ib.ID', '=', 'ibi.installbase_id')
-    ->join('deporepair.deporepair.customers_dpr as cd', 'cd.ID', '=', 'ib.CustomerID')
-    ->where('ibi.Serial_Numbers', $serialNumber)
- //  ->where('ibi.reference_id', $serialNumber)
-    ->select(
+    ->join('deporepair.customers_dpr as cd', 'cd.ID', '=', 'ib.CustomerID')
+    ->where('ibi.Serial_Numbers', $serialNumber);
+
+    if ($itemNumber !== null) {
+        $query->where('ibi.Item_Numbers', $itemNumber);
+    }
+
+    $data = $query->select(
         'ibi.Item_Numbers',
         'ibi.Serial_Numbers',
         'im.MAWP',

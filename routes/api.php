@@ -37,6 +37,14 @@ Route::middleware('auth:sanctum')->group(function () {
   Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/employees', [AuthController::class, 'getEmployees']); 
 
+     Route::prefix('gatepass')->group(function () {
+
+         Route::get('/security-stats', [GatePassController::class, 'getSecurityStats']);
+         Route::get('/pending-security-checks', [GatePassController::class, 'getPendingSecurityChecks']);
+         Route::get('/pending-returnable-checks', [GatePassController::class, 'getPendingReturnableChecks']);
+
+      });
+
     Route::prefix('customers')->group(function () {
         Route::post('/getsingle-customer/{id}', [CustomerController::class, 'getsingleCustomer']);
         Route::post('/', [CustomerController::class, 'store']);
@@ -64,9 +72,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/', [InstallBaseController::class, 'save']); // Create item
         Route::put('/{id}', [InstallBaseController::class, 'update']); // update the records
         Route::post('/search', [InstallBaseController::class, 'searchInstallBase']);
-        Route::get('{id}', [InstallBaseController::class, 'show']); // Get single item  
-        Route::get('item/{id}', [InstallBaseController::class, 'getItems']); //  
-        Route::get('customer/{id}', [InstallBaseController::class, 'getCustomerName']); //  
+        Route::get('item/{itemNumber}/{serialNumber}', [InstallBaseController::class, 'getItems']);
+        Route::get('item/{serialNumber}', [InstallBaseController::class, 'getItems']);
+        Route::get('customer/{id}', [InstallBaseController::class, 'getCustomerName']);
+        Route::get('{id}', [InstallBaseController::class, 'show']); // keep last — wildcard must not swallow specific routes above
     });
 
     Route::prefix('inspection-report')->group(function () {
