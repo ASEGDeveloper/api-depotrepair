@@ -106,33 +106,58 @@ class ItemMasterController extends Controller
         }
     }
 
-
-
-
-
-    public function searchItems(Request $request)
+public function searchItems(Request $request)
     {
         $query = ItemMasterModel::query();
 
-        $hasFilter = $request->filled(['ItemNumber', 'TankType', 'Manufacturer']);
-
-        if ($hasFilter) {
-            if ($request->filled('ItemNumber')) {
-                $query->where('ItemNumber', 'LIKE', '%' . $request->ItemNumber . '%');
-            }
-
-            if ($request->filled('TankType')) {
-                $query->orWhere('TankType', 'LIKE', '%' . $request->TankType . '%');
-            }
-
-            if ($request->filled('Manufacturer')) {
-                $query->orWhere('Manufacturer', 'LIKE', '%' . $request->Manufacturer . '%');
-            }
+        if ($request->filled('ItemNumber')) {
+            $term = $request->ItemNumber;
+            $query->where(function ($q) use ($term) {
+                $q->where('ItemNumber', 'LIKE', $term . '%')
+                  ->orWhere('ItemNumber', 'LIKE', '%' . $term . '%');
+            })->orderByRaw("CASE WHEN ItemNumber LIKE ? THEN 0 ELSE 1 END", [$term . '%']);
         }
 
-        // Explicitly select the fields you want to return, including id
-        return $query->select('id', 'ItemNumber', 'TankType', 'Manufacturer')->get();
+        if ($request->filled('TankType')) {
+            $query->where('TankType', 'LIKE', '%' . $request->TankType . '%');
+        }
+
+        if ($request->filled('Manufacturer')) {
+            $query->where('Manufacturer', 'LIKE', '%' . $request->Manufacturer . '%');
+        }
+
+        return $query
+            ->select('ID', 'ItemNumber', 'TankType', 'Manufacturer', 'Description', 'Capacity', 'PrimaryUOM', 'MAWP')
+            ->orderBy('ItemNumber')
+            ->limit(50)
+            ->get();
     }
+
+
+
+    // public function searchItems(Request $request)
+    // {
+    //     $query = ItemMasterModel::query();
+
+    //     $hasFilter = $request->filled(['ItemNumber', 'TankType', 'Manufacturer']);
+
+    //     if ($hasFilter) {
+    //         if ($request->filled('ItemNumber')) {
+    //             $query->where('ItemNumber', 'LIKE', '%' . $request->ItemNumber . '%');
+    //         }
+
+    //         if ($request->filled('TankType')) {
+    //             $query->orWhere('TankType', 'LIKE', '%' . $request->TankType . '%');
+    //         }
+
+    //         if ($request->filled('Manufacturer')) {
+    //             $query->orWhere('Manufacturer', 'LIKE', '%' . $request->Manufacturer . '%');
+    //         }
+    //     }
+
+    //     // Explicitly select the fields you want to return, including id
+    //     return $query->select('id', 'ItemNumber', 'TankType', 'Manufacturer')->get();
+    // }
 
 
 
