@@ -419,13 +419,12 @@ public function getItems($itemNumberOrSerial, $serialNumber = null)
         $itemNumber   = null;
         
     } else {
-        $itemNumber = $itemNumberOrSerial;
+        $itemNumber = $itemNumberOrSerial.$serialNumber ;
     }
 
     $existsQuery = DB::table('deporepair.installbase_items_dpr')
         ->where('Serial_Numbers', $serialNumber);
-
-        print_r($existsQuery)  ;
+ 
 
 
     if ($itemNumber !== null) {
