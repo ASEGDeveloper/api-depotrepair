@@ -423,7 +423,8 @@ class GatePassController extends Controller
             // return $logMsg.$gatePassId;
 
             $id = DB::table('deporepair.gate_pass')
-                ->where('gate_pass_no', $gatePassId)
+               // ->where('gate_pass_no', $gatePassId)
+               ->where('gate_pass_no', $gatePassId)
                 ->value('id'); // primary key
 
 
