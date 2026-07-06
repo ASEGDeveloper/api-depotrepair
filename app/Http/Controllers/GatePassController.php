@@ -509,7 +509,7 @@ class GatePassController extends Controller
                 return $this->failedResponse('Gate pass item not found', 404);
             }
 
-            $targetQty = (float) ($item->issued_qty ?? $item->requested_qty ?? 0);
+            $targetQty = (float) ($item->requested_qty ?? 0);
             $alreadyReturned = (float) ($item->returned_qty ?? 0);
 
             $qtyToAdd = $returnQty !== null ? (float) $returnQty : ($targetQty - $alreadyReturned);
