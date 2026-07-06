@@ -35,13 +35,15 @@ Route::post('/test-tna', [TnaControllerTest::class, 'createOrUpdateTNAEntry']);
 Route::middleware('auth:sanctum')->group(function () {
 
   Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/employees', [AuthController::class, 'getEmployees']); 
+  Route::get('/employees', [AuthController::class, 'getEmployees']); 
 
      Route::prefix('gatepass')->group(function () {
 
          Route::get('/security-stats', [GatePassController::class, 'getSecurityStats']);
          Route::get('/pending-security-checks', [GatePassController::class, 'getPendingSecurityChecks']);
          Route::get('/pending-returnable-checks', [GatePassController::class, 'getPendingReturnableChecks']);
+         Route::post('/verify', [GatePassController::class, 'verifyGatePass']);
+         Route::post('/return-item', [GatePassController::class, 'returnItem']);
 
       });
 

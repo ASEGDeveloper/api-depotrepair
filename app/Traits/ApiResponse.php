@@ -14,13 +14,19 @@ trait ApiResponse
      * @param int $status
      * @return JsonResponse
      */
-    public function successResponse($data = null, string $message = 'Success', int $status = 200): JsonResponse
+    public function successResponse($data = null, string $message = 'Success', int $status = 200, $meta = null): JsonResponse
     {
-        return response()->json([
+        $response = [
             'status' => TRUE,
             'message' => $message,
             'data' => $data
-        ], $status);
+        ];
+
+        if ($meta !== null) {
+            $response['meta'] = $meta;
+        }
+
+        return response()->json($response, $status);
     }
 
     /**
