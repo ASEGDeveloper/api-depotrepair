@@ -324,6 +324,7 @@ class GatePassController extends Controller
                 INNER JOIN deporepair.gate_pass_items gpi ON gp.id = gpi.gate_pass_id
                 WHERE gp.status = 'SECURITY_CLEARED'
                   AND UPPER(gpi.item_type) = 'RETURNABLE'
+                  AND (gpi.is_returned IS NULL OR gpi.is_returned = 0)
                   AND gp.workshop_location = ?
                   $searchSql
             ", array_merge([$workshopId], $searchParams))->total;
@@ -337,6 +338,7 @@ class GatePassController extends Controller
                 INNER JOIN deporepair.gate_pass_items gpi ON gp.id = gpi.gate_pass_id
                 WHERE gp.status = 'SECURITY_CLEARED'
                   AND UPPER(gpi.item_type) = 'RETURNABLE'
+                  AND (gpi.is_returned IS NULL OR gpi.is_returned = 0)
                   AND gp.workshop_location = ?
                   $searchSql
                 ORDER BY gp.id DESC
@@ -354,7 +356,8 @@ class GatePassController extends Controller
 
                 $items = $this->getGatePassItems($gatePass->id);
                 $gatePass->items = array_values(array_filter($items, function ($item) {
-                    return strtoupper(trim($item->item_type ?? '')) === 'RETURNABLE';
+                    return strtoupper(trim($item->item_type ?? '')) === 'RETURNABLE'
+                        && empty($item->is_returned);
                 }));
             }
 
