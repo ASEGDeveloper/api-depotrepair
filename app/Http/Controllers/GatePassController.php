@@ -197,13 +197,20 @@ class GatePassController extends Controller
                   AND CAST(gp.security_verified_date AS DATE) = CAST(GETDATE() AS DATE)
             ", [$wid])->cnt ?? 0;
 
-            $pendingReturn = DB::selectOne("
+            // $pendingReturn = DB::selectOne("
+            //     SELECT COUNT(DISTINCT gp.id) as cnt FROM deporepair.gate_pass gp
+            //     INNER JOIN deporepair.gate_pass_items gpi ON gp.id = gpi.gate_pass_id
+            //     WHERE gp.status IN ('SECURITY_CLEARED')
+            //       AND gp.workshop_location = ?
+            //       AND UPPER(gpi.item_type) = 'RETURNABLE'
+            // ", [$wid])->cnt ?? 0;
+
+             $pendingReturn = DB::selectOne("
                 SELECT COUNT(DISTINCT gp.id) as cnt FROM deporepair.gate_pass gp
                 INNER JOIN deporepair.gate_pass_items gpi ON gp.id = gpi.gate_pass_id
-                WHERE gp.status IN ('SECURITY_CLEARED')
-                  AND gp.workshop_location = ?
-                  AND UPPER(gpi.item_type) = 'RETURNABLE'
+                WHERE gp.status IN ('SECURITY_CLEARED')                  
             ", [$wid])->cnt ?? 0;
+
 
             $total = DB::selectOne("
                 SELECT COUNT(*) as cnt FROM deporepair.gate_pass
