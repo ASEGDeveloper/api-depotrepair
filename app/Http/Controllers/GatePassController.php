@@ -376,7 +376,7 @@ class GatePassController extends Controller
     {
         try {
 
-            $gatePassId = trim($request->input('gate_pass_id'));
+            $gatePassId = trim($request->input('gate_pass_no'));
             $status     = strtoupper(trim($request->input('status', '')));
             $employeeId = intval($request->user()->EmployeeID);
             $remarks    = trim($request->input('remarks', ''));
@@ -389,6 +389,14 @@ class GatePassController extends Controller
 
             if ($status === 'REJECTED' && $remarks === '') {
                 return $this->failedResponse('Remarks are required when rejecting a gate pass', 422);
+            }
+
+            $id = DB::table('deporepair.gate_pass')
+                ->where('gate_pass_no', $gatePassId)
+                ->value('id'); // primary key
+
+            if (!$id) {
+                return $this->failedResponse('Gate pass not found', 404);
             }
 
             $mainStatus = $status === 'VERIFIED' ? 'SECURITY_CLEARED' : 'SECURITY_REJECTED';
@@ -424,13 +432,6 @@ class GatePassController extends Controller
             }
 
             // return $logMsg.$gatePassId;
-
-            $id = DB::table('deporepair.gate_pass')
-               // ->where('gate_pass_no', $gatePassId)
-               ->where('gate_pass_no', $gatePassId)
-                ->value('id'); // primary key
-
-
 
             $this->addLog($id, $mainStatus, $logMsg);
 
