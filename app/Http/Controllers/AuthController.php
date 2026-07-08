@@ -128,8 +128,7 @@ class AuthController extends Controller
                 'ID'              => $employee->ID,
                 'EmployeeID'      => $employee->EmployeeID,
                 'EmployeeName'    => $employee->EmployeeName,
-                'EmployeeRole'    => $employee->EmployeeRole,
-                'Branch_ID'       => $employee->Branch_ID,
+                'EmployeeRole'    => $employee->EmployeeRole, 
                 'BranchName'      => $employee->BranchName,
             ],
         ];
