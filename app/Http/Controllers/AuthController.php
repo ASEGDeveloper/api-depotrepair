@@ -84,6 +84,8 @@ class AuthController extends Controller
 
         $employee = Employee::where('EmployeeEmail', $request->EmployeeEmail)
             ->whereRaw('LOWER(EmployeeRole) = ?', ['security'])
+            ->leftJoin('deporepair.workshop_gate as wg', 'wg.ID', '=', 'deporepair.employee.Branch_ID')
+            ->select('deporepair.employee.*', 'wg.name as BranchName')
             ->first();
 
         // ❌ User not found OR access not allowed
@@ -126,8 +128,9 @@ class AuthController extends Controller
                 'ID'              => $employee->ID,
                 'EmployeeID'      => $employee->EmployeeID,
                 'EmployeeName'    => $employee->EmployeeName,
-                'EmployeeRole'    => $employee->EmployeeRole,                
-                'Branch_ID'       => $employee->Branch_ID,               
+                'EmployeeRole'    => $employee->EmployeeRole,
+                'Branch_ID'       => $employee->Branch_ID,
+                'BranchName'      => $employee->BranchName,
             ],
         ];
 
