@@ -81,7 +81,7 @@ class HMService
 
             Log::error('HM creation failed', [
                 'error'   => $e->getMessage(),
-                'request' => $request->all()
+                'request' => (array) $request
             ]);
 
             return $this->errorResponse('Failed to create record. Please try again later.');
@@ -302,7 +302,7 @@ public function updateHM($request): array
 
             Log::error('HM creation failed', [
                 'error' => $e->getMessage(),
-                'request' => $request->all()
+                'request' => (array) $request
             ]);
             return $this->errorResponse(
                 'Failed to create record. Please try again later.'
