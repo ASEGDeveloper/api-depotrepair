@@ -25,6 +25,9 @@ class TnaService
     {
         return DB::table('deporepair.quotation_repair_order_jobs')
             ->where('Task_No', $taskNo)
+            ->first()
+            ?? DB::table('deporepair.actual_repair_order_jobs')
+            ->where('Task_No', $taskNo)
             ->first();
     }
 

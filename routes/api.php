@@ -17,9 +17,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('refresh', [AuthController::class, 'refresh']);
 
 Route::post('/security_login', [AuthController::class, 'securityLogin']);
-Route::post('security_refresh', [AuthController::class, 'securityRefresh']);
-
-
+Route::post('security_refresh', [AuthController::class, 'securityRefresh']); 
 
 
 Route::middleware('api.token')->post('/tna-entries', [TnaEntryController::class, 'createOrUpdateTNAEntry']);
