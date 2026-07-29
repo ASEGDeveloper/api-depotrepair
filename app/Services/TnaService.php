@@ -69,13 +69,6 @@ class TnaService
                 return $this->errorResponse("Job card '$jobCardOpen' is already open");
             }
 
-            $anyJobCardOpen= $this->isJobCodeAlreadyOpen($request->jobcode);
-
-            if ($anyJobCardOpen) {
-                // Return a message that job card is already open
-                return $this->errorResponse("Job card '$anyJobCardOpen' is already open ");
-            }
-
 
             $data = TnaEntry::create(array_merge($default, [
                 'EMPLOYEECODE' => $request->employeecode,
@@ -195,13 +188,6 @@ class TnaService
                 return $this->errorResponse("Job card '$jobCardOpen' is already open ");
             }
 
-           $anyJobCardOpen= $this->isJobCodeAlreadyOpen($request->jobcode);
-
-            if ($anyJobCardOpen) {
-                // Return a message that job card is already open
-                return $this->errorResponse("Job card '$anyJobCardOpen' is already open ");
-            }
-
 
             $create = TnaEntry::create(array_merge($default, [
                 'EMPLOYEECODE' => $request->employeecode,
@@ -281,12 +267,5 @@ class TnaService
             ->value('JOBCODE'); // returns the first matching JOBCODE or null
     }
 
-
-public function isJobCodeAlreadyOpen($JOBCODE)
-{
-    return TnaEntry::where('JOBCODE', $JOBCODE)
-        ->whereNull('ED')      // still open
-        ->value('JOBCODE');            // true if at least one open record exists
-}
 
 }

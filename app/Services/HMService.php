@@ -43,13 +43,6 @@ class HMService
                 return $this->errorResponse("Job card '$jobCardOpen' is already open ");
             }
 
-            $anyJobCardOpen = $this->tnaService->isJobCodeAlreadyOpen($request->jobcode); // job wise
-
-            if ($anyJobCardOpen) {
-                // Return a message that job card is already open
-                return $this->errorResponse("Job card '$anyJobCardOpen' is already open ");
-            }
-
 
             // Initialize $data outside closure
             $data = null;
@@ -262,14 +255,6 @@ public function updateHM($request): array
                 // Return a message that job card is already open
                 return $this->errorResponse("Job card '$jobCardOpen' is already open ");
             }
-
-            $anyJobCardOpen = $this->tnaService->isJobCodeAlreadyOpen($request->jobcode); // job wise
-
-            if ($anyJobCardOpen) {
-                // Return a message that job card is already open
-                return $this->errorResponse("Job card '$anyJobCardOpen' is already open ");
-            }
-
 
 
             DB::transaction(function () use ($request, &$data) {
