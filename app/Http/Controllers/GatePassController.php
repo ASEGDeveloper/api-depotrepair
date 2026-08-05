@@ -266,7 +266,8 @@ class GatePassController extends Controller
                        gp.pass_type, gp.driver_name, gp.driver_mobile_no, gp.supplier_name, gp.supplier_mobile
                 FROM deporepair.gate_pass gp
                 LEFT JOIN deporepair.branches b ON gp.department = b.id
-                LEFT JOIN deporepair.employee e ON TRY_CONVERT(int, gp.created_by) = e.EmployeeID
+                LEFT JOIN deporepair.employee e ON gp.created_by NOT LIKE '%[^0-9]%'
+                    AND gp.created_by = CAST(e.EmployeeID AS NVARCHAR(50))
                 WHERE gp.status IN ('QUANTITY_ISSUED', 'SHORTAGE_APPROVED')
                   AND (gp.security_status IS NULL OR gp.security_status = 'PENDING')
                   AND gp.workshop_location = ?
@@ -416,7 +417,8 @@ class GatePassController extends Controller
                 FROM deporepair.gate_pass gp
                 INNER JOIN deporepair.gate_pass_items gpi ON gp.id = gpi.gate_pass_id
                 LEFT JOIN deporepair.branches b ON gp.department = b.id
-                LEFT JOIN deporepair.employee e ON TRY_CONVERT(int, gp.created_by) = e.EmployeeID
+                LEFT JOIN deporepair.employee e ON gp.created_by NOT LIKE '%[^0-9]%'
+                    AND gp.created_by = CAST(e.EmployeeID AS NVARCHAR(50))
                 WHERE gp.status = 'SECURITY_CLEARED'
                   AND UPPER(gpi.item_type) = 'RETURNABLE'
                   AND (gpi.is_returned IS NULL OR gpi.is_returned = 0)
