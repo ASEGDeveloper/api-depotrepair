@@ -259,12 +259,14 @@ class GatePassController extends Controller
             $results = DB::select("
                 SELECT gp.id, gp.gate_pass_no, gp.wo_number, gp.customer_name, gp.customer_number, gp.site,
                        gp.department AS department_id, b.Branch_Name as department_name, gp.business_unit,
-                       gp.vehicle_registration_number, gp.remarks, gp.status, gp.created_by, gp.created_date,
+                       gp.vehicle_registration_number, gp.remarks, gp.status, gp.created_by,
+                       e.EmployeeName AS created_by_name, gp.created_date,
                        gp.security_status, gp.security_verified_by, gp.security_verified_date,
                        gp.technician_name, gp.technician_email, gp.technician_contact_no,
                        gp.pass_type, gp.driver_name, gp.driver_mobile_no, gp.supplier_name, gp.supplier_mobile
                 FROM deporepair.gate_pass gp
                 LEFT JOIN deporepair.branches b ON gp.department = b.id
+                LEFT JOIN deporepair.employee e ON TRY_CONVERT(int, gp.created_by) = e.EmployeeID
                 WHERE gp.status IN ('QUANTITY_ISSUED', 'SHORTAGE_APPROVED')
                   AND (gp.security_status IS NULL OR gp.security_status = 'PENDING')
                   AND gp.workshop_location = ?
@@ -408,12 +410,13 @@ class GatePassController extends Controller
             $results = DB::select("
                 SELECT DISTINCT gp.id, gp.gate_pass_no, gp.wo_number, gp.customer_name, gp.site,
                        gp.technician_name, gp.technician_email, gp.security_verified_date,
-                       gp.vehicle_registration_number, gp.created_by, gp.created_by AS created_by_name,
+                       gp.vehicle_registration_number, gp.created_by, e.EmployeeName AS created_by_name,
                        gp.department AS department_id, b.Branch_Name AS department_name,
                        gp.pass_type, gp.driver_name, gp.driver_mobile_no, gp.supplier_name, gp.supplier_mobile
                 FROM deporepair.gate_pass gp
                 INNER JOIN deporepair.gate_pass_items gpi ON gp.id = gpi.gate_pass_id
                 LEFT JOIN deporepair.branches b ON gp.department = b.id
+                LEFT JOIN deporepair.employee e ON TRY_CONVERT(int, gp.created_by) = e.EmployeeID
                 WHERE gp.status = 'SECURITY_CLEARED'
                   AND UPPER(gpi.item_type) = 'RETURNABLE'
                   AND (gpi.is_returned IS NULL OR gpi.is_returned = 0)
