@@ -408,10 +408,12 @@ class GatePassController extends Controller
             $results = DB::select("
                 SELECT DISTINCT gp.id, gp.gate_pass_no, gp.wo_number, gp.customer_name, gp.site,
                        gp.technician_name, gp.technician_email, gp.security_verified_date,
-                       gp.vehicle_registration_number, gp.created_by,
+                       gp.vehicle_registration_number, gp.created_by, gp.created_by AS created_by_name,
+                       gp.department AS department_id, b.Branch_Name AS department_name,
                        gp.pass_type, gp.driver_name, gp.driver_mobile_no, gp.supplier_name, gp.supplier_mobile
                 FROM deporepair.gate_pass gp
                 INNER JOIN deporepair.gate_pass_items gpi ON gp.id = gpi.gate_pass_id
+                LEFT JOIN deporepair.branches b ON gp.department = b.id
                 WHERE gp.status = 'SECURITY_CLEARED'
                   AND UPPER(gpi.item_type) = 'RETURNABLE'
                   AND (gpi.is_returned IS NULL OR gpi.is_returned = 0)
