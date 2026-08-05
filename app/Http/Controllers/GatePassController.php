@@ -224,7 +224,7 @@ class GatePassController extends Controller
         }
     }
 
-    public function getPendingSecurityChecks(Request $request)
+     public function getPendingSecurityChecks(Request $request)
     {
         try {
             $workshopId = intval($request->user()->Branch_ID);
@@ -259,12 +259,14 @@ class GatePassController extends Controller
             $results = DB::select("
                 SELECT gp.id, gp.gate_pass_no, gp.wo_number, gp.customer_name, gp.customer_number, gp.site,
                        gp.department AS department_id, b.Branch_Name as department_name, gp.business_unit,
-                       gp.vehicle_registration_number, gp.remarks, gp.status, gp.created_by, gp.created_date,
+                       gp.vehicle_registration_number, gp.remarks, gp.status, gp.created_by,
+                       e.EmployeeName AS created_by_name, gp.created_date,
                        gp.security_status, gp.security_verified_by, gp.security_verified_date,
                        gp.technician_name, gp.technician_email, gp.technician_contact_no,
                        gp.pass_type, gp.driver_name, gp.driver_mobile_no, gp.supplier_name, gp.supplier_mobile
                 FROM deporepair.gate_pass gp
                 LEFT JOIN deporepair.branches b ON gp.department = b.id
+                LEFT JOIN deporepair.employee e ON gp.created_by = e.EmployeeID
                 WHERE gp.status IN ('QUANTITY_ISSUED', 'SHORTAGE_APPROVED')
                   AND (gp.security_status IS NULL OR gp.security_status = 'PENDING')
                   AND gp.workshop_location = ?
@@ -295,6 +297,80 @@ class GatePassController extends Controller
             return $this->errorResponse('Failed to fetch pending security checks', 500, $e->getMessage());
         }
     }
+
+    
+
+    // public function getPendingSecurityChecks(Request $request)
+    // {
+    //     try {
+    //         $workshopId = intval($request->user()->Branch_ID);
+
+    //         $page    = max(1, (int) $request->input('page', 1));
+    //         $perPage = min(100, max(1, (int) $request->input('per_page', 20)));
+    //         $offset  = ($page - 1) * $perPage;
+    //         $search  = trim((string) $request->input('search', ''));
+
+    //         $searchSql = '';
+    //         $searchParams = [];
+    //         if ($search !== '') {
+    //             $searchSql = " AND (
+    //                 gp.technician_name LIKE ?
+    //                 OR gp.customer_name LIKE ?
+    //                 OR gp.gate_pass_no LIKE ?
+    //                 OR gp.vehicle_registration_number LIKE ?
+    //             )";
+    //             $like = '%' . $search . '%';
+    //             $searchParams = [$like, $like, $like, $like];
+    //         }
+
+    //         $total = DB::selectOne("
+    //             SELECT COUNT(*) AS total
+    //             FROM deporepair.gate_pass gp
+    //             WHERE gp.status IN ('QUANTITY_ISSUED', 'SHORTAGE_APPROVED')
+    //               AND (gp.security_status IS NULL OR gp.security_status = 'PENDING')
+    //               AND gp.workshop_location = ?
+    //               $searchSql
+    //         ", array_merge([$workshopId], $searchParams))->total;
+
+    //         $results = DB::select("
+    //             SELECT gp.id, gp.gate_pass_no, gp.wo_number, gp.customer_name, gp.customer_number, gp.site,
+    //                    gp.department AS department_id, b.Branch_Name as department_name, gp.business_unit,
+    //                    gp.vehicle_registration_number, gp.remarks, gp.status, gp.created_by, gp.created_date,
+    //                    gp.security_status, gp.security_verified_by, gp.security_verified_date,
+    //                    gp.technician_name, gp.technician_email, gp.technician_contact_no,
+    //                    gp.pass_type, gp.driver_name, gp.driver_mobile_no, gp.supplier_name, gp.supplier_mobile
+    //             FROM deporepair.gate_pass gp
+    //             LEFT JOIN deporepair.branches b ON gp.department = b.id
+    //             WHERE gp.status IN ('QUANTITY_ISSUED', 'SHORTAGE_APPROVED')
+    //               AND (gp.security_status IS NULL OR gp.security_status = 'PENDING')
+    //               AND gp.workshop_location = ?
+    //               $searchSql
+    //             ORDER BY gp.id DESC
+    //             OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
+    //         ", array_merge([$workshopId], $searchParams, [$offset, $perPage]));
+
+    //         foreach ($results as $gatePass) {
+    //             if (empty($gatePass->pass_type)) {
+    //                 $gatePass->pass_type = 'General';
+    //             }
+
+    //             if (strtoupper($gatePass->pass_type) !== 'BOUGHTOUT') {
+    //                 unset($gatePass->supplier_name, $gatePass->supplier_mobile);
+    //             }
+
+    //             $gatePass->items = $this->getGatePassItems($gatePass->id);
+    //         }
+
+    //         return $this->successResponse($results, 'Pending security checks fetched successfully', 200, [
+    //             'page' => $page,
+    //             'per_page' => $perPage,
+    //             'total' => $total,
+    //             'total_pages' => (int) ceil($total / $perPage),
+    //         ]);
+    //     } catch (\Throwable $e) {
+    //         return $this->errorResponse('Failed to fetch pending security checks', 500, $e->getMessage());
+    //     }
+    // }
 
 
     public function getPendingReturnableChecks(Request $request)
@@ -334,10 +410,11 @@ class GatePassController extends Controller
             $results = DB::select("
                 SELECT DISTINCT gp.id, gp.gate_pass_no, gp.wo_number, gp.customer_name, gp.site,
                        gp.technician_name, gp.technician_email, gp.security_verified_date,
-                       gp.vehicle_registration_number,
+                       gp.vehicle_registration_number, gp.created_by, e.EmployeeName AS created_by_name,
                        gp.pass_type, gp.driver_name, gp.driver_mobile_no, gp.supplier_name, gp.supplier_mobile
                 FROM deporepair.gate_pass gp
                 INNER JOIN deporepair.gate_pass_items gpi ON gp.id = gpi.gate_pass_id
+                LEFT JOIN deporepair.employee e ON gp.created_by = e.EmployeeID
                 WHERE gp.status = 'SECURITY_CLEARED'
                   AND UPPER(gpi.item_type) = 'RETURNABLE'
                   AND (gpi.is_returned IS NULL OR gpi.is_returned = 0)
