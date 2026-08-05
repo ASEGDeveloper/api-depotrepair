@@ -75,7 +75,74 @@ class AuthController extends Controller
     }
 
 
-    public function securityLogin(Request $request)
+    // public function securityLogin(Request $request)
+    // {
+    //     $request->validate([
+    //         'EmployeeEmail' => 'required',
+    //         'EmployeePassword' => 'required',
+    //     ]);
+
+    //     $employee = Employee::where('EmployeeEmail', $request->EmployeeEmail)
+    //         ->whereRaw('LOWER(EmployeeRole) = ?', ['security'])
+    //         ->leftJoin('deporepair.workshop_gate as wg', 'wg.ID', '=', 'deporepair.employee.Branch_ID')
+    //         ->select('deporepair.employee.*', 'wg.name as BranchName')
+    //         ->first();
+
+    //     // ❌ User not found OR access not allowed
+    //     if (!$employee) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Access not allowed or user not found'
+    //         ], 403);
+    //     }
+
+    //     // ❌ Password mismatch
+    //     if (strtolower(trim($employee->EmployeePassword)) !== md5($request->EmployeePassword)) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Invalid email or password'
+    //         ], 401);
+    //     }
+
+    //     // ✅ Delete old tokens
+    //     $employee->tokens()->delete();
+
+    //     // ✅ Create access token
+    //     $accessToken = $employee->createToken(
+    //         'API Token',
+    //         ['*'],
+    //         now()->addMinutes(15)
+    //     );
+
+    //     // ✅ Create refresh token
+    //     $refreshToken = Str::random(64);
+    //     $employee->refreshTokens()->create([
+    //         'token' => hash('sha256', $refreshToken),
+    //         'expires_at' => now()->addDays(7),
+    //     ]);
+
+    //     $data = [
+    //         'accessToken' => $accessToken->plainTextToken,
+    //         'refreshToken' => $refreshToken,
+    //         'employee' => [
+    //             'ID'              => $employee->ID,
+    //             'EmployeeID'      => $employee->EmployeeID,
+    //             'EmployeeName'    => $employee->EmployeeName,
+    //             'EmployeeRole'    => $employee->EmployeeRole, 
+    //             'Branch_ID'       => $employee->Branch_ID,  
+    //             'BranchName'      => $employee->BranchName,
+    //         ],
+    //     ];
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'Logged in successfully',
+    //         'data' => $data
+    //     ], 200);
+    // }
+
+
+ public function securityLogin(Request $request)
     {
         $request->validate([
             'EmployeeEmail' => 'required',
@@ -104,10 +171,7 @@ class AuthController extends Controller
             ], 401);
         }
 
-        // ✅ Delete old tokens
-        $employee->tokens()->delete();
-
-        // ✅ Create access token
+        // ✅ Create access token (old tokens kept so the same credentials can be logged in on multiple devices)
         $accessToken = $employee->createToken(
             'API Token',
             ['*'],
@@ -140,9 +204,6 @@ class AuthController extends Controller
             'data' => $data
         ], 200);
     }
-
-
-
 
 
     // public function login(Request $request)
