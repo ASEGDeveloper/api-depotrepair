@@ -89,8 +89,7 @@ public function updateHM($request): array
         $affectedRows = TnaEntry::where('COMPANYCODE', $request->companycode)
             ->where('EMPLOYEECODE', $request->employeecode)
             ->where('JOBCODE', $request->jobcode)
-            ->where('STARTDATE', $request->startdate)
-            ->where('STARTTIME', $request->starttime)
+            ->whereNull('ENDTIME')
             ->update([
                 'ENDDATE' => $request->enddate,
                 'ENDTIME' => $request->endtime,
@@ -106,8 +105,8 @@ public function updateHM($request): array
 
         if (!$affectedRows) {
             throw new \Exception(
-                "No matching job card found for employee '{$request->employeecode}' " .
-                "with job code '{$request->jobcode}' on '{$request->startdate} {$request->starttime}'."
+                "No open job card found for employee '{$request->employeecode}' " .
+                "with job code '{$request->jobcode}'."
             );
         }
 
@@ -129,6 +128,54 @@ public function updateHM($request): array
         ];
     }
 }
+
+
+// public function updateHM($request): array
+// {
+//     try {
+//         $affectedRows = TnaEntry::where('COMPANYCODE', $request->companycode)
+//             ->where('EMPLOYEECODE', $request->employeecode)
+//             ->where('JOBCODE', $request->jobcode)
+//             ->where('STARTDATE', $request->startdate)
+//             ->where('STARTTIME', $request->starttime)
+//             ->update([
+//                 'ENDDATE' => $request->enddate,
+//                 'ENDTIME' => $request->endtime,
+//                 'ED'      => $request->enddate,
+//                 'Action'  => Status::CLOSED
+//             ]);
+
+//         Log::info('Affected rows', [
+//             'count'        => $affectedRows,
+//             'EMPLOYEECODE' => $request->employeecode,
+//             'JOBCODE'      => $request->jobcode,
+//         ]);
+
+//         if (!$affectedRows) {
+//             throw new \Exception(
+//                 "No matching job card found for employee '{$request->employeecode}' " .
+//                 "with job code '{$request->jobcode}' on '{$request->startdate} {$request->starttime}'."
+//             );
+//         }
+
+//         return [
+//             'success' => true,
+//             'message' => 'Job card updated and closed successfully.'
+//         ];
+
+//     } catch (\Throwable $e) {
+//         Log::error('HM update failed', [
+//             'error'        => $e->getMessage(),
+//             'EMPLOYEECODE' => $request->employeecode,
+//             'JOBCODE'      => $request->jobcode,
+//         ]);
+
+//         return [
+//             'success' => false,
+//             'message' => $e->getMessage()
+//         ];
+//     }
+// }
 
 
     // public function updateHM($request): array
