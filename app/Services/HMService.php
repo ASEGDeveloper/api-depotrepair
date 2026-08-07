@@ -33,16 +33,21 @@ class HMService
 
             if ($isJobOpen) {
                 // Return immediately if job is already open
-                return $this->errorResponse('This job is already open. Please close the existing job before proceeding.');
+                return $this->errorResponse('This job is already open. Please close the existing job before proceeding.', 422);
             }
 
             $jobCardOpen = $this->tnaService->getOpenJobCode($request->employeecode);  // employee wise
 
             if ($jobCardOpen) {
                 // Return a message that job card is already open
-                return $this->errorResponse("Job card '$jobCardOpen' is already open ");
+                return $this->errorResponse("Job card '$jobCardOpen' is already open ", 422);
             }
 
+            $duplicate = $this->checkDuplicate($request);
+
+            if (!$duplicate['success']) {
+                return $this->errorResponse($duplicate['message'], 422);
+            }
 
             // Initialize $data outside closure
             $data = null;
@@ -300,9 +305,16 @@ public function updateHM($request): array
 
             if ($jobCardOpen) {
                 // Return a message that job card is already open
-                return $this->errorResponse("Job card '$jobCardOpen' is already open ");
+                return $this->errorResponse("Job card '$jobCardOpen' is already open ", 422);
             }
 
+            $duplicate = $this->checkDuplicate($request);
+
+            if (!$duplicate['success']) {
+                return $this->errorResponse($duplicate['message'], 422);
+            }
+
+            $data = null;
 
             DB::transaction(function () use ($request, &$data) {
                 $data = TnaEntry::create([
@@ -340,5 +352,106 @@ public function updateHM($request): array
                 'Failed to create record. Please try again later.'
             );
         }
+    }
+
+
+    /**
+     * Check for a duplicate / overlapping job card entry before creating a new record.
+     *
+     * - Rejects an exact duplicate: same company/employee/job on the same start date.
+     * - When an end date/time is supplied, also rejects any time-range overlap with
+     *   an existing (non-deleted) entry for the same employee on the same date.
+     *
+     * @param  $request
+     * @return array{success: bool, message?: string}
+     */
+    private function checkDuplicate($request): array
+    {
+        $companycode  = $request->companycode ?? null;
+        $employeecode = $request->employeecode ?? null;
+        $jobcode      = $request->jobcode ?? null;
+        $startdate    = $request->startdate ?? null;
+        $starttime    = $request->starttime ?? null;
+        $enddate      = $request->enddate ?? null;
+        $endtime      = $request->endtime ?? null;
+
+        if (empty($companycode) || empty($employeecode) || empty($jobcode) || empty($startdate) || empty($starttime)) {
+            return [
+                'success' => false,
+                'message' => 'Missing required field(s) for duplicate check.',
+            ];
+        }
+
+        // Exact duplicate: same company/employee/job with the same start date+time
+        $exactDuplicate = TnaEntry::where('COMPANYCODE', $companycode)
+            ->where('EMPLOYEECODE', $employeecode)
+            ->where('JOBCODE', $jobcode)
+            ->whereDate('STARTDATE', $startdate)
+            ->where('STARTTIME', $starttime)
+            ->exists();
+
+        if ($exactDuplicate) {
+            return [
+                'success' => false,
+                'message' => 'Duplicate record found for this employee/job at the same start date/time.',
+            ];
+        }
+
+        // Time-overlap check only applies when an end date/time is supplied (full entry)
+        if (!empty($enddate) && !empty($endtime)) {
+            $startDateTime = strtotime($this->extractDatePart($startdate) . " {$starttime}");
+            $endDateTime   = strtotime($this->extractDatePart($enddate) . " {$endtime}");
+
+            if ($endDateTime <= $startDateTime) {
+                return [
+                    'success' => false,
+                    'message' => 'End date/time must be greater than start date/time.',
+                ];
+            }
+
+            $sameDayEntries = TnaEntry::where('COMPANYCODE', $companycode)
+                ->where('EMPLOYEECODE', $employeecode)
+                ->whereDate('STARTDATE', $startdate)
+                ->whereNotNull('ENDDATE')
+                ->whereNotNull('ENDTIME')
+                ->get(['STARTDATE', 'STARTTIME', 'ENDDATE', 'ENDTIME']);
+
+            foreach ($sameDayEntries as $entry) {
+                $existingStart = strtotime($this->extractDatePart($entry->STARTDATE) . " {$entry->STARTTIME}");
+                $existingEnd   = strtotime($this->extractDatePart($entry->ENDDATE) . " {$entry->ENDTIME}");
+
+                if ($existingStart === false || $existingEnd === false) {
+                    continue;
+                }
+
+                // Overlap when existing.start < new.end AND existing.end > new.start
+                if ($existingStart < $endDateTime && $existingEnd > $startDateTime) {
+                    return [
+                        'success' => false,
+                        'message' => 'Time slot overlap detected with existing record.',
+                    ];
+                }
+            }
+        }
+
+        return ['success' => true];
+    }
+
+    /**
+     * Extract just the date portion (YYYY-MM-DD) from a date value that may have
+     * extra content appended (e.g. a stray time or AM/PM suffix), so it can be
+     * safely combined with a separate time field for comparison.
+     */
+    private function extractDatePart(?string $date): string
+    {
+        if (empty($date)) {
+            return '';
+        }
+
+        if (preg_match('/^\d{4}-\d{2}-\d{2}/', trim($date), $matches)) {
+            return $matches[0];
+        }
+
+        return trim($date);
     }
 }
