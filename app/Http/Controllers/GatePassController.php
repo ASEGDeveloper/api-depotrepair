@@ -224,7 +224,7 @@ class GatePassController extends Controller
         }
     }
 
-     public function getPendingSecurityChecks(Request $request)
+    public function getPendingSecurityChecks(Request $request)
     {
         try {
             $workshopId = intval($request->user()->Branch_ID);
@@ -299,7 +299,7 @@ class GatePassController extends Controller
         }
     }
 
-    
+
 
     // public function getPendingSecurityChecks(Request $request)
     // {
@@ -484,17 +484,8 @@ class GatePassController extends Controller
 
             $mainStatus = $status === 'VERIFIED' ? 'SECURITY_CLEARED' : 'SECURITY_REJECTED';
 
-            DB::update("
-    UPDATE deporepair.gate_pass
-    SET security_status = ?,
-        security_verified_by = ?,
-        security_verified_date = GETDATE(),
-        security_remarks = ?,
-        status = ?,
-        updated_by = ?,
-        updated_date = GETDATE()
-    WHERE gate_pass_no = ?
-", [
+            DB::update(" UPDATE deporepair.gate_pass  SET security_status = ?, security_verified_by = ?,  security_verified_date = GETDATE(),
+            security_remarks = ?,  status = ?, updated_by = ?,  updated_date = GETDATE() WHERE gate_pass_no = ? ", [
                 $status,
                 $employeeId,
                 $remarks ?: null,
@@ -554,20 +545,21 @@ class GatePassController extends Controller
                     'driver_mobile_no',
                     'supplier_name',
                     'supplier_mobile',
-                    'status'
+                    'status',
+                    'created_by'
                 ])
                 ->where('id', $gatePassId)
                 ->first();
 
-                
+
 
             if (!$gp) {
                 return $this->failedResponse('Gate pass not found', 404);
             }
 
-           
 
-           
+
+
             if (empty($gp->pass_type)) {
                 $gp->pass_type = 'General';
             }
@@ -578,15 +570,15 @@ class GatePassController extends Controller
 
             $gpStatus = strtoupper(trim($gp->status ?? ''));
 
-           // $eligibleStatuses = ['SECURITY_CLEARED', 'QUANTITY_ISSUED', 'SHORTAGE_APPROVED', 'APPROVED'];
-           $eligibleStatuses = ['SECURITY_CLEARED'];
+            // $eligibleStatuses = ['SECURITY_CLEARED', 'QUANTITY_ISSUED', 'SHORTAGE_APPROVED', 'APPROVED'];
+            $eligibleStatuses = ['SECURITY_CLEARED'];
 
 
-            
+
 
             if (!in_array($gpStatus, $eligibleStatuses)) {
                 return $this->failedResponse('Gate pass not eligible for return marking', 422);
-            } 
+            }
 
             $item = DB::table('deporepair.gate_pass_items')
                 ->where('id', $id)
@@ -633,7 +625,7 @@ class GatePassController extends Controller
                 ->count();
 
             $allReturned = ($pendingCount === 0);
- 
+
 
             if ($allReturned) {
                 DB::statement("
@@ -649,7 +641,12 @@ class GatePassController extends Controller
                     return strtoupper(trim($i->item_type ?? '')) === 'RETURNABLE';
                 }));
 
-                $recipients = array_filter([$gp->technician_email ?? null, 'haridwar.yadav@servoedge.com']);
+                $creatorEmail = DB::table('deporepair.employee')
+                    ->where('EmployeeID', $gp->created_by)
+                    ->value('EmployeeEmail');
+
+                $recipients = array_filter([$gp->technician_email ?? null, $creatorEmail]);
+
                 if (!empty($recipients)) {
                     Mail::to($recipients)->send(new GatePassReturnedMail($gp, $returnableItems));
                 }
