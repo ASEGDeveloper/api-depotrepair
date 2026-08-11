@@ -72,9 +72,9 @@ class WipReportController extends Controller
 
     public function download(Request $request, WipReportDataService $dataService, WipReportExcelExport $exporter): BinaryFileResponse
     {
-        response("Hello");
+        // response("Hello");
 
-        die("Download function is temporarily disabled for testing purposes. ");
+        // die("Download function is temporarily disabled for testing purposes. ");
 
         // This report runs several heavy synchronous queries; the default
         // 60s max_execution_time is not enough for larger date ranges/branches.
