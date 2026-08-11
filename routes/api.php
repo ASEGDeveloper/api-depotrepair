@@ -11,7 +11,7 @@ use App\Http\Controllers\ItemMasterController;
 use App\Http\Controllers\TnaEntryController;
 use App\Http\Controllers\HMController;
 use App\Http\Controllers\GatePassController;
- use App\Http\Controllers\Api\V1\WipReportController;
+ use App\Http\Controllers\WipReportController;
 
 use Tests\Feature\TnaControllerTest;
 
