@@ -21,7 +21,7 @@ Route::post('refresh', [AuthController::class, 'refresh']);
 Route::post('/security_login', [AuthController::class, 'securityLogin']);
 Route::post('security_refresh', [AuthController::class, 'securityRefresh']); 
 
-Route::post('reports/wip-service/download', [WipReportController::class, 'download']);
+Route::post('reports/wip-download', [WipReportController::class, 'download'])->name('reports.wip-download');
 
 
 
