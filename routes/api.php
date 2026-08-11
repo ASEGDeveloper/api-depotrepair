@@ -1,5 +1,6 @@
 <?php
 
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\ItemMasterController;
 use App\Http\Controllers\TnaEntryController;
 use App\Http\Controllers\HMController;
 use App\Http\Controllers\GatePassController;
+ use App\Http\Controllers\Api\V1\WipReportController;
 
 use Tests\Feature\TnaControllerTest;
 
@@ -18,6 +20,9 @@ Route::post('refresh', [AuthController::class, 'refresh']);
 
 Route::post('/security_login', [AuthController::class, 'securityLogin']);
 Route::post('security_refresh', [AuthController::class, 'securityRefresh']); 
+
+Route::post('reports/wip-service/download', [WipReportController::class, 'download']);
+
 
 
 Route::middleware('api.token')->post('/tna-entries', [TnaEntryController::class, 'createOrUpdateTNAEntry']);
