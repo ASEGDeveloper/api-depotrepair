@@ -56,11 +56,16 @@ trait ApiResponse
      */
     public function errorResponse(string $message = 'Error', int $status = 500, $errors = null): JsonResponse
     {
-        return response()->json([
+        $response = [
             'status' => 'error',
             'message' => $message,
-            'errors' => $errors
-        ], $status);
+        ];
+
+        if ($errors !== null) {
+            $response['errors'] = $errors;
+        }
+
+        return response()->json($response, $status);
     }
 
 

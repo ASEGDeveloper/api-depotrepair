@@ -297,11 +297,13 @@ public function updateHM($request): array
             );
 
             if ($isJobOpen) {
-                return $this->successResponse('', 'This job is already open. Please close the existing job before proceeding.');
+                return $this->errorResponse('This job is already open. Please close the existing job before proceeding.', 422);
             }
 
 
             $jobCardOpen = $this->tnaService->getOpenJobCode($request->employeecode);  // employee wise
+
+            //return $this->errorResponse("Job card '$jobCardOpen' is already open ", 422);
 
             if ($jobCardOpen) {
                 // Return a message that job card is already open

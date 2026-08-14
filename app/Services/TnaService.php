@@ -263,7 +263,8 @@ class TnaService
     public function getOpenJobCode($EMPLOYEECODE)
     {
         return TnaEntry::where('EMPLOYEECODE', $EMPLOYEECODE)
-            ->whereNull('ED')
+           // ->whereNull('ED')
+           ->whereNull('ENDTIME')
             ->value('JOBCODE'); // returns the first matching JOBCODE or null
     }
 

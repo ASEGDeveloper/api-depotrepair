@@ -104,8 +104,14 @@ class HMController extends Controller
     {
         // CASE 1: End task
         if ($hasEnd && $isTaskOpen) {
-           
-            return $this->hmService->updateHM($input);
+
+            $result = $this->hmService->updateHM($input);
+
+            if (!$result['success']) {
+                return $this->errorResponse($result['message'], 422);
+            }
+
+            return $this->successResponse(null, $result['message']);
         }
 
         // CASE 2: Full entry (start + end)
@@ -148,10 +154,7 @@ class HMController extends Controller
 
         // ✅ Handle invalid / empty JSON
         if (!is_array($input)) {
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'Invalid JSON payload',
-            ], 400);
+            return $this->errorResponse('Invalid JSON payload', 400);
         }
 
         $validator = Validator::make($input, [
@@ -164,11 +167,7 @@ class HMController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'status'  => 'error',
-                'message' => $validator->errors()->first(),
-                'errors'  => $validator->errors(),
-            ], 422);
+            return $this->errorResponse($validator->errors()->first(), 422);
         }
 
         return null; // ✅ validation passed
