@@ -338,7 +338,7 @@ public function updateHM($request): array
                     'TAS_DATA_FROM'      => $request->tas_data_from,
                     'PROJECTEDENDDATE'   => '2025-10-12',
                     'PROJECTEDENDTIME'   => '18:00',
-                    'Action'             => Status::FULL,
+                    'Action'             => Status::CLOSED,
                 ]);
             });
 
