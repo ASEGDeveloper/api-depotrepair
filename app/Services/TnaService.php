@@ -162,7 +162,9 @@ class TnaService
             '18:00'
         );
 
-        $exists = $this->checkJobCardPunchingStatusSMS($request->employeecode, $request->jobcode);
+         
+
+       $exists = $this->checkJobCardPunchingStatusSMS($request->employeecode, $request->jobcode);
 
         if ($exists) {
 
@@ -251,8 +253,8 @@ class TnaService
     {
         return TnaEntry::where('EMPLOYEECODE', $EMPLOYEECODE)
             ->where('JOBCODE', $JOBCODE)
-               ->whereNull('ED')
-           // ->whereNull('ENDTIME')
+            //   ->whereNull('ED')
+            ->whereNull('ENDTIME')
             ->exists();
     }
 
