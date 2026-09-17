@@ -367,6 +367,79 @@ public function updateHM($request): array
      * @param  $request
      * @return array{success: bool, message?: string}
      */
+    // private function checkDuplicate($request): array
+    // {
+    //     $companycode  = $request->companycode ?? null;
+    //     $employeecode = $request->employeecode ?? null;
+    //     $jobcode      = $request->jobcode ?? null;
+    //     $startdate    = $request->startdate ?? null;
+    //     $starttime    = $request->starttime ?? null;
+    //     $enddate      = $request->enddate ?? null;
+    //     $endtime      = $request->endtime ?? null;
+
+    //     if (empty($companycode) || empty($employeecode) || empty($jobcode) || empty($startdate) || empty($starttime)) {
+    //         return [
+    //             'success' => false,
+    //             'message' => 'Missing required field(s) for duplicate check.',
+    //         ];
+    //     }
+
+    //     // Exact duplicate: same company/employee/job with the same start date+time
+    //     $exactDuplicate = TnaEntry::where('COMPANYCODE', $companycode)
+    //         ->where('EMPLOYEECODE', $employeecode)
+    //         ->where('JOBCODE', $jobcode)
+    //         ->whereDate('STARTDATE', $startdate)
+    //         ->where('STARTTIME', $starttime)
+    //         ->exists();
+
+    //     if ($exactDuplicate) {
+    //         return [
+    //             'success' => false,
+    //             'message' => 'Duplicate record found for this employee/job at the same start date/time.',
+    //         ];
+    //     }
+
+    //     // Time-overlap check only applies when an end date/time is supplied (full entry)
+    //     if (!empty($enddate) && !empty($endtime)) {
+    //         $startDateTime = strtotime($this->extractDatePart($startdate) . " {$starttime}");
+    //         $endDateTime   = strtotime($this->extractDatePart($enddate) . " {$endtime}");
+
+    //         if ($endDateTime <= $startDateTime) {
+    //             return [
+    //                 'success' => false,
+    //                 'message' => 'End date/time must be greater than start date/time.',
+    //             ];
+    //         }
+
+    //         $sameDayEntries = TnaEntry::where('COMPANYCODE', $companycode)
+    //             ->where('EMPLOYEECODE', $employeecode)
+    //             ->whereDate('STARTDATE', $startdate)
+    //             ->whereNotNull('ENDDATE')
+    //             ->whereNotNull('ENDTIME')
+    //             ->get(['STARTDATE', 'STARTTIME', 'ENDDATE', 'ENDTIME']);
+
+    //         foreach ($sameDayEntries as $entry) {
+    //             $existingStart = strtotime($this->extractDatePart($entry->STARTDATE) . " {$entry->STARTTIME}");
+    //             $existingEnd   = strtotime($this->extractDatePart($entry->ENDDATE) . " {$entry->ENDTIME}");
+
+    //             if ($existingStart === false || $existingEnd === false) {
+    //                 continue;
+    //             }
+
+    //             // Overlap when existing.start < new.end AND existing.end > new.start
+    //             if ($existingStart < $endDateTime && $existingEnd > $startDateTime) {
+    //                 return [
+    //                     'success' => false,
+    //                     'message' => 'Time slot overlap detected with existing record.',
+    //                 ];
+    //             }
+    //         }
+    //     }
+
+    //     return ['success' => true];
+    // }
+
+
     private function checkDuplicate($request): array
     {
         $companycode  = $request->companycode ?? null;
@@ -384,25 +457,35 @@ public function updateHM($request): array
             ];
         }
 
-        // Exact duplicate: same company/employee/job with the same start date+time
-        $exactDuplicate = TnaEntry::where('COMPANYCODE', $companycode)
+        $startMinute = $this->extractTimeToMinute($starttime);
+
+        // Exact duplicate: same company/employee/job with the same start date+minute (ignore seconds)
+        $sameDayStarts = TnaEntry::where('COMPANYCODE', $companycode)
             ->where('EMPLOYEECODE', $employeecode)
             ->where('JOBCODE', $jobcode)
             ->whereDate('STARTDATE', $startdate)
-            ->where('STARTTIME', $starttime)
-            ->exists();
+            ->pluck('STARTTIME');
 
-        if ($exactDuplicate) {
-            return [
-                'success' => false,
-                'message' => 'Duplicate record found for this employee/job at the same start date/time.',
-            ];
+        foreach ($sameDayStarts as $existingStartTime) {
+            if ($this->extractTimeToMinute($existingStartTime) === $startMinute) {
+                return [
+                    'success' => false,
+                    'message' => 'Duplicate record found for this employee/job at the same start date/time.',
+                ];
+            }
         }
 
         // Time-overlap check only applies when an end date/time is supplied (full entry)
         if (!empty($enddate) && !empty($endtime)) {
-            $startDateTime = strtotime($this->extractDatePart($startdate) . " {$starttime}");
-            $endDateTime   = strtotime($this->extractDatePart($enddate) . " {$endtime}");
+            $startDateTime = $this->toMinuteTimestamp($startdate, $starttime);
+            $endDateTime   = $this->toMinuteTimestamp($enddate, $endtime);
+
+            if ($startDateTime === false || $endDateTime === false) {
+                return [
+                    'success' => false,
+                    'message' => 'Invalid start or end date/time.',
+                ];
+            }
 
             if ($endDateTime <= $startDateTime) {
                 return [
@@ -419,14 +502,14 @@ public function updateHM($request): array
                 ->get(['STARTDATE', 'STARTTIME', 'ENDDATE', 'ENDTIME']);
 
             foreach ($sameDayEntries as $entry) {
-                $existingStart = strtotime($this->extractDatePart($entry->STARTDATE) . " {$entry->STARTTIME}");
-                $existingEnd   = strtotime($this->extractDatePart($entry->ENDDATE) . " {$entry->ENDTIME}");
+                $existingStart = $this->toMinuteTimestamp($entry->STARTDATE, $entry->STARTTIME);
+                $existingEnd   = $this->toMinuteTimestamp($entry->ENDDATE, $entry->ENDTIME);
 
                 if ($existingStart === false || $existingEnd === false) {
                     continue;
                 }
 
-                // Overlap when existing.start < new.end AND existing.end > new.start
+                // Overlap when existing.start < new.end AND existing.end > new.start (minute precision)
                 if ($existingStart < $endDateTime && $existingEnd > $startDateTime) {
                     return [
                         'success' => false,
@@ -437,6 +520,38 @@ public function updateHM($request): array
         }
 
         return ['success' => true];
+    }
+
+    /**
+     * Normalize a time value to HH:MM, dropping seconds.
+     * Supports formats like 14:40:46, 14:40, 14.40, 14.40.46.
+     */
+    private function extractTimeToMinute(?string $time): string
+    {
+        if (empty($time)) {
+            return '';
+        }
+
+        if (preg_match('/(\d{1,2})[:.](\d{2})/', trim($time), $matches)) {
+            return sprintf('%02d:%02d', (int) $matches[1], (int) $matches[2]);
+        }
+
+        return trim($time);
+    }
+
+    /**
+     * Build a Unix timestamp from date + time at minute precision (seconds ignored).
+     */
+    private function toMinuteTimestamp(?string $date, ?string $time): int|false
+    {
+        $datePart = $this->extractDatePart($date);
+        $timePart = $this->extractTimeToMinute($time);
+
+        if ($datePart === '' || $timePart === '') {
+            return false;
+        }
+
+        return strtotime("{$datePart} {$timePart}");
     }
 
     /**

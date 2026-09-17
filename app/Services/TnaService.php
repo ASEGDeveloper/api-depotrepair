@@ -251,11 +251,25 @@ class TnaService
      // Returns true if a record with ED = null exists
     public function checkJobCardPunchingStatusSMS($EMPLOYEECODE, $JOBCODE)
     {
-        return TnaEntry::where('EMPLOYEECODE', $EMPLOYEECODE)
-            ->where('JOBCODE', $JOBCODE)
+
+    return TnaEntry::where('EMPLOYEECODE', $EMPLOYEECODE)
+            ->where('JOBCODE', $JOBCODE)                 
             //   ->whereNull('ED')
             ->whereNull('ENDTIME')
             ->exists();
+            
+    // return TnaEntry::query()
+    //     ->where('EMPLOYEECODE', trim($EMPLOYEECODE))
+    //     ->where('JOBCODE', trim($JOBCODE))
+    //     ->where('TAS_DATA_FROM', 'SMS')
+    //     ->where(function ($query) {
+    //         $query->whereNull('ENDTIME')
+    //               ->orWhere('ENDTIME', '');
+    //     })
+    //     ->exists();
+
+
+        
     }
 
 
