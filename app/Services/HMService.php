@@ -487,12 +487,21 @@ public function updateHM($request): array
                 ];
             }
 
-            if ($endDateTime <= $startDateTime) {
+            // if ($endDateTime <= $startDateTime) {
+            //     return [
+            //         'success' => false,
+            //         'message' => 'End date/time must be greater than start date/time.',
+            //     ];
+            // }
+
+            if ($endDateTime <= $starttime) {
                 return [
                     'success' => false,
                     'message' => 'End date/time must be greater than start date/time.',
                 ];
             }
+
+
 
             $sameDayEntries = TnaEntry::where('COMPANYCODE', $companycode)
                 ->where('EMPLOYEECODE', $employeecode)
