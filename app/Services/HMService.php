@@ -550,9 +550,9 @@ public function updateHM($request): array
             ];
         }
 
-        $startMinute = $this->extractTimeToMinute($starttime);
+        $startSecond = $this->normalizeTime($starttime);
 
-        // Exact duplicate: same company/employee/job with the same start date+minute (ignore seconds)
+        // Exact duplicate: same company/employee/job with the same start date+time (seconds precision)
         $sameDayStarts = TnaEntry::where('COMPANYCODE', $companycode)
             ->where('EMPLOYEECODE', $employeecode)
             ->where('JOBCODE', $jobcode)
@@ -560,7 +560,7 @@ public function updateHM($request): array
             ->pluck('STARTTIME');
 
         foreach ($sameDayStarts as $existingStartTime) {
-            if ($this->extractTimeToMinute($existingStartTime) === $startMinute) {
+            if ($this->normalizeTime($existingStartTime) === $startSecond) {
                 return [
                     'success' => false,
                     'message' => 'Duplicate record found for this employee/job at the same start date/time.',
@@ -570,8 +570,8 @@ public function updateHM($request): array
 
         // Time-overlap check only applies when an end date/time is supplied (full entry)
         if (!empty($enddate) && !empty($endtime)) {
-            $startDateTime = $this->toMinuteTimestamp($startdate, $starttime);
-            $endDateTime   = $this->toMinuteTimestamp($enddate, $endtime);
+            $startDateTime = $this->toTimestamp($startdate, $starttime);
+            $endDateTime   = $this->toTimestamp($enddate, $endtime);
 
             if ($startDateTime === false || $endDateTime === false) {
                 return [
@@ -580,18 +580,7 @@ public function updateHM($request): array
                 ];
             }
 
-            // if ($endDateTime <= $startDateTime) {
-            //     return [
-            //         'success' => false,
-            //         'message' => 'End date/time must be greater than start date/time.',
-            //     ];
-            // }
-
-            // Compare with seconds so entries within the same minute are still valid
-            $startWithSeconds = strtotime($this->extractDatePart($startdate) . ' ' . trim($starttime));
-            $endWithSeconds   = strtotime($this->extractDatePart($enddate) . ' ' . trim($endtime));
-
-            if ($startWithSeconds === false || $endWithSeconds === false || $endWithSeconds <= $startWithSeconds) {
+            if ($endDateTime <= $startDateTime) {
                 return [
                     'success' => false,
                     'message' => 'End date/time must be greater than start date/time.',
@@ -608,14 +597,14 @@ public function updateHM($request): array
                 ->get(['STARTDATE', 'STARTTIME', 'ENDDATE', 'ENDTIME']);
 
             foreach ($sameDayEntries as $entry) {
-                $existingStart = $this->toMinuteTimestamp($entry->STARTDATE, $entry->STARTTIME);
-                $existingEnd   = $this->toMinuteTimestamp($entry->ENDDATE, $entry->ENDTIME);
+                $existingStart = $this->toTimestamp($entry->STARTDATE, $entry->STARTTIME);
+                $existingEnd   = $this->toTimestamp($entry->ENDDATE, $entry->ENDTIME);
 
                 if ($existingStart === false || $existingEnd === false) {
                     continue;
                 }
 
-                // Overlap when existing.start < new.end AND existing.end > new.start (minute precision)
+                // Overlap when existing.start < new.end AND existing.end > new.start (seconds precision)
                 if ($existingStart < $endDateTime && $existingEnd > $startDateTime) {
                     return [
                         'success' => false,
@@ -631,29 +620,29 @@ public function updateHM($request): array
 
 
     /**
-     * Normalize a time value to HH:MM, dropping seconds.
+     * Normalize a time value to HH:MM:SS (seconds default to 00 when missing).
      * Supports formats like 14:40:46, 14:40, 14.40, 14.40.46.
      */
-    private function extractTimeToMinute(?string $time): string
+    private function normalizeTime(?string $time): string
     {
         if (empty($time)) {
             return '';
         }
 
-        if (preg_match('/(\d{1,2})[:.](\d{2})/', trim($time), $matches)) {
-            return sprintf('%02d:%02d', (int) $matches[1], (int) $matches[2]);
+        if (preg_match('/(\d{1,2})[:.](\d{2})(?:[:.](\d{2}))?/', trim($time), $matches)) {
+            return sprintf('%02d:%02d:%02d', (int) $matches[1], (int) $matches[2], (int) ($matches[3] ?? 0));
         }
 
         return trim($time);
     }
 
     /**
-     * Build a Unix timestamp from date + time at minute precision (seconds ignored).
+     * Build a Unix timestamp from date + time at seconds precision.
      */
-    private function toMinuteTimestamp(?string $date, ?string $time): int|false
+    private function toTimestamp(?string $date, ?string $time): int|false
     {
         $datePart = $this->extractDatePart($date);
-        $timePart = $this->extractTimeToMinute($time);
+        $timePart = $this->normalizeTime($time);
 
         if ($datePart === '' || $timePart === '') {
             return false;
