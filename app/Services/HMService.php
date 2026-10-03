@@ -440,7 +440,100 @@ public function updateHM($request): array
     // }
 
 
-    private function checkDuplicate($request): array
+    // private function checkDuplicate($request): array
+    // {
+    //     $companycode  = $request->companycode ?? null;
+    //     $employeecode = $request->employeecode ?? null;
+    //     $jobcode      = $request->jobcode ?? null;
+    //     $startdate    = $request->startdate ?? null;
+    //     $starttime    = $request->starttime ?? null;
+    //     $enddate      = $request->enddate ?? null;
+    //     $endtime      = $request->endtime ?? null;
+
+    //     if (empty($companycode) || empty($employeecode) || empty($jobcode) || empty($startdate) || empty($starttime)) {
+    //         return [
+    //             'success' => false,
+    //             'message' => 'Missing required field(s) for duplicate check.',
+    //         ];
+    //     }
+
+    //     $startMinute = $this->extractTimeToMinute($starttime);
+
+    //     // Exact duplicate: same company/employee/job with the same start date+minute (ignore seconds)
+    //     $sameDayStarts = TnaEntry::where('COMPANYCODE', $companycode)
+    //         ->where('EMPLOYEECODE', $employeecode)
+    //         ->where('JOBCODE', $jobcode)
+    //         ->whereDate('STARTDATE', $startdate)
+    //         ->pluck('STARTTIME');
+
+    //     foreach ($sameDayStarts as $existingStartTime) {
+    //         if ($this->extractTimeToMinute($existingStartTime) === $startMinute) {
+    //             return [
+    //                 'success' => false,
+    //                 'message' => 'Duplicate record found for this employee/job at the same start date/time.',
+    //             ];
+    //         }
+    //     }
+
+    //     // Time-overlap check only applies when an end date/time is supplied (full entry)
+    //     if (!empty($enddate) && !empty($endtime)) {
+    //         $startDateTime = $this->toMinuteTimestamp($startdate, $starttime);
+    //         $endDateTime   = $this->toMinuteTimestamp($enddate, $endtime);
+
+    //         if ($startDateTime === false || $endDateTime === false) {
+    //             return [
+    //                 'success' => false,
+    //                 'message' => 'Invalid start or end date/time.',
+    //             ];
+    //         }
+
+    //         // if ($endDateTime <= $startDateTime) {
+    //         //     return [
+    //         //         'success' => false,
+    //         //         'message' => 'End date/time must be greater than start date/time.',
+    //         //     ];
+    //         // }
+
+    //         if ($endDateTime <= $starttime) {
+    //             return [
+    //                 'success' => false,
+    //                 'message' => 'End date/time must be greater than start date/time.',
+    //             ];
+    //         }
+
+
+
+    //         $sameDayEntries = TnaEntry::where('COMPANYCODE', $companycode)
+    //             ->where('EMPLOYEECODE', $employeecode)
+    //             ->whereDate('STARTDATE', $startdate)
+    //             ->whereNotNull('ENDDATE')
+    //             ->whereNotNull('ENDTIME')
+    //             ->get(['STARTDATE', 'STARTTIME', 'ENDDATE', 'ENDTIME']);
+
+    //         foreach ($sameDayEntries as $entry) {
+    //             $existingStart = $this->toMinuteTimestamp($entry->STARTDATE, $entry->STARTTIME);
+    //             $existingEnd   = $this->toMinuteTimestamp($entry->ENDDATE, $entry->ENDTIME);
+
+    //             if ($existingStart === false || $existingEnd === false) {
+    //                 continue;
+    //             }
+
+    //             // Overlap when existing.start < new.end AND existing.end > new.start (minute precision)
+    //             if ($existingStart < $endDateTime && $existingEnd > $startDateTime) {
+    //                 return [
+    //                     'success' => false,
+    //                     'message' => 'Time slot overlap detected with existing record.',
+    //                 ];
+    //             }
+    //         }
+    //     }
+
+    //     return ['success' => true];
+    // }
+
+
+
+     private function checkDuplicate($request): array
     {
         $companycode  = $request->companycode ?? null;
         $employeecode = $request->employeecode ?? null;
@@ -494,7 +587,11 @@ public function updateHM($request): array
             //     ];
             // }
 
-            if ($endDateTime <= $starttime) {
+            // Compare with seconds so entries within the same minute are still valid
+            $startWithSeconds = strtotime($this->extractDatePart($startdate) . ' ' . trim($starttime));
+            $endWithSeconds   = strtotime($this->extractDatePart($enddate) . ' ' . trim($endtime));
+
+            if ($startWithSeconds === false || $endWithSeconds === false || $endWithSeconds <= $startWithSeconds) {
                 return [
                     'success' => false,
                     'message' => 'End date/time must be greater than start date/time.',
@@ -530,6 +627,8 @@ public function updateHM($request): array
 
         return ['success' => true];
     }
+
+
 
     /**
      * Normalize a time value to HH:MM, dropping seconds.

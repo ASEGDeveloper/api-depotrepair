@@ -97,27 +97,38 @@ return [
             'search_path' => 'public',
             'sslmode' => 'prefer',
         ],
- 
- 
-        
-    'sqlsrv' => [
-    'driver' => 'sqlsrv',
-    'url' => env('DATABASE_URL'),
-    'host' => env('DB_HOST', 'localhost'),
-    'port' => env('DB_PORT', '1433'),
-    'database' => env('DB_DATABASE', 'forge'),
-    'username' => env('DB_USERNAME', 'forge'),
-    'password' => env('DB_PASSWORD', ''),
-    'charset' => 'utf8',
-    'prefix' => '',
-    'prefix_indexes' => true,
-    // Add these options
-    'options' => [
-        'Encrypt' => env('DB_ENCRYPT', false),
-        'TrustServerCertificate' => env('DB_TRUST_SERVER_CERTIFICATE', true),
-    ],
-],
- 
+
+        'sqlsrv' => [
+            'driver' => 'sqlsrv',
+            'url' => env('DATABASE_URL'),
+            'host' => env('DB_HOST', 'localhost'),
+            'port' => env('DB_PORT', '1433'),
+            'database' => env('DB_DATABASE', 'forge'),
+            'username' => env('DB_USERNAME', 'forge'),
+            'password' => env('DB_PASSWORD', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'options' => [
+                'Encrypt' => env('DB_ENCRYPT', false),
+                'TrustServerCertificate' => env('DB_TRUST_SERVER_CERTIFICATE', true),
+            ],
+        ],
+
+        'tas' => [
+            'driver'   => 'sqlsrv',
+            'host'     => env('TAS_DB_HOST'),
+            'port'     => env('TAS_DB_PORT', '1433'),
+            'database' => env('TAS_DB_DATABASE'),
+            'username' => env('TAS_DB_USERNAME'),
+            'password' => env('TAS_DB_PASSWORD'),
+            'charset'  => 'utf8',
+            'prefix'   => '',
+            'prefix_indexes' => true,
+            'encrypt'  => 'yes',
+            'trust_server_certificate' => true,
+        ],
+
     ],
 
     /*

@@ -12,6 +12,7 @@ use App\Http\Controllers\TnaEntryController;
 use App\Http\Controllers\HMController;
 use App\Http\Controllers\GatePassController;
  use App\Http\Controllers\WipReportController;
+use App\Http\Controllers\DataMigrationController;
 
 use Tests\Feature\TnaControllerTest;
 
@@ -32,6 +33,9 @@ Route::middleware('api.token')->post('/hm/records', [HMController::class, 'store
 Route::middleware('api.token')
     ->post('/hm/full', [HMController::class, 'addFullRecords'])
     ->name('hm.full.addFullRecords');
+
+Route::post('/data-migration/tas', [DataMigrationController::class, 'migrateFromTas'])
+    ->name('data-migration.tas');
 
 Route::post('/test-tna', [TnaControllerTest::class, 'createOrUpdateTNAEntry']);  
 
