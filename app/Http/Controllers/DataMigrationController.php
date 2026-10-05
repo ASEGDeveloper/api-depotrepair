@@ -20,6 +20,9 @@ class DataMigrationController extends Controller
 
     private const TARGET_TABLE = 'deporepair.tna_entries_uat';
 
+   // private const TARGET_TABLE = 'deporepair.tna_entry';
+
+
     /**
      * Migrate bulk data from the external TAS database (TAS_JOBTIMESHEET)
      * into deporepair.tna_entries_uat. Replaces the old tna cron script.

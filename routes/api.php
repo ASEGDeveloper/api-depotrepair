@@ -35,7 +35,7 @@ Route::middleware('api.token')
     ->name('hm.full.addFullRecords');
 
 Route::post('/data-migration/tas', [DataMigrationController::class, 'migrateFromTas'])
-    ->name('data-migration.tas');
+    ->name('data-migration.tass');
 
 Route::post('/test-tna', [TnaControllerTest::class, 'createOrUpdateTNAEntry']);  
 
